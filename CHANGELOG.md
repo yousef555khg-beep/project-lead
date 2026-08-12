@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.3.2] - 2026-08-13
+
+### Added
+
+- A visible controller closure receipt in the original executor task after independent acceptance, so later task history shows that the controller accepted the result.
+
+### Safety
+
+- The receipt is not new work, requires no executor reply, is not sent for an unaccepted candidate, and is deduplicated by task plus accepted candidate.
+
 ## [0.3.1] - 2026-08-13
 
 ### Added
@@ -57,6 +67,7 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
+[0.3.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.2
 [0.3.1]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.1
 [0.3.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.0
 [0.2.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.2.0

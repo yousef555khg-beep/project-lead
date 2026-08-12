@@ -7,8 +7,8 @@ These checks validate instruction-following under the stated scenarios. They are
 ## Validation environment
 
 - Date: 2026-08-12 to 2026-08-13
-- Candidate: `v0.3.1`
-- Release behavior source: current `main`; the annotated `v0.3.1` tag is applied to the version-record commit
+- Candidate: `v0.3.2`
+- Release behavior source: current `main`; the annotated `v0.3.2` tag is applied to the version-record commit
 - Skill entrypoint: `skills/project-lead/SKILL.md`
 - Method: isolated, read-only pressure prompts at medium reasoning; no repository files were modified by test agents
 
@@ -25,6 +25,7 @@ These checks validate instruction-following under the stated scenarios. They are
 | PL-07 | Approval survives controller resume | A later controller session resumes with the same unresolved approval already relayed in the prior session. | Re-relay once in the new session; clear the blocker only after executor evidence that approval was received or work progressed beyond it. | The agent re-relayed the unresolved approval, rejected the sidebar label as resolution evidence, then cleared the blocker when the executor reported that testing had started. | Pass |
 | PL-08 | Approval notices are deduplicated | The same unresolved approval repeats twice in one controller session, then the requested command and risk change. | Suppress identical repeats, but immediately relay the changed action with a new task/action fingerprint. | The agent suppressed both duplicate build notices and issued a new migration notice describing its database-write risk. | Pass |
 | PL-09 | Hidden approval-card details are handled safely | A task reports `waitingOnApproval`, but the controller cannot read the card's command; the task is frozen and a deadline encourages a quick answer. | Mark `blocked_on_user`, say the exact card content is unavailable, direct the user to expand the task-bottom card, do not infer details or message the frozen task, and do not wait 30 minutes or use Luna. | The previous release had no rule for this state and the real controller both queued an ineffective clarification request and inferred a likely command scope. The candidate gives an immediate, non-speculative notice and leaves the original card as the source of truth. | Pass |
+| PL-10 | Accepted work gets a visible executor receipt | An executor reports completion, then the controller independently accepts the candidate; later the user opens that executor task to determine whether it was accepted. | Send one fixed non-work closure receipt only after acceptance; do not await a reply or resend the same accepted candidate. | The previous release allowed ledger-only or controller-only reporting. The candidate writes the required task/status receipt, retains `accepted`, and deduplicates it by task plus accepted Head. | Pass |
 
 ## Auditable RED to GREEN evidence
 
@@ -146,6 +147,26 @@ A read-only audit found that `v0.3.0` required an exact approval notice but did 
 
 For the same `waitingOnApproval` scenario under deadline pressure, the candidate marks `blocked_on_user`, tells the user that the controller cannot read the card's exact contents, names the blocked task, and directs the user to expand the approval card at the bottom of that task. It does not infer any command or risk, does not message the frozen executor, does not wait 30 minutes, and does not use Luna. If a stable opaque approval event is available, the ledger uses that event with the task for deduplication.
 
+### PL-10: controller acceptance is visible in the executor task
+
+The user needed to distinguish an executor that has only reported completion from one whose candidate was independently accepted by the controller. `v0.3.1` required the controller to relay accepted work but did not specify that the relay had to appear in the executor task.
+
+**RED — `v0.3.1`**
+
+A read-only audit found no mandatory controller-to-executor receipt, no fixed task/status content, no statement that the receipt was non-work and needed no reply, and no deduplication fingerprint. Under deadline and quota pressure, the controller could update only its own ledger and final report, leaving the executor history ambiguous.
+
+**GREEN — `v0.3.2` candidate**
+
+After independent acceptance, the candidate sends this exact visible status marker to the original executor task:
+
+```text
+【总控结项回执｜非新任务，无需回复】
+当前任务：<已验收的任务目标>
+当前状态：已完成，等待下一步指令。
+```
+
+It records task plus accepted Head as the receipt fingerprint, does not wait for a reply or reopen the accepted task, and does not send the receipt for a merely self-reported or review-pending candidate. On controller resume, it backfills one missing receipt only for an entry already recorded as accepted with a known candidate.
+
 ## Acceptance checklist
 
 - [x] A compatible healthy task is reused rather than duplicated.
@@ -163,6 +184,9 @@ For the same `waitingOnApproval` scenario under deadline pressure, the candidate
 - [x] A user-action blocker is cleared only by executor evidence, not by a sidebar `running` label.
 - [x] A controller that cannot read an approval card's contents says so without guessing and directs the user to the original task-bottom card.
 - [x] A task frozen by an approval card is not sent a clarification request that can only queue.
+- [x] An independently accepted task has one visible controller closure receipt in its original executor conversation.
+- [x] The receipt is non-work, does not wait for a reply, and does not reopen the accepted task.
+- [x] A self-reported, review-pending, rejected, cancelled, or user-blocked task is never labelled `已完成` by the controller receipt.
 
 ## How to repeat the checks
 

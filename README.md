@@ -90,6 +90,10 @@ Repeated notices are deduplicated within a controller session. An unresolved req
 
 Some system approval cards expose their exact command or confirmation only at the bottom of the executor conversation. If the controller can see `waitingOnApproval` but cannot see that card, it says so plainly, does not guess from the surrounding task plan, and does not message the frozen executor for clarification. It tells the user to expand the original card, which remains the source of truth.
 
+### Accepted task closure receipt
+
+After independent acceptance—not merely an executor's completion claim—the controller writes a short, visible, non-work receipt back into the original executor task. It identifies the accepted task and states `已完成，等待下一步指令。` The receipt is deduplicated per accepted candidate, does not require a reply, and does not reopen the task. On a later controller resume, a ledger entry already recorded as accepted but missing its receipt receives one backfill; an old executor message alone is never treated as acceptance.
+
 ## Workflow
 
 ```text

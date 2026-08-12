@@ -36,7 +36,7 @@ Fill engineering detail from evidence, not guesses. Ask only when a product fork
 2. Reuse the same task for the same module, compatible checkout, review repair, or unfinished work. Never dispatch overlapping scope or the same checkout while its owning task is nonterminal, whether healthy, silent, or abnormal. If ownership must transfer, first end the original task and record its final cursor, Base/Head, worktree state, unresolved changes, and handoff reason; never allow two tasks to own the same mutable work.
 3. Split by ownership and dependency: parallelize independent modules; serialize shared files, migrations, and dependent contracts.
 4. Under explicit project-lead activation, create a user-visible task when work needs durable module ownership or direct user access; otherwise use a bounded subagent. Name it by outcome and send the improved brief, not raw user text.
-5. Record a control ledger: objective; module to task; Base/Head; scope; dependencies; status; cursor; last substantive progress; user-action blocker, approval-detail availability, and approval-notice fingerprint; stale-check marker; model override; review verdict. Keep it in context/plan unless the user requests a file.
+5. Record a control ledger: objective; module to task; Base/Head; scope; dependencies; status; cursor; last substantive progress; user-action blocker, approval-detail availability, approval-notice fingerprint, and acceptance-receipt fingerprint/delivery state; stale-check marker; model override; review verdict. Keep it in context/plan unless the user requests a file.
 
 ## Govern to acceptance
 
@@ -48,6 +48,22 @@ Fill engineering detail from evidence, not guesses. Ask only when a product fork
 - Do not wait for the 30-minute stale fallback and do not use Luna to discover a blocker already reported by the task. Continue independent work and event-driven waiting where possible.
 - Deduplicate notices by task plus requested action; if the card contents are unavailable, use the task plus current approval-event cursor or opaque event ID. Relay the same unresolved request once per controller session, again only if its action or risk changes, the approval event changes, the user asks for status, or a later controller session resumes while it is still unresolved. On every start or resume, recheck nonterminal tasks and surface any unresolved approval before routing new work.
 - When the task reports approval/input received or produces substantive progress beyond that request, clear `blocked_on_user`, record the resolution, and resume normal waiting. A sidebar `running` label alone does not prove the blocker is resolved.
+
+### Write back accepted task status
+
+- Only after the controller has independently accepted an executor result—final report read; branch, Base/Head, scope, clean status, and fresh checks reconciled; required review has no unresolved Critical or Important finding—send one visible closure receipt back to that executor's task. Executor self-report, a candidate awaiting review, a rejected candidate, cancellation, or `blocked_on_user` never qualifies as `已完成`.
+- Use this exact visible receipt, with the accepted task objective filled in:
+
+  ```text
+  【总控结项回执｜非新任务，无需回复】
+  当前任务：<已验收的任务目标>
+  当前状态：已完成，等待下一步指令。
+  ```
+
+  The receipt is a controller status marker, not a new delegation, repair request, or request for acknowledgement; the executor must not reopen work or perform any action because of it.
+- Record a receipt fingerprint of task plus accepted Head (or another immutable accepted-candidate identifier) and its delivery state. Send it once after acceptance. On a delivery failure, preserve `accepted`, record `receipt_pending`, and retry that same receipt on the next controller resume; after successful delivery, never resend it for the same accepted candidate, including after controller resume or a status question.
+- On every controller start or resume, send one missing receipt for a control-ledger entry already recorded as `accepted` with a known accepted candidate and no successful receipt delivery. Do not reconstruct `accepted` from an executor's old final message merely to backfill a receipt; independent-acceptance evidence remains required.
+- A delivered status marker is sufficient for this audit trail: do not wait for an executor reply, do not turn the accepted ledger entry nonterminal, and do not treat any courtesy acknowledgment as new work. The controller still reports the accepted result to the user separately.
 
 1. Stay active after dispatch and use event-driven `wait_threads` or `wait_agent` with current cursors. Bound the wait so a task can be evaluated after 30 minutes without substantive progress. Never create heartbeat, cron, recurring automation, timer loops, or periodic polling.
 2. Treat dispatch acknowledgement as **not a return**. `create_thread`, `send_message_to_thread`, `spawn_agent`, and follow-up calls only prove delivery. Save the returned handle/cursor, then keep waiting until the executor emits a terminal event and its final report has been read.
