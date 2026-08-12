@@ -56,7 +56,7 @@ Engineering details are derived from evidence rather than guesses.
 
 ### Ownership-aware routing
 
-Before creating work, the controller inventories active and relevant completed tasks. Compatible tasks are reused for the same module, checkout, repair cycle, or unfinished work. Independent modules may proceed in parallel, while shared files, migrations, and dependent contracts are serialized.
+Before creating work, the controller inventories active and relevant completed tasks. Compatible tasks are reused for the same module, checkout, repair cycle, or unfinished work. A silent or abnormal task does not justify a second owner for overlapping scope: ownership must be ended and its worktree state recorded before a handoff. Independent modules may proceed in parallel, while shared files, migrations, and dependent contracts are serialized.
 
 A lightweight control ledger keeps objectives, ownership, branches, dependencies, status, review decisions, and follow-up work traceable.
 
@@ -77,7 +77,9 @@ Before reporting success, the controller invokes `verification-before-completion
 
 ### Event-driven coordination
 
-`project-lead` coordinates work through task events and current cursors. It does not create timers, heartbeat jobs, recurring automation, or periodic polling loops. This reduces unnecessary quota usage while preserving the ability to recover task state after an interruption.
+`project-lead` coordinates work through task events and current cursors. It does not create timers, heartbeat jobs, recurring automation, or periodic polling loops. If an active task produces no substantive progress for 30 minutes, the controller may take one fresh read-only snapshot and, only when the state remains unclear, ask the same task once through `gpt-5.6-luna` for status. The fallback cannot edit, review, accept, restart, or duplicate work, and it rearms only after real progress.
+
+This reduces unnecessary quota usage while preserving bounded status recovery. It is not background monitoring: if the controller terminates, it cannot wake itself, and the next controller turn must reconcile saved task handles.
 
 ## Workflow
 
@@ -139,6 +141,13 @@ Use project-lead to govern this project.
 
 - `requesting-code-review` for structured review briefs and review gates.
 - `verification-before-completion` for evidence-based completion claims.
+
+## Evidence and Community
+
+- [Sanitized real-world use cases](docs/USE-CASES.md) describe how the skill has governed two private multi-module products without publishing private source code.
+- [Behavior validation](docs/VALIDATION.md) records repeatable pressure scenarios for duplicate dispatch, controller authority, independent review, and the 30-minute status fallback.
+- [Changelog](CHANGELOG.md) tracks public releases.
+- [Contributing guide](CONTRIBUTING.md) explains how to report problems and propose rule changes.
 
 ## Model Defaults
 

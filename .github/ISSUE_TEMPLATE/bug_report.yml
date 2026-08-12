@@ -1,0 +1,53 @@
+name: Controller behavior problem
+description: Report a reproducible routing, authority, review, or verification failure.
+title: "[Behavior]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove private code, repository paths, credentials, customer data, and internal logs before submitting.
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Minimal pressure scenario
+      description: Describe the controller state, active task state, and the instruction that exposed the problem.
+      placeholder: A healthy task already owned module A, but...
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed controller behavior
+      description: State what the controller actually did. Separate direct evidence from executor self-report.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: State the safe routing, review, verification, or recovery behavior you expected.
+    validations:
+      required: true
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Boundary involved
+      options:
+        - Duplicate task routing
+        - Controller authority
+        - Independent review
+        - Completion verification
+        - Stale-task recovery
+        - External or destructive action
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed private code, paths, credentials, customer data, and internal logs.
+          required: true
