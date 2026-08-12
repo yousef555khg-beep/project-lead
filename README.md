@@ -26,6 +26,7 @@ Common failure modes include:
 - Frontend, backend, database, and API dependencies are executed in the wrong order.
 - Completion is reported without current build or test evidence.
 - Task ownership and progress are lost after an interruption.
+- Approval prompts remain hidden at the bottom of an executor conversation while the sidebar still shows the task as running.
 - Polling loops and background waiting consume quota without producing decisions.
 
 `project-lead` addresses these problems through explicit role boundaries, ownership-aware routing, independent review, and evidence-based acceptance.
@@ -80,6 +81,12 @@ Before reporting success, the controller invokes `verification-before-completion
 `project-lead` coordinates work through task events and current cursors. It does not create timers, heartbeat jobs, recurring automation, or periodic polling loops. If an active task produces no substantive progress for 30 minutes, the controller may take one fresh read-only snapshot and, only when the state remains unclear, ask the same task once through `gpt-5.6-luna` for status. The fallback cannot edit, review, accept, restart, or duplicate work, and it rearms only after real progress.
 
 This reduces unnecessary quota usage while preserving bounded status recovery. It is not background monitoring: if the controller terminates, it cannot wake itself, and the next controller turn must reconcile saved task handles.
+
+### Human approval relay
+
+When an executor needs a command approval, confirmation, or other user input, `project-lead` treats it as an immediate `blocked_on_user` state instead of an ordinary running task. The controller names the affected task, explains the exact action and its effect or risk, and tells the user to open that task and act at the bottom of the conversation. It does not wait for the 30-minute fallback or approve on the user's behalf.
+
+Repeated notices are deduplicated within a controller session. An unresolved request is surfaced again when a later controller session resumes, and the blocker is cleared only after the executor reports that approval was received or produces substantive progress beyond it.
 
 ## Workflow
 

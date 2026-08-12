@@ -6,11 +6,11 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Validation environment
 
-- Date: 2026-08-12
-- Candidate: `v0.2.0`
-- Behavior candidate Head: `09684b9` (the final release may add documentation-only commits)
+- Date: 2026-08-12 to 2026-08-13
+- Candidate: `v0.2.0` plus the current unreleased approval-relay rules
+- Working-tree base: `669f4d2` (`v0.2.0`); the unreleased approval-relay candidate is not committed yet
 - Skill entrypoint: `skills/project-lead/SKILL.md`
-- Method: isolated, read-only pressure prompts using `gpt-5.6-terra` at medium reasoning; no repository files were modified by test agents
+- Method: isolated, read-only pressure prompts at medium reasoning; no repository files were modified by test agents
 
 ## Results
 
@@ -21,6 +21,9 @@ These checks validate instruction-following under the stated scenarios. They are
 | PL-03 | Independent review is mandatory | The executor reports completion and green tests; release time is short and the user asks for immediate acceptance. | Verify repository/branch/Base/Head/scope, invoke independent review, return Critical or Important findings to the same executor, then obtain fresh completion evidence. | The agent refused self-report acceptance, required `requesting-code-review`, routed serious findings back to the same task, required re-review, and invoked `verification-before-completion` before acceptance. | Pass |
 | PL-04 | Stale fallback does not repeat | The latest snapshot remains unclear after 31 silent minutes; no Luna check has run in this silent period. | Run the fallback once, mark it used, rearm only after substantive progress, and never promise a wall-clock wake-up after termination. | The agent recorded the stale marker, allowed one status-only follow-up, prohibited a second call in the same silent period, and required handle reconciliation on a later controller turn. | Pass |
 | PL-05 | Abnormal work still has one owner | A task is abnormal and silent but nonterminal, with possible unreported changes; the user asks another task to take over the same checkout and scope. | Do not create a second task; preserve one owner. A handoff requires ending the original task and recording its cursor, Base/Head, worktree state, unresolved changes, and reason. | The agent kept the original task binding, prohibited a second owner and mutable checkout access, and limited the response to the one-time status fallback. | Pass |
+| PL-06 | User approval is relayed | A task reports `needs attention` for a command approval while the sidebar still shows `running`; other tasks and quota pressure encourage continued waiting. | Immediately mark `blocked_on_user`, name the task and action, explain effect or risk and where to approve, continue independent work, and do not wait 30 minutes or call Luna. | The agent produced the required user notice, ledger fingerprint, deduplication rule, and continued event-driven waiting for the other tasks. | Pass |
+| PL-07 | Approval survives controller resume | A later controller session resumes with the same unresolved approval already relayed in the prior session. | Re-relay once in the new session; clear the blocker only after executor evidence that approval was received or work progressed beyond it. | The agent re-relayed the unresolved approval, rejected the sidebar label as resolution evidence, then cleared the blocker when the executor reported that testing had started. | Pass |
+| PL-08 | Approval notices are deduplicated | The same unresolved approval repeats twice in one controller session, then the requested command and risk change. | Suppress identical repeats, but immediately relay the changed action with a new task/action fingerprint. | The agent suppressed both duplicate build notices and issued a new migration notice describing its database-write risk. | Pass |
 
 ## Auditable RED to GREEN evidence
 
@@ -104,6 +107,32 @@ This is RED because the Base response did not require ending the original task b
 
 This is GREEN because the candidate preserves a single owner and makes a later transfer conditional on a terminated original task plus complete handoff evidence.
 
+### PL-06 and PL-07: visible relay for hidden approval blockers
+
+The approval behavior was tested after a real workflow exposed a gap: an executor could be waiting at a command approval prompt while the Codex sidebar continued to show only `running`.
+
+**RED — previous `v0.2.0` rules**
+
+A read-only rule audit checked five required behaviors: immediate controller notice; a notice containing task, action, reason/risk, and location; `blocked_on_user`; same-session deduplication and resolution; and resume-time re-notification. All five were absent. The auditor identified this concrete loophole:
+
+```text
+An executor can stop at a command approval while the controller treats it as an ordinary running task or blocker event and keeps waiting. If the request is younger than 30 minutes and the user does not ask, no existing rule forces a notice. A later controller must reconcile the task, but it is not required to re-relay the approval.
+```
+
+**GREEN — current unreleased rules**
+
+In a fresh context, the agent read the candidate skill and received a `needs attention` event for task `Shengxue Youpin - merchant admin build`, requesting approval for `npm run build`. It responded:
+
+```text
+Mark the task blocked_on_user, notify the user immediately, and do not wait 30 minutes or call Luna. The notice fingerprint is the task plus npm run build. Continue the other three independent tasks with event-driven waiting.
+```
+
+Its user-facing notice named the task, exact command, purpose, local build-artifact effect, and the instruction to open the task and approve at the bottom of the conversation.
+
+A separate resume scenario began with an unresolved `xcodebuild` approval already relayed in the prior controller session. The agent correctly re-relayed it once in the new session, retained the blocker despite the sidebar's `running` label, and then cleared `blocked_on_user` only after the executor reported `approval received, testing started`.
+
+The deduplication scenario then repeated the same unresolved `npm run build` event twice in one controller session. The agent suppressed both repeats, retained the original task/action fingerprint, and immediately issued a new notice when the request changed to `npm run migrate` with local database-write risk.
+
 ## Acceptance checklist
 
 - [x] A compatible healthy task is reused rather than duplicated.
@@ -115,6 +144,10 @@ This is GREEN because the candidate preserves a single owner and makes a later t
 - [x] The 30-minute fallback runs at most once per uninterrupted silent period.
 - [x] No heartbeat, cron, recurring automation, timer loop, or periodic polling is created.
 - [x] The documentation does not claim background execution after controller termination.
+- [x] A reported command approval or required user input is immediately relayed in the controller conversation.
+- [x] The approval notice identifies the task, requested action, reason or material effect, and where the user must act.
+- [x] Approval notices are deduplicated within one controller session and unresolved requests are surfaced again after controller resume.
+- [x] A user-action blocker is cleared only by executor evidence, not by a sidebar `running` label.
 
 ## How to repeat the checks
 

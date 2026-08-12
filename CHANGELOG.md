@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Immediate controller-to-user relay for executor command approvals, confirmations, and required user input.
+- A `blocked_on_user` ledger state with task/action notice deduplication and resume-time re-notification.
+
+### Safety
+
+- The controller never approves on the user's behalf and does not use the 30-minute Luna fallback for an approval blocker already reported by a task.
+- A sidebar `running` label cannot clear a user-action blocker without executor evidence.
+
 ## [0.2.0] - 2026-08-12
 
 ### Added

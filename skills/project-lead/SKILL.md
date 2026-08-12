@@ -36,9 +36,17 @@ Fill engineering detail from evidence, not guesses. Ask only when a product fork
 2. Reuse the same task for the same module, compatible checkout, review repair, or unfinished work. Never dispatch overlapping scope or the same checkout while its owning task is nonterminal, whether healthy, silent, or abnormal. If ownership must transfer, first end the original task and record its final cursor, Base/Head, worktree state, unresolved changes, and handoff reason; never allow two tasks to own the same mutable work.
 3. Split by ownership and dependency: parallelize independent modules; serialize shared files, migrations, and dependent contracts.
 4. Under explicit project-lead activation, create a user-visible task when work needs durable module ownership or direct user access; otherwise use a bounded subagent. Name it by outcome and send the improved brief, not raw user text.
-5. Record a control ledger: objective; module to task; Base/Head; scope; dependencies; status; cursor; last substantive progress; stale-check marker; model override; review verdict. Keep it in context/plan unless the user requests a file.
+5. Record a control ledger: objective; module to task; Base/Head; scope; dependencies; status; cursor; last substantive progress; user-action blocker and approval-notice fingerprint; stale-check marker; model override; review verdict. Keep it in context/plan unless the user requests a file.
 
 ## Govern to acceptance
+
+### Relay user-action blockers
+
+- Treat a task event such as `needs attention`, a command/tool approval request, confirmation prompt, or required user input as an immediate user-action blocker. Read the task's latest relevant message to identify the actual request; do not infer approval from a generic `running` label and never approve on the user's behalf.
+- Immediately mark the ledger entry `blocked_on_user` and notify the user in the controller conversation. The notice must name the task, state the exact approval or input needed, explain why it is needed and any material risk or effect, and tell the user to open that task and act at the bottom of its conversation. Use commentary while other work continues; if the controller turn must end on the blocker, repeat the complete notice in `final`.
+- Do not wait for the 30-minute stale fallback and do not use Luna to discover a blocker already reported by the task. Continue independent work and event-driven waiting where possible.
+- Deduplicate notices by task plus requested action. Relay the same unresolved request once per controller session, again only if its action or risk changes, the user asks for status, or a later controller session resumes while it is still unresolved. On every start or resume, recheck nonterminal tasks and surface any unresolved approval before routing new work.
+- When the task reports approval/input received or produces substantive progress beyond that request, clear `blocked_on_user`, record the resolution, and resume normal waiting. A sidebar `running` label alone does not prove the blocker is resolved.
 
 1. Stay active after dispatch and use event-driven `wait_threads` or `wait_agent` with current cursors. Bound the wait so a task can be evaluated after 30 minutes without substantive progress. Never create heartbeat, cron, recurring automation, timer loops, or periodic polling.
 2. Treat only a new phase, evidence, candidate, blocker, or terminal state as substantive progress; status chatter does not reset the 30-minute window.
