@@ -9,6 +9,7 @@ All notable changes to this project are documented in this file.
 - A bounded fallback for tasks with 30 minutes of no substantive progress.
 - A single status-only `gpt-5.6-luna` follow-up when a fresh snapshot remains unclear.
 - Explicit recovery of nonterminal task handles when a controller starts or resumes.
+- An explicit one-owner rule and evidence requirements for handing off abnormal nonterminal work.
 - Sanitized real-world case studies for Yuji and Shengxue Youpin.
 - Behavioral pressure-test records for duplicate routing, authority boundaries, independent review, and stale-task handling.
 - Contribution guidance and GitHub issue templates.

@@ -56,7 +56,7 @@ Engineering details are derived from evidence rather than guesses.
 
 ### Ownership-aware routing
 
-Before creating work, the controller inventories active and relevant completed tasks. Compatible tasks are reused for the same module, checkout, repair cycle, or unfinished work. Independent modules may proceed in parallel, while shared files, migrations, and dependent contracts are serialized.
+Before creating work, the controller inventories active and relevant completed tasks. Compatible tasks are reused for the same module, checkout, repair cycle, or unfinished work. A silent or abnormal task does not justify a second owner for overlapping scope: ownership must be ended and its worktree state recorded before a handoff. Independent modules may proceed in parallel, while shared files, migrations, and dependent contracts are serialized.
 
 A lightweight control ledger keeps objectives, ownership, branches, dependencies, status, review decisions, and follow-up work traceable.
 

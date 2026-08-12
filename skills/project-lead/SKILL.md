@@ -33,7 +33,7 @@ Fill engineering detail from evidence, not guesses. Ask only when a product fork
 ## Route work automatically
 
 1. Inventory active and relevant completed tasks before dispatch.
-2. Reuse the same task for the same module, compatible checkout, review repair, or unfinished work. Never duplicate healthy work.
+2. Reuse the same task for the same module, compatible checkout, review repair, or unfinished work. Never dispatch overlapping scope or the same checkout while its owning task is nonterminal, whether healthy, silent, or abnormal. If ownership must transfer, first end the original task and record its final cursor, Base/Head, worktree state, unresolved changes, and handoff reason; never allow two tasks to own the same mutable work.
 3. Split by ownership and dependency: parallelize independent modules; serialize shared files, migrations, and dependent contracts.
 4. Under explicit project-lead activation, create a user-visible task when work needs durable module ownership or direct user access; otherwise use a bounded subagent. Name it by outcome and send the improved brief, not raw user text.
 5. Record a control ledger: objective; module to task; Base/Head; scope; dependencies; status; cursor; last substantive progress; stale-check marker; model override; review verdict. Keep it in context/plan unless the user requests a file.
