@@ -1,0 +1,43 @@
+name: Governance improvement
+description: Propose a focused improvement to project-lead behavior or documentation.
+title: "[Proposal]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Governance problem
+      description: What controller situation is not covered well today?
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Example scenario
+      description: Provide a sanitized, minimal scenario that demonstrates the need.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed outcome
+      description: Describe the desired behavior, not a large rewrite of the skill.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Safety and trade-offs
+      description: Explain how the proposal affects task ownership, controller authority, review, verification, quota, or recovery.
+    validations:
+      required: true
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Required constraints
+      options:
+        - label: The proposal preserves independent review and fresh verification.
+          required: true
+        - label: The proposal does not require private code or credentials in this repository.
+          required: true
