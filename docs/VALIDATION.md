@@ -7,8 +7,8 @@ These checks validate instruction-following under the stated scenarios. They are
 ## Validation environment
 
 - Date: 2026-08-12 to 2026-08-13
-- Candidate: `v0.2.0` plus the current unreleased approval-relay rules
-- Working-tree base: `669f4d2` (`v0.2.0`); the unreleased approval-relay candidate is not committed yet
+- Candidate: `v0.3.0`
+- Release behavior commit: `40b5d80`; version metadata and the `v0.3.0` tag are released with this record
 - Skill entrypoint: `skills/project-lead/SKILL.md`
 - Method: isolated, read-only pressure prompts at medium reasoning; no repository files were modified by test agents
 

@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [0.3.0] - 2026-08-13
 
 ### Added
 
@@ -45,5 +45,6 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
+[0.3.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.0
 [0.2.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.2.0
 [0.1.0]: https://github.com/yousef555khg-beep/project-lead/commit/2225d9c
