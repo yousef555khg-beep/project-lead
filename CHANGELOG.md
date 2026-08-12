@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.3.1] - 2026-08-13
+
+### Added
+
+- A safe approval-card fallback when a controller can see `waitingOnApproval` but cannot read the card's exact command or confirmation text.
+- Public synchronization of the installed completion-relay rules, so a controller does not mistake dispatch acknowledgement for executor completion.
+
+### Safety
+
+- A controller must not guess approval-card details from task context or send a clarification message to an executor frozen by that card.
+- The original approval card remains the source of truth; the controller tells the user when its contents are unavailable.
+
 ## [0.3.0] - 2026-08-13
 
 ### Added
@@ -45,6 +57,7 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
+[0.3.1]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.1
 [0.3.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.0
 [0.2.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.2.0
 [0.1.0]: https://github.com/yousef555khg-beep/project-lead/commit/2225d9c

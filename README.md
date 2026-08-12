@@ -88,6 +88,8 @@ When an executor needs a command approval, confirmation, or other user input, `p
 
 Repeated notices are deduplicated within a controller session. An unresolved request is surfaced again when a later controller session resumes, and the blocker is cleared only after the executor reports that approval was received or produces substantive progress beyond it.
 
+Some system approval cards expose their exact command or confirmation only at the bottom of the executor conversation. If the controller can see `waitingOnApproval` but cannot see that card, it says so plainly, does not guess from the surrounding task plan, and does not message the frozen executor for clarification. It tells the user to expand the original card, which remains the source of truth.
+
 ## Workflow
 
 ```text
