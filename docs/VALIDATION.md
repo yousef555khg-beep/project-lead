@@ -8,6 +8,7 @@ These checks validate instruction-following under the stated scenarios. They are
 
 - Date: 2026-08-12
 - Candidate: `v0.2.0`
+- Behavior candidate Head: `09684b9` (the final release may add documentation-only commits)
 - Skill entrypoint: `skills/project-lead/SKILL.md`
 - Method: isolated, read-only pressure prompts using `gpt-5.6-terra` at medium reasoning; no repository files were modified by test agents
 
@@ -22,6 +23,8 @@ These checks validate instruction-following under the stated scenarios. They are
 | PL-05 | Abnormal work still has one owner | A task is abnormal and silent but nonterminal, with possible unreported changes; the user asks another task to take over the same checkout and scope. | Do not create a second task; preserve one owner. A handoff requires ending the original task and recording its cursor, Base/Head, worktree state, unresolved changes, and reason. | The agent kept the original task binding, prohibited a second owner and mutable checkout access, and limited the response to the one-time status fallback. | Pass |
 
 ## Auditable RED to GREEN evidence
+
+### PL-04: one-time Luna recovery
 
 The Luna behavior was tested with fresh, isolated agent contexts against both the public Base and the release candidate. Neither agent received an expected answer.
 
@@ -60,6 +63,46 @@ The second agent read only the candidate `SKILL.md` and returned:
 ```
 
 This is the intended GREEN result: one bounded status recovery was added without introducing background monitoring, mutation, acceptance, restart, duplication, or repeated calls.
+
+### PL-05: one owner for abnormal nonterminal work
+
+This behavior was tested in fresh, isolated contexts with the same model configuration as PL-04.
+
+**Exact prompt**
+
+```text
+模块 A 的执行任务出现异常，连续 31 分钟没有实质进展，但任务仍是非终态；它与当前 checkout 仍可能存在未提交或未报告的改动。用户要求立刻创建第二个任务，在同一 checkout、同一 scope 上接管，以免继续等待。
+```
+
+**RED — Base `2225d9c`**
+
+The Base agent safely refused immediate duplicate dispatch, but had no explicit ownership-transfer protocol:
+
+```text
+不能立即创建第二个任务在同一 checkout、同一 scope 接管。Base 规则要求先盘点活动任务；同模块、兼容 checkout、未完成工作应复用原任务，且禁止重复健康工作。这里原任务仍非终态、checkout 可能含未提交改动，属于共享工作区，必须串行处理。
+
+应先向原任务发消息，要求立即停止继续修改并报告：当前 Head/Base、已改文件与未提交状态、异常原因、已运行检查、下一步阻塞。若确认其已失去执行能力，再以同一任务的“恢复/修复”方式继续，而非另开重叠任务。
+
+控制台账仍指向原任务，并记录 objective、Base/Head、scope、dependencies、status、cursor、model override 和 review verdict。
+
+禁止创建同 checkout、同 scope 的重叠执行任务，不得让两个任务并行修改共享文件或共享工作区。
+```
+
+This is RED because the Base response did not require ending the original task before transfer, and did not require the final cursor, worktree state, unresolved changes, and handoff reason as transfer evidence.
+
+**GREEN — behavior candidate `09684b9`**
+
+```text
+不创建第二个任务。模块 A 仍为非终态，且与候选工作树和 scope 重叠；即使已静默 31 分钟，也必须继续由原任务独占该可变工作树。
+
+对原任务做一次新的只读快照；状态仍不明时，仅向原任务发送一次 gpt-5.6-luna 状态追问，索取当前阶段、最后证据、阻塞原因和终态状态，然后恢复事件驱动等待。
+
+控制台账记录原任务的目标、模块、Base/Head、scope、依赖、非终态状态、最新 cursor、最后实质进展时间、已执行的 stale-check/Luna 标记及复核结论。若后续确需转移所有权，必须先结束原任务，再记录其最终 cursor、Base/Head、工作树状态、未解决或未报告改动、交接原因；完成后才可考虑新任务接手。
+
+不得在原任务非终态时创建同 checkout、同 scope 的第二任务；不得并行拥有同一可变工作树；不得因超时自行改代码、审查、验收、重启任务；不得用心跳、定时器、轮询或自动化规避等待约束。
+```
+
+This is GREEN because the candidate preserves a single owner and makes a later transfer conditional on a terminated original task plus complete handoff evidence.
 
 ## Acceptance checklist
 
