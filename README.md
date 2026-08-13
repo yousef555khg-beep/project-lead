@@ -166,6 +166,8 @@ Use project-lead to govern this project.
 
 For tasks first created under `project-lead`, Terra is the default execution model and Sol is the default control and review model. A user-specified model choice always takes precedence.
 
+Architecture is classified before that default is applied. A high-impact system decision that crosses independent modules and still has shared contracts, boundaries, or costly risks may be drafted by the Sol controller as a no-code architecture decision record. It must receive an independent architecture review before any dependent work is dispatched. Once boundaries and interfaces are accepted, Terra is the default for module design and implementation. A user model override changes the drafting model, not the independent-review requirement.
+
 ## Design Goal
 
 `project-lead` is not intended to create more tasks for their own sake. Its purpose is to make every task traceable: each task should have a clear objective, owner, scope, evidence, review decision, and stop condition.
