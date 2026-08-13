@@ -4,13 +4,22 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-14
+
 ### Added
 
 - An architecture routing decision: Sol may draft a no-code system architecture decision record for high-impact, cross-module work; Terra remains the default for accepted module architecture and implementation.
+- Review-ready batching, risk-based reviewer selection, immutable candidate fingerprints, incremental repair review, and a two-RETURN circuit breaker.
+
+### Changed
+
+- Routine bounded module review now defaults to an independent `gpt-5.6-terra high`; elevated-risk review defaults to an independent `gpt-5.6-sol xhigh`.
+- Related work-in-progress repairs are consolidated before review, and full-repository rescans now require a recorded cross-cutting or uncertain-impact reason.
 
 ### Safety
 
 - The authoring controller cannot review its own system architecture record. A separate reviewer must approve it before dependent work is dispatched, and an uncertain classification is treated as system architecture.
+- Duplicate review events cannot rerun an unchanged candidate or convert an unchanged `RETURN` into `APPROVE`; circuit breaking pauses wasteful loops but never waives repair review.
 
 ## [0.3.2] - 2026-08-13
 
@@ -77,6 +86,8 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
+[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.4.0
 [0.3.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.2
 [0.3.1]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.1
 [0.3.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.0

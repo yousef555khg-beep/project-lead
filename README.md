@@ -28,6 +28,7 @@ Common failure modes include:
 - Task ownership and progress are lost after an interruption.
 - Approval prompts remain hidden at the bottom of an executor conversation while the sidebar still shows the task as running.
 - Polling loops and background waiting consume quota without producing decisions.
+- Small repair commits repeatedly trigger expensive full-project reviews before a coherent candidate exists.
 
 `project-lead` addresses these problems through explicit role boundaries, ownership-aware routing, independent review, and evidence-based acceptance.
 
@@ -72,7 +73,11 @@ Executor self-reports are not treated as acceptance. For every substantial candi
 - Fresh build and test results.
 - Unreported or unrelated changes.
 
-The controller then invokes `requesting-code-review` with the exact requirements and commit range. Critical or Important findings return to the same executor for repair, and the changed diff is reviewed again.
+The controller invokes `requesting-code-review` only after a read-only preflight proves a coherent review-ready candidate. For code, it reconciles the actual branch, immutable Base/Head, complete changed-file scope, clean worktree, and fresh checks bound to that Head. A no-code system-architecture record uses a versioned artifact or content digest and cannot be reviewed by its author. Related work-in-progress commits are batched instead of reviewed one by one.
+
+Review cost follows risk rather than the controller's model. A bounded single-module change under accepted interfaces defaults to an independent `gpt-5.6-terra high` reviewer. System architecture, authentication or authorization, secrets, payments, destructive behavior, data ownership or loss, migrations, concurrency and recovery, shared contracts, cross-module integration, external side effects, deployment, and release default to an independent `gpt-5.6-sol xhigh` reviewer. A user model override changes the model, never reviewer independence or the gate.
+
+Each review is deduplicated by task, code Base/Head or immutable non-code artifact, scope, and evidence. Critical or Important findings return in one consolidated repair brief to the same candidate owner: the executor for code or the bounded architecture author for a non-code record. Code is re-reviewed from the previous Head to the new Head; a non-code record is re-reviewed from its previous artifact/digest to its new artifact/digest. Both include affected context, unresolved finding IDs, and refreshed checks rather than an automatic full-repository rescan, and neither author can review their own repair. After two consecutive `RETURN` verdicts, the controller pauses an immediate third review for root-cause and design reconciliation; the resulting candidate still requires independent review.
 
 Before reporting success, the controller invokes `verification-before-completion` and confirms that the evidence is fresh and relevant.
 
@@ -164,7 +169,7 @@ Use project-lead to govern this project.
 
 ## Model Defaults
 
-For tasks first created under `project-lead`, Terra is the default execution model and Sol is the default control and review model. A user-specified model choice always takes precedence.
+For tasks first created under `project-lead`, Terra is the default execution model and Sol is the default control model. Independent review is risk-routed: routine bounded module work defaults to `gpt-5.6-terra high`, while elevated-risk work defaults to `gpt-5.6-sol xhigh`. A user-specified model choice takes precedence, but cannot remove reviewer independence or a required review.
 
 Architecture is classified before that default is applied. A high-impact system decision that crosses independent modules and still has shared contracts, boundaries, or costly risks may be drafted by the Sol controller as a no-code architecture decision record. It must receive an independent architecture review before any dependent work is dispatched. Once boundaries and interfaces are accepted, Terra is the default for module design and implementation. A user model override changes the drafting model, not the independent-review requirement.
 
