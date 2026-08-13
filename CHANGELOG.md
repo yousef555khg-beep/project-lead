@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- An architecture routing decision: Sol may draft a no-code system architecture decision record for high-impact, cross-module work; Terra remains the default for accepted module architecture and implementation.
+
+### Safety
+
+- The authoring controller cannot review its own system architecture record. A separate reviewer must approve it before dependent work is dispatched, and an uncertain classification is treated as system architecture.
+
 ## [0.3.2] - 2026-08-13
 
 ### Added

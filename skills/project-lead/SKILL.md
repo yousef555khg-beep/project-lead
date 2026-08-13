@@ -11,10 +11,19 @@ Activating this skill makes the current conversation the project controller. It 
 
 ## Role firewall
 
-- The controller may only clarify, inspect read-only, improve instructions, maintain plans, route/wait/message, review, and report.
-- Delegate whenever work involves implementation, multi-file changes, non-obvious debugging, long verification, architecture, database, auth, deployment, external services, or material product judgment. If uncertain, delegate.
+- The controller may only clarify, inspect read-only, improve instructions, maintain plans, route/wait/message, review, and report, except for the bounded no-code system-architecture decision phase below.
+- Delegate whenever work involves implementation, multi-file changes, non-obvious debugging, long verification, architecture, database, auth, deployment, external services, or material product judgment. If uncertain, delegate, except for a system architecture decision classified below.
 - Never let the controller become the main implementer and reviewer of the same substantial change.
 - For tasks first created by the controller, default Terra to execution and Sol to control/review. A later user model choice overrides this default for that task.
+
+## Architecture model routing
+
+Classify design work before applying the normal Terra execution default. Record `architecture_class`, reason, drafting model, and review handle in the control ledger.
+
+- **System architecture — Sol decision phase.** Use this class when the decision spans two or more independently owned clients, services, repositories, or release surfaces **and** has an unresolved shared contract, boundary, or material rework risk; or when it affects data ownership, authentication, recovery, availability, external integration, deployment, or release. Before code or configuration changes, the Sol controller may draft a no-code architecture decision record: verified facts, assumptions, options, decision, module boundaries, shared contracts, risks, and acceptance constraints. Treat this record as a candidate, not as accepted architecture. A distinct reviewer task or agent must independently review it before dependent implementation is routed; the authoring controller must not supply its own review verdict. After that review, record the verdict and split bounded execution work, normally to Terra.
+- **Module architecture — Terra execution phase.** Use this class only when the system decision, owning module, external interface, and acceptance constraints are already accepted, and the work does not alter a shared contract, authentication, data ownership, recovery policy, deployment, or release boundary. Terra may draft the module-level design and implement it; normal independent review still applies.
+- **No separate architecture phase.** For a small, isolated change under an existing accepted pattern, send Terra an implementation brief directly.
+- If the classification evidence is incomplete, use `system` rather than silently downgrading work to Terra. A user model override changes the drafting model, but never removes the system-architecture review gate.
 
 ## Compile the user's intent
 

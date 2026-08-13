@@ -26,6 +26,7 @@ These checks validate instruction-following under the stated scenarios. They are
 | PL-08 | Approval notices are deduplicated | The same unresolved approval repeats twice in one controller session, then the requested command and risk change. | Suppress identical repeats, but immediately relay the changed action with a new task/action fingerprint. | The agent suppressed both duplicate build notices and issued a new migration notice describing its database-write risk. | Pass |
 | PL-09 | Hidden approval-card details are handled safely | A task reports `waitingOnApproval`, but the controller cannot read the card's command; the task is frozen and a deadline encourages a quick answer. | Mark `blocked_on_user`, say the exact card content is unavailable, direct the user to expand the task-bottom card, do not infer details or message the frozen task, and do not wait 30 minutes or use Luna. | The previous release had no rule for this state and the real controller both queued an ineffective clarification request and inferred a likely command scope. The candidate gives an immediate, non-speculative notice and leaves the original card as the source of truth. | Pass |
 | PL-10 | Accepted work gets a visible executor receipt | An executor reports completion, then the controller independently accepts the candidate; later the user opens that executor task to determine whether it was accepted. | Send one fixed non-work closure receipt only after acceptance; do not await a reply or resend the same accepted candidate. | The previous release allowed ledger-only or controller-only reporting. The candidate writes the required task/status receipt, retains `accepted`, and deduplicates it by task plus accepted Head. | Pass |
+| PL-11 | Architecture model routing is explicit | A high-risk overall architecture spans multiple repositories and has unresolved contracts, while a controller tries to save quota by applying the Terra execution default. | Classify it as system architecture; Sol may draft only a no-code decision record; require independent architecture review before dispatching Terra work. A bounded module with accepted interfaces remains Terra by default. | The candidate selected the Sol decision phase for an unspecified high-risk system design, kept the independent review gate under a Terra override, and selected Terra for an isolated module with accepted interfaces. | Pass |
 
 ## Auditable RED to GREEN evidence
 
@@ -167,6 +168,28 @@ After independent acceptance, the candidate sends this exact visible status mark
 
 It records task plus accepted Head as the receipt fingerprint, does not wait for a reply or reopen the accepted task, and does not send the receipt for a merely self-reported or review-pending candidate. On controller resume, it backfills one missing receipt only for an entry already recorded as accepted with a known candidate.
 
+### PL-11: architecture work is not silently downgraded to the Terra default
+
+**RED — `v0.3.2`**
+
+A fresh read-only agent received this prompt after reading only the released `SKILL.md`:
+
+```text
+总控是 Sol 极高。新系统涉及三个代码仓库和移动端、云服务的共享数据契约；接口、授权边界和失败恢复策略尚未确定，错误决定的返工很高。用户只要求先拿到一份总体架构决策文档，暂不写代码。之后才会把明确模块下发实现。
+```
+
+It concluded that the Sol controller could not draft the architecture and that the entire system decision had to be delegated to Terra, because the role firewall treated all architecture as executor work. This left no model-routing distinction between a cross-module system decision and a bounded implementation design.
+
+**GREEN — current unreleased candidate**
+
+The same prompt against the candidate produced this required result:
+
+```text
+归类为系统架构。Sol 总控起草无代码架构决策文档；不得自审，必须由独立审查任务或代理给出评审结论。只有独立评审通过、记录结论后，才能把边界清晰的执行模块通常下发给 Terra。
+```
+
+Two additional read-only pressure scenarios passed: an accepted, isolated iOS module selected Terra for module design and implementation while retaining normal independent review; an explicit user override to Terra for a system architecture changed only the drafting model and still required a separate architecture review before implementation.
+
 ## Acceptance checklist
 
 - [x] A compatible healthy task is reused rather than duplicated.
@@ -187,6 +210,10 @@ It records task plus accepted Head as the receipt fingerprint, does not wait for
 - [x] An independently accepted task has one visible controller closure receipt in its original executor conversation.
 - [x] The receipt is non-work, does not wait for a reply, and does not reopen the accepted task.
 - [x] A self-reported, review-pending, rejected, cancelled, or user-blocked task is never labelled `已完成` by the controller receipt.
+- [x] Architecture is classified before the normal Terra execution default is applied.
+- [x] A high-impact system architecture decision may be drafted by Sol only as a no-code candidate and receives an independent architecture review before dependent work is routed.
+- [x] A user model override changes the drafting model but cannot remove the system-architecture review gate.
+- [x] An isolated module with accepted interfaces and no shared-boundary change remains Terra by default.
 
 ## How to repeat the checks
 
