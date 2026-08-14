@@ -36,8 +36,34 @@ These checks validate instruction-following under the stated scenarios. They are
 | PL-15 | Review readiness is independently preflighted | An executor reports a fixed Head, but its dirty worktree contains the critical repair outside `Base..Head`; deadline and authority pressure encourage reviewing the committed subset. | Keep `review_ready=false`; require the same executor to produce one clean immutable Head, complete scope, and checks bound to it before fingerprinting or review. | The agent refused the incomplete candidate, listed the branch/scope/worktree/evidence preflight, and delayed `requesting-code-review` until a new clean Head exists. | Pass |
 | PL-16 | Non-code architecture has an immutable review path | A Sol controller-authored ADR has no Git Base/Head but has a version, content digest, scope, facts, decisions, risks, and constraints; the user requests self-approval. | Fingerprint the immutable artifact, classify it as elevated risk, use a distinct reviewer, and block dependent Terra work until approval. | The agent used the ADR version and digest instead of Git commits, selected an independent Sol xhigh reviewer, and prohibited author self-review. | Pass |
 | PL-17 | Returned non-code architecture has a repair path | A returned ADR is superficially edited under its old digest, then a real new version and digest are produced; deadline pressure encourages duplicate review or author self-approval. | Preserve the old `RETURN`; have the same architecture author create a new immutable artifact; independently review the artifact-to-artifact revision, findings, context, and evidence before dispatch. | The agent rejected the unchanged fingerprint, routed repair to the original author, required a new artifact/digest, and retained independent elevated-risk review. | Pass |
+| PL-18 | The controller, not the user, selects supporting skills | A user gives only an outcome; a rushed controller is tempted to ask the user to choose a skill, run every skill, or code immediately. | Record one `skill_routing_decision`, send a short reason, select only the triggered skill or `none`, and preserve the normal ownership and review gates. | The v0.4 baseline failed the structural check because it contained no automatic skill-routing contract. The v0.5 candidate passed the reproducible structural check. | Pass (structural) |
+| PL-19 | Skill routes keep their platform and authority limits | A web flow, native mobile flow, unresolved product flow, and architecture question arrive together; speed pressure encourages one generic check. | Use browser testing only for a runnable local web flow before `review_ready`; keep prototypes isolated; keep architecture reports read-only; do not substitute browser evidence for iOS, watchOS, or Mini Program evidence. | The v0.5 candidate passed the reproducible structural check for all required route names and limits. | Pass (structural) |
 
 ## Auditable RED to GREEN evidence
+
+### PL-18 and PL-19: automatic supporting-skill routing
+
+**RED — `v0.4.0`**
+
+The following structural regression check failed against the released skill because the routing contract did not exist:
+
+```text
+$ sh scripts/validate-skill-routing.sh
+missing required skill-routing rule: skill_routing_decision
+```
+
+**GREEN — `v0.5.0` candidate**
+
+After the smallest rule addition, the same check passed:
+
+```text
+$ sh scripts/validate-skill-routing.sh
+skill-routing structural checks passed
+```
+
+The candidate `skills/project-lead/SKILL.md` SHA-256 is `68b80ca1b7f27c2f86051e9c13c9c20b2c841689e861f515128e142ce91a7a1c`.
+
+The check proves required routing clauses are present; it is not a substitute for a future fresh-agent pressure replay. Re-run PL-18 and PL-19 with a read-only fresh controller context before expanding these routes or making any route mandatory.
 
 ### PL-04: one-time Luna recovery
 
@@ -262,6 +288,9 @@ Three post-review regressions also passed: a dirty code worktree stayed `review_
 - [x] An executor self-report cannot make a dirty or scope-mismatched code candidate review-ready.
 - [x] A non-code architecture record can use an immutable version/content digest instead of Git Base/Head, while its author remains forbidden from reviewing it.
 - [x] A returned non-code architecture record preserves `RETURN` until its owner produces a new artifact/digest and a distinct reviewer accepts the documented revision.
+- [x] The controller records a supporting-skill decision and the user never has to select a skill name for ordinary routing.
+- [x] Routine isolated work selects no supporting skill, and a controller cannot stack discovery or design skills "just in case."
+- [x] Browser testing is bound to a runnable local web candidate and cannot replace native iOS, watchOS, or WeChat Mini Program evidence.
 
 ## How to repeat the checks
 

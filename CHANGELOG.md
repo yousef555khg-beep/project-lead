@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-14
+
+### Added
+
+- Automatic supporting-skill routing: controllers choose the minimum necessary available skill from the task evidence, record the decision, and give the user a short reason instead of requiring the user to remember skill names.
+- Bounded routes for throwaway prototypes, read-only architecture reports, interface design, interaction design, and browser-rendered web acceptance.
+- A reproducible structural regression check for the skill-routing contract.
+
+### Safety
+
+- Routine isolated work explicitly selects no supporting skill; controllers may use at most one discovery or design skill per phase and must not run every skill "just in case."
+- Prototypes remain isolated from production state; architecture reports cannot approve architecture or bypass independent review; browser evidence cannot replace native iOS, watchOS, or WeChat Mini Program evidence.
+
 ## [0.4.0] - 2026-08-14
 
 ### Added
@@ -86,7 +99,8 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
-[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.5.0
 [0.4.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.4.0
 [0.3.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.2
 [0.3.1]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.1

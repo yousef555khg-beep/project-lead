@@ -60,7 +60,21 @@ Engineering details are derived from evidence rather than guesses.
 
 Before creating work, the controller inventories active and relevant completed tasks. Compatible tasks are reused for the same module, checkout, repair cycle, or unfinished work. A silent or abnormal task does not justify a second owner for overlapping scope: ownership must be ended and its worktree state recorded before a handoff. Independent modules may proceed in parallel, while shared files, migrations, and dependent contracts are serialized.
 
-A lightweight control ledger keeps objectives, ownership, branches, dependencies, status, review decisions, and follow-up work traceable.
+A lightweight control ledger keeps objectives, ownership, branches, dependencies, status, supporting-skill decisions, review decisions, and follow-up work traceable.
+
+### Automatic supporting-skill routing
+
+Users state the outcome they want; they do not need to know or select skill names. Before dispatch, the controller records one routing decision with its trigger, scope, expected evidence, and reason for skipping alternatives.
+
+| Situation | Controller action | User sees |
+| --- | --- | --- |
+| The flow or state model is genuinely unresolved | Request a bounded `prototype` in a temporary location, then stop for the user's choice. | A small interactive option set, not production changes. |
+| A new subsystem, unclear ownership, repeated integration friction, or a shared contract needs investigation | Request a read-only `improve-codebase-architecture` report; use `codebase-design` only if a selected module interface remains unresolved. | A bounded architecture report and a clear next decision. |
+| A material user-facing gesture, transition, hierarchy, or accessibility question | Add `apple-design` guidance to the design or executor brief, using native conventions for iOS and watchOS. | The rationale for the experience choice. |
+| A changed, runnable local web flow needs acceptance evidence | Require `webapp-testing` before `review_ready`. | Repeatable browser evidence bound to the candidate commit. |
+| A routine, isolated change | Select no supporting skill. | The ordinary implementation, verification, and review path. |
+
+The controller uses at most one discovery or design skill per phase and never runs every available skill "just in case." Supporting skills refine a brief or provide evidence; they do not change ownership, user authority, review independence, or final verification. Browser testing is not a substitute for native iOS, watchOS, or WeChat Mini Program verification.
 
 ### Independent acceptance
 
@@ -107,6 +121,8 @@ Product request
 Inspect repository, branch, and active tasks
       ↓
 Compile scope, dependencies, and acceptance criteria
+      ↓
+Select the minimum necessary supporting skill, or none
       ↓
 Route work by module ownership
       ↓
@@ -159,6 +175,13 @@ Use project-lead to govern this project.
 
 - `requesting-code-review` for structured review briefs and review gates.
 - `verification-before-completion` for evidence-based completion claims.
+
+It can also route to these optional skills when they are installed and their trigger is present:
+
+- `prototype` for unresolved user flows or state models.
+- `improve-codebase-architecture` and `codebase-design` for bounded architecture investigation and interface decisions.
+- `apple-design` for material interaction, hierarchy, motion, or accessibility decisions.
+- `webapp-testing` for browser-rendered local web acceptance evidence.
 
 ## Evidence and Community
 
