@@ -107,6 +107,8 @@ Use project-lead to govern this project.
 - [Behavior validation](docs/VALIDATION.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing guide](CONTRIBUTING.md)
+- [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+- [Security policy](.github/SECURITY.md)
 
 ## License
 

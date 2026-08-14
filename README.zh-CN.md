@@ -107,6 +107,8 @@ npx skills add yousef555khg-beep/project-lead@project-lead -g -a codex
 - [行为验证记录](docs/VALIDATION.md)
 - [更新日志](CHANGELOG.md)
 - [贡献指南](CONTRIBUTING.md)
+- [社区行为守则](.github/CODE_OF_CONDUCT.md)
+- [安全策略](.github/SECURITY.md)
 
 ## 许可证
 
