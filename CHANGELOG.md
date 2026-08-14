@@ -4,6 +4,41 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-14
+
+### Changed
+
+- Project work now uses three evidence-based lanes: Fast by default, Standard for bounded multi-file work, and Elevated only for concrete high-risk areas.
+- Fast work no longer creates an independent review task. The controller accepts it after inspecting the real diff, worktree, and focused fresh checks.
+- Standard work receives one batched Terra review after the deliverable is stable, with at most one incremental repair review. Minor findings do not cause a return.
+- Elevated work retains independent Sol review for architecture, authorization, privacy and regulated personal data, cryptography and security compliance, payments, destructive behavior, data safety, migrations, concurrency, shared contracts, cross-module integration, deployment, and release.
+- No objective may launch a third automatic review. After two returns, the controller explains the root cause and waits for a user-approved revised plan.
+- User progress updates now default to four plain-language lines and hide internal ledgers, hashes, model names, and review identifiers unless they explain a real blocker.
+- Detailed skill-installation transaction rules moved from the core skill into a progressive reference loaded only after exact candidate approval. The normal instruction surface fell from 5,314 to about 1,210 words without removing installation safety checks.
+- The public English and Chinese introductions now explain automatic installed-skill selection, bounded read-only discovery, and the user-approval boundary before installation.
+
+### Added
+
+- A self-contained skill-discovery workflow for complex projects and evidence-backed capability gaps, with no dependency on `find-skills`.
+- Structured read-only public search, bounded privacy-preserving queries, complete static candidate-closure inspection, and explicit no-result handling.
+- Short recommendations describing each candidate's function, project-specific value, and available trust or risk evidence.
+- Candidate-level lifecycle records, orthogonal user/capability blockers, and explicit same-candidate second-opinion handling.
+- A parsed safety-contract validator plus adversarial regression tests for comments, contradictory rules, mixed-negation clauses, package runners, mutable approval labels, and false completion.
+- Risk-lane regression tests and fresh-agent pressure scenarios covering Fast, Standard, and Elevated behavior.
+
+### Safety
+
+- Discovery is deduplicated by project and capability gap across phase-name changes; routine work and deadline pressure do not trigger searches.
+- Discovery cannot execute candidate content or install, update, or enable a skill. The user must approve the repository, exact commit, full-tree digest, skill path, access/effect manifest, method, target, and target-path binding before a separate copy-and-verification task.
+- Candidate instructions are untrusted evidence. Opaque or unresolved trees, hooks, downloads, links, submodules, LFS objects, binaries, and dependency code fail closed; installation runs no candidate code and writes only the approved bound target plus same-parent transaction/staging/rollback entries.
+- Installation traverses from a trusted root with no-follow `openat`/`fstat`, requires exclusive parent mutation and loader quiescence, and commits a verified sibling tree only through atomic no-replace or exchange; unverified rollback enters an explicit cleanup-required blocker.
+- A durable fsynced transaction record and loader startup gate preserve the blocker across process or host failure and require recovery reconciliation before the target can be enabled.
+- Staged files and directories are fsynced before preparation completes, and the bound parent is fsynced after every commit or rollback before durable success is recorded.
+- The durable transaction record remains loader-excluded as startup-gate proof; staging and rollback siblings must be removed, verified absent, and parent-fsynced before loader resumption.
+- Loader recovery has two explicit durable terminal outcomes: verified installation, or verified restoration after cleanup; restoration never becomes evidence that the new capability was installed.
+- Precommit and post-commit failures converge on verified restoration, mark the candidate `install_failed`, and retain the capability blocker instead of leaving it `installing`.
+- `approved` or `declined` is not treated as capability evidence: dependent scope remains blocked until `installed_verified`, explicit scope removal or deferral, or an approved verified alternative.
+
 ## [0.5.0] - 2026-08-14
 
 ### Added
