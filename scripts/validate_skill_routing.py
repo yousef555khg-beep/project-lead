@@ -48,6 +48,17 @@ CORE_REQUIRED = {
         "controller may handle a brief, isolated, reversible change directly",
         "compact private ledger",
     ),
+    "## Execution model routing": (
+        "`model_routing_authority: approved | fixed_default | pending`",
+        "Before every new objective, dispatch, or substantive follow-up",
+        "Never inherit a previous objective's model",
+        "Choose `gpt-5.3-codex-spark high` only when every condition is true",
+        "If any Spark condition is false, unknown, or becomes false, select `gpt-5.6-terra high`",
+        "same owner and task",
+        "explicit `gpt-5.6-terra high` override",
+        "A completed Spark objective does not authorize Spark for the next objective",
+        "Execution-model routing never changes the review lane",
+    ),
     "## Architecture routing": (
         "Missing evidence means inspect or ask",
         "do not review every draft",
@@ -210,6 +221,19 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
         errors.append(ValidationError("automatic-system", "missing evidence cannot automatically escalate architecture"))
     if re.search(r"\bminor findings?\b[^.\n]{0,50}\b(?:requires?|must|always)\b[^.\n]{0,50}\b(?:return|re-review|repair)\b", lowered):
         errors.append(ValidationError("minor-rereview", "minor findings cannot force another review"))
+    inherited_model = re.compile(
+        r"\b(?:reuse|inherit|carry|keep)\b[^.\n]{0,80}"
+        r"\b(?:current|previous|existing)\b[^.\n]{0,40}\bmodel\b"
+        r"[^.\n]{0,70}\b(?:next|new)\b[^.\n]{0,30}\bobjective\b"
+    )
+    for match in inherited_model.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "inherited-model",
+                    f"line {line_number_at(text, match.start())}: execution model cannot carry into a new objective",
+                )
+            )
     return errors
 
 

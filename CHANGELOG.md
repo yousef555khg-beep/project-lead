@@ -4,6 +4,21 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-15
+
+### Added
+
+- One-time per-project authorization for automatic Spark/Terra execution-model routing.
+- A task-local model decision for every new objective, dispatch, and substantive follow-up, with explicit model overrides instead of inheriting an executor task's current model.
+- A strict Spark allowlist for small Fast-lane work and a Terra fallback for ambiguity, complexity, expanded scope, or unavailable Spark capacity.
+
+### Safety
+
+- A completed Spark objective never authorizes Spark for the next objective, including when the same executor task is reused.
+- Spark-to-Terra escalation preserves the same owner and task, starts on the next turn, and cannot mark interrupted work complete or create a replacement owner.
+- An accepted, running, or queued Spark turn blocks a concurrent Terra fallback until rejection, interruption, or terminal state is confirmed.
+- Execution-model routing remains independent of review routing: Standard review stays with Terra, Elevated review stays with Sol, and Spark cannot review its own implementation.
+
 ## [0.6.0] - 2026-08-14
 
 ### Changed
@@ -134,7 +149,9 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
-[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.7.0
+[0.6.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.6.0
 [0.5.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.5.0
 [0.4.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.4.0
 [0.3.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.3.2

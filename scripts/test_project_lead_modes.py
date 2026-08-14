@@ -85,6 +85,84 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_review_loop_has_a_hard_automatic_cap(self) -> None:
         self.assertIn("No lane may launch a third automatic review", self.skill)
 
+    def test_model_routing_asks_once_per_project_then_stops_reprompting(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("ask once", routing)
+        self.assertIn("`model_routing_authority: approved | fixed_default | pending`", routing)
+        self.assertIn("Do not ask again for each model choice or switch", routing)
+        self.assertIn("Until authority is approved", routing)
+
+    def test_every_objective_gets_a_fresh_explicit_model_decision(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Before every new objective, dispatch, or substantive follow-up", routing)
+        self.assertIn("`execution_model_decision`", routing)
+        self.assertIn("Never inherit a previous objective's model", routing)
+        self.assertIn("pass the chosen model explicitly", routing)
+        self.assertIn("A completed Spark objective does not authorize Spark for the next objective", routing)
+
+    def test_spark_is_an_all_conditions_allowlist_with_terra_fallback(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Choose `gpt-5.3-codex-spark high` only when every condition is true", routing)
+        for phrase in (
+            "Fast lane",
+            "exact target scope",
+            "accepted interface or pattern",
+            "reversible",
+            "focused verification",
+            "no Elevated trigger",
+            "non-obvious debugging",
+            "cross-module",
+        ):
+            self.assertIn(phrase, routing)
+        self.assertIn(
+            "If any Spark condition is false, unknown, or becomes false, select `gpt-5.6-terra high`",
+            routing,
+        )
+
+    def test_complex_follow_up_overrides_spark_on_the_same_task(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("`model_escalation_required`", routing)
+        self.assertIn("same owner and task", routing)
+        self.assertIn("next substantive follow-up", routing)
+        self.assertIn("explicit `gpt-5.6-terra high` override", routing)
+        self.assertIn("cannot change a running turn mid-response", routing)
+        self.assertIn("Do not create a replacement task", routing)
+
+    def test_unavailable_spark_capacity_falls_back_explicitly_to_terra(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Task fit and model availability are separate checks", routing)
+        self.assertIn("Spark quota is exhausted or the model is unavailable before dispatch", routing)
+        self.assertIn("explicit `gpt-5.6-terra high` capacity fallback", routing)
+        self.assertIn("Never send a Terra fallback while a Spark turn is accepted, running, or queued", routing)
+        self.assertIn("confirmed rejection, interruption, or terminal state", routing)
+        self.assertIn("report the blocker instead of creating concurrent work", routing)
+
+    def test_execution_and_review_model_choices_are_independent(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Execution-model routing never changes the review lane", routing)
+        self.assertIn("Spark never reviews its own implementation", routing)
+
+    def test_public_docs_explain_safe_automatic_model_routing(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Automatic execution-model routing",
+            "authorizes automatic routing once per project",
+            "Every new objective is classified again",
+            "never inherits the previous objective's model",
+            "Spark-to-Terra escalation reuses the same task",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## 自动选择执行模型",
+            "每个项目只授权一次自动路由",
+            "每个新目标都会重新判断",
+            "绝不继承上一个目标的模型",
+            "Spark 升级到 Terra 时复用同一个任务",
+        ):
+            self.assertIn(phrase, readme_zh)
+
     def test_user_feedback_is_plain_and_progress_first(self) -> None:
         for line in (
             "已完成：<用户能理解的结果>",

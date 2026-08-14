@@ -16,15 +16,35 @@ At intake:
 3. Define scope, owner, dependencies, acceptance checks, and forbidden actions.
 4. Ship the smallest usable vertical slice before optional architecture, polish, or expansion.
 
-Ask the user only for a real product fork, new authority, destructive or external action, purchase, deployment, or secret.
+Ask once for model-routing authority as defined below. Otherwise ask the user only for a real product fork, new authority, destructive or external action, purchase, deployment, or secret.
 
 ## Ownership and dispatch
 
 - Keep one mutable scope or checkout under one owner. Reuse its task for repair or continuation; never create overlapping owners.
 - Split independent modules in parallel and serialize shared files, migrations, and contracts.
-- The controller may handle a brief, isolated, reversible change directly when no executor owns the files and verification can finish in the current turn. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work, normally to Terra.
+- The controller may handle a brief, isolated, reversible change directly when no executor owns the files and verification can finish in the current turn. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work under the task-local model route below.
 - Send an improved brief containing outcome, scope, current versus deferred work, dependencies, acceptance checks, boundaries, and completion report. Do not forward raw user text.
-- Keep a compact private ledger: task, owner, scope, status, blocker, last real evidence, and review lane. Do not make the user read the ledger.
+- Keep a compact private ledger: task, owner, scope, status, blocker, last real evidence, execution-model decision, and review lane. Do not make the user read the ledger.
+
+## Execution model routing
+
+At the first Project Lead intake for a project, ask once whether the user authorizes automatic Spark/Terra execution-model routing. Record `model_routing_authority: approved | fixed_default | pending`. Do not ask again for each model choice or switch. A new project or controller asks once unless an explicit durable project rule already records the choice. Until authority is approved, use the user-configured default or recommend a model without overriding it; `fixed_default` always uses the user's chosen execution model.
+
+Before every new objective, dispatch, or substantive follow-up, create a fresh task-local `execution_model_decision` from the current objective, scope, evidence, and risk lane. Never inherit a previous objective's model or use an executor task's current/default model as routing evidence. Bind the decision to that objective and scope; completion, cancellation, or a material scope change invalidates it. Every task creation or follow-up that performs work must pass the chosen model explicitly. If the override is unavailable or cannot be verified, do not silently run another model; use a verified user default or ask once for direction.
+
+Choose `gpt-5.3-codex-spark high` only when every condition is true:
+
+- The work is in the Fast lane, with exact target scope and acceptance checks already known.
+- It follows an accepted interface or pattern, is reversible, and has focused verification.
+- It has no Elevated trigger, unresolved architecture choice, non-obvious debugging, cross-module effect, long verification, or materially uncertain context.
+
+If any Spark condition is false, unknown, or becomes false, select `gpt-5.6-terra high`. Terra is the fail-safe execution choice for Standard or Elevated implementation, mixed simple-and-complex scope, and materially expanded work; it is still a fresh decision, not an inherited default.
+
+Task fit and model availability are separate checks. If Spark quota is exhausted or the model is unavailable before dispatch, keep the Spark classification as evidence but use an explicit `gpt-5.6-terra high` capacity fallback when automatic routing is approved. Never send a Terra fallback while a Spark turn is accepted, running, or queued. Resume with Terra only after a confirmed rejection, interruption, or terminal state; if that cannot be confirmed, report the blocker instead of creating concurrent work. Re-evaluate availability on the next objective.
+
+When a Spark executor discovers a failed condition, it stops expanding the change, preserves its current work, and reports `model_escalation_required` with the changed scope, evidence, and remaining work. The controller keeps the same owner and task and sends the next substantive follow-up with an explicit `gpt-5.6-terra high` override. A controller cannot change a running turn mid-response, so the override starts on the next turn. Do not create a replacement task, discard work, or report the interrupted objective complete. Do not downgrade Terra during the same complex objective.
+
+A completed Spark objective does not authorize Spark for the next objective, even in the same task. Reclassify and pass a new explicit model every time. Execution-model routing never changes the review lane: Standard review remains independent Terra, Elevated review remains independent Sol, and Spark never reviews its own implementation. After authorization, tell the user only when a Spark-to-Terra escalation materially changes time or scope; model switching itself needs no repeated approval.
 
 ## Architecture routing
 
