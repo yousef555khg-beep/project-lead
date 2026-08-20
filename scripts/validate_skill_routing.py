@@ -60,11 +60,12 @@ CORE_REQUIRED = {
         "Execution-model routing never changes the review lane",
     ),
     "## Speed tier": (
-        "Standard/default is mandatory for controllers and child turns",
-        "Model-routing authority never authorizes Fast/priority service",
-        "Fast requires separate explicit user approval for one objective",
-        "never infer it from the Low-risk lane, Spark, or urgency",
-        "dispatch cannot verify a Standard child, stop and ask the user to disable Fast",
+        "The controller's own service tier is user-configured and grants no child authority",
+        "Standard/default is mandatory for every new child task and child follow-up",
+        "Model-routing authority never authorizes Fast/priority child service",
+        "Fast requires separate explicit user approval for one child objective",
+        "never infer it from the Low-risk lane, Spark, urgency, or the parent controller",
+        "dispatch cannot set and verify a Standard child, stop and ask the user",
         "Prompt text cannot change the transport service tier",
     ),
     "## Architecture routing": (
@@ -254,10 +255,10 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
             )
 
     fast_for_scope = re.compile(
-        r"\b(?:use|enable|select|apply)\b[^.\n]{0,50}\b(?:fast mode|priority service tier)\b"
-        r"[^.\n]{0,60}\b(?:every|all|low[- ]risk)\b"
-        r"|\b(?:every|all|low[- ]risk)\b[^.\n]{0,60}\b(?:use|enable|select|apply)\b"
-        r"[^.\n]{0,50}\b(?:fast mode|priority service tier)\b"
+        r"\b(?:use|enable|select|apply)\b[^.\n]{0,50}\b(?:fast mode|priority(?: child)? service tier)\b"
+        r"[^.\n]{0,60}\b(?:every|all|new child|child task)\b"
+        r"|\b(?:every|all|new child|child task)\b[^.\n]{0,60}\b(?:use|enable|select|apply)\b"
+        r"[^.\n]{0,50}\b(?:fast mode|priority(?: child)? service tier)\b"
     )
     for match in fast_for_scope.finditer(lowered):
         if not directly_negated(lowered, match.start()):
@@ -271,7 +272,7 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
     fast_authority = re.compile(
         r"\b(?:automatic )?model[- ]routing authority\b[^.\n]{0,80}"
         r"\b(?:authorizes?|includes?|covers?)\b[^.\n]{0,45}"
-        r"\b(?:fast(?: mode)?|priority service tier)\b"
+        r"\b(?:fast(?:/priority)?(?: child)?(?: mode| service)?|priority(?: child)? service tier)\b"
     )
     for match in fast_authority.finditer(lowered):
         action = re.search(r"\b(?:authorizes?|includes?|covers?)\b", match.group(0))
@@ -288,6 +289,9 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
         r"\b(?:inherit|reuse|carry)\b[^.\n]{0,80}\b(?:parent|controller|current)\b"
         r"[^.\n]{0,60}\b(?:fast mode|priority service tier)\b[^.\n]{0,80}"
         r"\b(?:child|subagent|task|turn)\b"
+        r"|\b(?:child|subagent)\b[^.\n]{0,60}\b(?:inherit|reuse|carry|use)\b"
+        r"[^.\n]{0,80}\b(?:parent|controller|current)\b[^.\n]{0,60}"
+        r"\b(?:fast mode|priority service tier)\b"
     )
     for match in fast_inheritance.finditer(lowered):
         if not directly_negated(lowered, match.start()):

@@ -84,9 +84,9 @@ class SkillRoutingContractTests(unittest.TestCase):
 
     def test_fast_service_tier_cannot_be_automatic_or_inherited(self) -> None:
         hostile_cases = (
-            ("Use Fast mode for every low-risk task.", "fast-service-tier"),
+            ("Use Fast mode for every new child task.", "fast-service-tier"),
             (
-                "Automatic model-routing authority also authorizes priority service tier.",
+                "Automatic model-routing authority also authorizes priority child service tier.",
                 "fast-authority",
             ),
             (

@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-20
+
+### Fixed
+
+- Standard/default speed now applies to every newly dispatched child task and child follow-up, not to the controller's own user-configured speed.
+- A controller's Fast/priority state, model-routing authority, and a previous child objective can never authorize or leak Fast service into a new child objective.
+- Dispatch fails closed and asks the user when it cannot set and verify Standard service for the child task.
+
 ## [0.8.0] - 2026-08-20
 
 ### Added

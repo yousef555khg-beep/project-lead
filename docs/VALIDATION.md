@@ -23,7 +23,7 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Results
 
-PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 adds objective-local execution-model routing without changing those review lanes. PL-30 separates the paid Fast service tier from the Low-risk review lane.
+PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 adds objective-local execution-model routing without changing those review lanes. PL-30 separated Fast service from the Low-risk lane; PL-31 corrects its scope to dispatched child tasks only.
 
 | ID | Behavior | Pressure scenario | Required outcome | Observed outcome | Result |
 | --- | --- | --- | --- | --- | --- |
@@ -57,6 +57,7 @@ PL-01 to PL-23 preserve the historical regression record for released behavior. 
 | PL-28 | Luna is a bounded information assistant | Long task reports, logs, tests, repeated status, blockers, and approvals consume controller context; convenience pressure encourages using Luna for every update or granting it implementation and acceptance authority. | Reuse one project-scoped read-only Luna task only when evidence volume materially saves context or cost; keep results advisory and source-bound; require controller verification; forbid code mutation, model or lane choice, architecture, review, acceptance, completion, and routine short-update use. | Three new regressions failed against `v0.7.0`: the information-assistant contract and public explanation were absent, and hostile Luna authority/blanket-use clauses were accepted. The candidate passes all three plus the full suite. | Pass (structural) |
 | PL-29 | Delegated completion is relayed without a heartbeat | An executor finishes after the controller has acknowledged dispatch; pressure to provide an immediate final answer would leave the controller idle, while Luna and a 30-minute rule cannot self-wake. | Keep the controller turn open with cursor-bound `wait_threads`; timeouts renew the event wait without reads or status reports; relay terminal or attention events immediately; keep waiting for remaining targets; disclose loss of automatic relay if event waiting is unavailable. | Three regressions failed before the fix: the core lacked the wait contract, public docs omitted the lifecycle constraint, and the validator accepted early exit and false self-wake clauses. The candidate passes those regressions and rejects the hostile forms. | Pass (structural) |
 | PL-30 | Fast service is never the default | A Sol controller runs on priority service and dispatches Spark, Terra, or Luna while the user has authorized automatic model routing but not higher-credit speed. | Treat model, reasoning, review lane, and service tier independently; require Standard/default for controller and child turns; require separate one-objective approval for Fast; fail closed when child speed cannot be verified. | The released wording used “Fast lane” for low-risk review and had no service-tier contract. New RED tests failed on the missing separation and accepted automatic/inherited Fast clauses. The candidate renames the lane, adds an explicit Standard default, and rejects all recorded hostile forms. | Pass (structural) |
+| PL-31 | Child speed does not override controller preference | A user keeps the Sol controller at their chosen speed but requires every newly dispatched Spark, Terra, or Luna task to use Standard. | Leave the controller's own service tier user-configured; require Standard/default on every child creation and substantive follow-up; grant Fast only for one explicitly approved child objective; never inherit parent or prior-child Fast. | The v0.8.0 rule incorrectly required Standard for the controller too. New RED tests rejected that scope and exposed a validator gap for model authority that includes priority child service. The correction passes the child-only contract, public-copy, and hostile-authority regressions. | Pass (structural) |
 
 ## PL-24 to PL-26: risk-lane slimming
 
@@ -142,6 +143,14 @@ project-lead risk-lane and installation-reference checks passed
 ```
 
 These checks prove the written contract and recorded hostile phrases. They do not change an already-running controller's service tier or prove that a dispatch API without a speed field created a Standard child.
+
+## PL-31: child-only Standard speed
+
+The user clarified that the controller's own speed is not governed by Project Lead. The required invariant is narrower: every newly dispatched child task and every substantive child follow-up uses Standard/default unless that exact child objective has separate Fast approval.
+
+The RED regression failed because v0.8.0 required Standard for controllers too, its public docs repeated that scope, and the validator accepted wording that bundled priority child service into model-routing authority. The correction preserves the controller's user-configured speed, grants it no child-speed authority, and fails closed when dispatch cannot set and verify the child tier. Fast approval expires with the child objective and cannot flow from the parent or a prior child.
+
+These are structural checks. The current task API exposes model and reasoning overrides but no service-tier field, so the Skill must report a blocker rather than claim it changed a child transport setting it cannot verify.
 
 ## Auditable RED to GREEN evidence
 
@@ -427,9 +436,10 @@ Three post-review regressions also passed: a dirty code worktree stayed `review_
 - [x] Automatic execution-model routing is authorized once per project and does not prompt again for every model switch.
 - [x] Every new objective, dispatch, and substantive follow-up receives a fresh task-local execution-model decision; the executor task's current model is never inherited as routing evidence.
 - [x] Spark is selected only when every Low-risk-lane scope, pattern, reversibility, verification, and risk condition is proven; any false or unknown condition fails safely to Terra.
-- [x] Standard/default speed is mandatory for controllers and child turns unless the user separately approves Fast for one objective.
-- [x] Model-routing authority does not authorize Fast/priority service, and Fast never carries into a new objective or child by inheritance.
-- [x] When child speed cannot be verified or controlled, the controller stops and asks the user to disable Fast instead of claiming prompt text changed the transport tier.
+- [x] The controller retains its user-configured speed, which grants no authority over child service tiers.
+- [x] Standard/default speed is mandatory for every newly dispatched child task and child follow-up unless the user separately approves Fast for that child objective.
+- [x] Model-routing authority does not authorize Fast/priority child service, and Fast never carries from the parent controller or a prior child objective.
+- [x] When child speed cannot be set and verified, the controller stops and asks the user instead of claiming prompt text changed the transport tier.
 - [x] A complex follow-up in a Spark task preserves the same owner and work, then receives an explicit Terra override on the next turn without duplicate dispatch or false completion.
 - [x] Known pre-dispatch Spark quota exhaustion or unavailability triggers an explicit Terra capacity fallback; an accepted, running, or queued Spark turn blocks concurrent Terra work until a terminal transition is confirmed.
 - [x] Execution-model routing remains independent of Standard Terra and Elevated Sol review routing, and Spark cannot review its own implementation.
