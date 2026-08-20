@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-20
+
+### Added
+
+- A reusable project-scoped Luna information assistant for large or repetitive read-only evidence, including task-report, log, test-output, blocker, approval, terminal-state, deduplication, and plain-language update extraction.
+- Event-driven completion relay that keeps the controller turn open on exact delegated targets until they finish or need attention.
+- A separate speed-tier contract: controllers and child tasks default to Standard, while Fast requires explicit approval for one objective.
+
+### Changed
+
+- The former "Fast lane" is now named "Low-risk lane" so review intensity cannot be confused with Codex Fast service.
+
+### Safety
+
+- Luna assistance is advisory, source-bound, deduplicated, and reserved for work that materially reduces controller context or cost; routine short updates stay with the controller.
+- Luna owns no mutable scope and cannot write code, select execution or review routes, decide architecture, review, accept, mark work complete, call mutating tools, or replace required verification.
+- Controllers cannot end with a promised target still accepted, queued, or running; timeouts renew the same cursor-bound event wait without polling, repeated reads, or Luna.
+- When event waiting is unavailable, the controller must disclose that automatic relay is not guaranteed; neither Luna nor the 30-minute fallback is presented as a background wake mechanism.
+- Model-routing authority never enables Fast/priority service, Fast approval never carries into another objective, and unverifiable child speed fails closed with a user-facing request to disable Fast.
+
 ## [0.7.0] - 2026-08-15
 
 ### Added

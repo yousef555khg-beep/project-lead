@@ -39,13 +39,13 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_core_skill_stays_within_context_budget(self) -> None:
         self.assertLessEqual(len(self.skill.split()), 1800)
 
-    def test_fast_lane_is_default_and_skips_independent_review(self) -> None:
-        fast = section(self.skill, "### Fast lane — default")
-        self.assertIn("`independent_review: none`", fast)
-        self.assertIn("Do not create an independent reviewer", fast)
+    def test_low_risk_lane_is_default_and_skips_independent_review(self) -> None:
+        low_risk = section(self.skill, "### Low-risk lane — default")
+        self.assertIn("`independent_review: none`", low_risk)
+        self.assertIn("Do not create an independent reviewer", low_risk)
         self.assertIn(
             "controller may handle a brief, isolated, reversible change directly",
-            fast,
+            low_risk,
         )
 
     def test_standard_lane_batches_one_review_and_one_repair_review(self) -> None:
@@ -104,7 +104,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         routing = section(self.skill, "## Execution model routing")
         self.assertIn("Choose `gpt-5.3-codex-spark high` only when every condition is true", routing)
         for phrase in (
-            "Fast lane",
+            "Low-risk lane",
             "exact target scope",
             "accepted interface or pattern",
             "reversible",
@@ -142,6 +142,83 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Execution-model routing never changes the review lane", routing)
         self.assertIn("Spark never reviews its own implementation", routing)
 
+    def test_standard_speed_is_default_and_fast_needs_separate_authority(self) -> None:
+        speed = section(self.skill, "## Speed tier")
+        for phrase in (
+            "Standard/default is mandatory for controllers and child turns",
+            "Model-routing authority never authorizes Fast/priority service",
+            "Fast requires separate explicit user approval for one objective",
+            "never infer it from the Low-risk lane, Spark, or urgency",
+            "dispatch cannot verify a Standard child, stop and ask the user to disable Fast",
+            "Prompt text cannot change the transport service tier",
+        ):
+            self.assertIn(phrase, speed)
+
+    def test_luna_is_a_bounded_read_only_information_assistant(self) -> None:
+        monitoring = section(self.skill, "## Monitoring and blockers")
+        for phrase in (
+            "`gpt-5.6-luna medium`",
+            "one project-scoped read-only Luna assistant task",
+            "large or repetitive enough to materially reduce controller context or cost",
+            "summarize long task reports, logs, and test output",
+            "extract progress, evidence, blockers, pending approvals, and terminal state",
+            "deduplicate repeated status and draft the four-line user update",
+            "A Luna result is advisory",
+            "verify the primary evidence before acting",
+            "Do not use Luna for a few lines, routine updates, or to appear busy",
+            "cannot write or modify code, choose execution models or review lanes, make architecture decisions, review, accept, or mark work complete",
+            "deduplicate by phase plus evidence",
+        ):
+            self.assertIn(phrase, monitoring)
+
+    def test_controller_keeps_event_wait_open_until_relay_is_safe(self) -> None:
+        monitoring = section(self.skill, "## Monitoring and blockers")
+        for phrase in (
+            "immediately enter `wait_threads`",
+            "Do not send a final answer while any promised target is accepted, queued, or running",
+            "A timeout is not a state change; reuse the returned cursor",
+            "do not read tasks, call Luna, or report unchanged status",
+            "relay it in commentary and keep waiting for the rest",
+            "End the turn only when all promised targets are terminal",
+            "automatic relay cannot be guaranteed",
+            "an idle controller, the 30-minute rule, or Luna can wake itself",
+        ):
+            self.assertIn(phrase, monitoring)
+
+    def test_public_docs_explain_the_luna_information_assistant(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Luna as a read-only information assistant",
+            "large or repetitive evidence",
+            "never writes code, selects models, reviews, accepts, or marks work complete",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## Luna 只读信息助理",
+            "大量或重复的证据",
+            "不会写代码、选择模型、审查、验收或宣布完成",
+        ):
+            self.assertIn(phrase, readme_zh)
+
+    def test_public_docs_explain_event_driven_completion_relay(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Event-driven completion relay",
+            "keeps the controller turn open with `wait_threads`",
+            "Luna and the 30-minute rule cannot wake an idle controller",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## 事件驱动的完成回传",
+            "使用 `wait_threads` 保持总控回合",
+            "Luna 和 30 分钟规则都不能唤醒空闲总控",
+        ):
+            self.assertIn(phrase, readme_zh)
+
     def test_public_docs_explain_safe_automatic_model_routing(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
         for phrase in (
@@ -160,6 +237,23 @@ class ProjectLeadModeTests(unittest.TestCase):
             "每个新目标都会重新判断",
             "绝不继承上一个目标的模型",
             "Spark 升级到 Terra 时复用同一个任务",
+        ):
+            self.assertIn(phrase, readme_zh)
+
+    def test_public_docs_separate_low_risk_work_from_fast_speed(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Standard speed by default",
+            "Fast speed is not the Low-risk lane",
+            "separate explicit approval",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## 默认使用普通速度",
+            "Fast 速度不等于低风险通道",
+            "单独明确授权",
         ):
             self.assertIn(phrase, readme_zh)
 
