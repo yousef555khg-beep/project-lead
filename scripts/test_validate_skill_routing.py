@@ -82,6 +82,58 @@ class SkillRoutingContractTests(unittest.TestCase):
         )
         self.assertIn("inherited-model", self.codes(hostile))
 
+    def test_fast_service_tier_cannot_be_automatic_or_inherited(self) -> None:
+        hostile_cases = (
+            ("Use Fast mode for every low-risk task.", "fast-service-tier"),
+            (
+                "Automatic model-routing authority also authorizes priority service tier.",
+                "fast-authority",
+            ),
+            (
+                "Inherit the parent controller's Fast mode for every child task.",
+                "fast-inheritance",
+            ),
+        )
+        for statement, expected_code in hostile_cases:
+            with self.subTest(statement=statement):
+                self.assertIn(expected_code, self.codes(self.core + f"\n{statement}\n"))
+
+    def test_luna_cannot_gain_execution_or_blanket_routing_authority(self) -> None:
+        for statement in (
+            "Luna may write code, review it, and accept completion.",
+            "Luna may mark work complete.",
+            "Luna can choose execution models and review lanes.",
+            "Luna should make architecture decisions.",
+            "Luna may call mutating tools.",
+        ):
+            with self.subTest(statement=statement):
+                authority = self.core + f"\n{statement}\n"
+                self.assertIn("luna-authority", self.codes(authority))
+
+        overuse = self.core + "\nAlways use Luna for every short status update.\n"
+        self.assertIn("luna-overuse", self.codes(overuse))
+
+    def test_controller_cannot_exit_early_or_claim_false_self_wake(self) -> None:
+        for statement in (
+            "After dispatch, send a final answer while the executor is still running.",
+            "After dispatch, finish the controller turn while delegated work continues.",
+            "Return control to the user while the delegated task is still running.",
+            "The controller may go idle after acknowledging a queued executor.",
+        ):
+            with self.subTest(statement=statement):
+                hostile = self.core + f"\n{statement}\n"
+                self.assertIn("early-controller-exit", self.codes(hostile))
+
+        for statement in (
+            "Luna will wake the idle controller when delegated work completes.",
+            "The 30-minute rule wakes an idle controller automatically.",
+            "The 30 minute fallback will reactivate the controller.",
+            "A heartbeat can wake the idle controller after the turn ends.",
+        ):
+            with self.subTest(statement=statement):
+                hostile = self.core + f"\n{statement}\n"
+                self.assertIn("false-self-wake", self.codes(hostile))
+
     def test_installation_contract_values_are_enforced(self) -> None:
         reference = REFERENCE.read_text(encoding="utf-8")
         hostile = reference.replace(

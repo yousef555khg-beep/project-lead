@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-A Codex skill for coordinating multi-module projects, automatically routing Spark or Terra execution and useful supporting skills, and keeping ordinary work out of unnecessary review loops.
+A Codex skill for coordinating multi-module projects, automatically routing Spark or Terra execution, using Luna for bounded read-only information assistance, selecting useful supporting skills, and keeping ordinary work out of unnecessary review loops.
 
 ## What changed
 
@@ -23,20 +23,36 @@ For example, it may use `apple-design` for a gesture-driven Apple interface, `co
 
 ## Automatic execution-model routing
 
-The user authorizes automatic routing once per project; Project Lead does not ask again for every switch. Every new objective is classified again from its current scope, evidence, and risk, and it never inherits the previous objective's model.
+The user authorizes automatic routing once per project, covering Spark/Terra execution and bounded Luna read-only assistance; Project Lead does not ask again for every switch. Every new objective is classified again from its current scope, evidence, and risk, and it never inherits the previous objective's model.
 
-- Spark is used only for Fast work whose target, accepted pattern, reversibility, and focused verification are all clear.
+- Spark is used only for Low-risk work whose target, accepted pattern, reversibility, and focused verification are all clear.
 - Terra is the conservative choice whenever a Spark condition is false or unknown, and for Standard or Elevated implementation, non-obvious debugging, cross-module effects, or expanded scope.
 - Spark-to-Terra escalation reuses the same task and sends an explicit Terra override on the next turn. A running response is not switched mid-turn, and the interrupted work is not reported complete.
 - Execution routing does not weaken review independence: Standard review remains Terra, Elevated review remains Sol, and Spark never reviews its own implementation.
 
 Spark eligibility and Spark capacity are checked separately. If the research-preview quota is exhausted or the model is unavailable before dispatch, an authorized controller explicitly falls back to Terra for that objective. If a Spark turn is already accepted, running, or queued, Project Lead does not start concurrent Terra work; it waits for a confirmed rejection, interruption, or terminal state, then rechecks availability on the next objective.
 
+## Standard speed by default
+
+Fast speed is not the Low-risk lane. Model routing chooses a model and reasoning level; it does not authorize the higher-credit Fast service. Controllers and child tasks use Standard/default unless the user gives separate explicit approval for Fast on one objective. That approval expires with the objective and never carries forward.
+
+## Luna as a read-only information assistant
+
+When large or repetitive evidence would materially expand controller context or cost, Project Lead may reuse one project-scoped `gpt-5.6-luna medium` assistant. It summarizes long task reports, logs, and test output; extracts progress, blockers, approvals, and terminal state; deduplicates repeated status; and drafts the plain-language update.
+
+Luna is not used for a few lines or routine updates. Its result remains advisory and source-bound, so the controller verifies primary evidence before acting. Luna never writes code, selects models, reviews, accepts, or marks work complete, and it never replaces required verification.
+
+## Event-driven completion relay
+
+After delegated work is accepted, Project Lead keeps the controller turn open with `wait_threads` until every promised target finishes or needs attention. A timeout only renews the event wait; it does not trigger status polling, repeated reads, or Luna. When one target finishes, the controller relays it in commentary and continues waiting for the others.
+
+The controller ends early only for required user input, an explicit user stop, or an unavailable event-wait tool. In that last case it states that automatic relay cannot be guaranteed. Luna and the 30-minute rule cannot wake an idle controller.
+
 ## Risk-based review lanes
 
 | Lane | Use when | Review behavior |
 | --- | --- | --- |
-| Fast — default | Copy, styling, tests, local fixes, small reversible behavior, isolated work under accepted interfaces | No independent reviewer. The controller verifies the real diff, worktree, and focused checks, then accepts. |
+| Low-risk — default | Copy, styling, tests, local fixes, small reversible behavior, isolated work under accepted interfaces | No independent reviewer. The controller verifies the real diff, worktree, and focused checks, then accepts. |
 | Standard | Meaningful multi-file work inside one module or bounded integration under accepted contracts | One batched `gpt-5.6-terra high` review after the deliverable is stable. At most one incremental repair review. Minor findings never cause a return. |
 | Elevated | Authentication, authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive actions, data loss or ownership, migration, concurrency or recovery, shared contracts, cross-module integration, deployment, release, or system architecture | One stable candidate receives an independent `gpt-5.6-sol xhigh` review. A necessary irreversible architecture decision may be reviewed once before implementation. |
 
@@ -47,11 +63,11 @@ No lane launches a third automatic review for the same objective. After two retu
 1. Inspect the live repository and active tasks.
 2. Separate the current usable outcome from optional later work.
 3. Keep one owner per mutable scope and reuse that task for repair.
-4. Choose Fast, Standard, or Elevated from concrete risk evidence.
+4. Choose Low-risk, Standard, or Elevated from concrete risk evidence.
 5. Run only the checks required by the changed surface and repository policy.
 6. Report progress in plain language.
 
-The controller may handle a brief, isolated, reversible change directly when no executor owns the files. Delegated Fast work may use Spark only when every allowlist condition is proven; substantial implementation, non-obvious debugging, long verification, and parallel modules go to Terra.
+The controller may handle a brief, isolated, reversible change directly when no executor owns the files. Delegated Low-risk work may use Spark only when every allowlist condition is proven; substantial implementation, non-obvious debugging, long verification, and parallel modules go to Terra.
 
 Missing information does not automatically create a system-architecture phase. The controller first inspects or asks. System architecture is reserved for a real cross-client or cross-service boundary with an unresolved shared contract, material rework risk, or an Elevated trigger.
 

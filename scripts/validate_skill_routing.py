@@ -59,11 +59,19 @@ CORE_REQUIRED = {
         "A completed Spark objective does not authorize Spark for the next objective",
         "Execution-model routing never changes the review lane",
     ),
+    "## Speed tier": (
+        "Standard/default is mandatory for controllers and child turns",
+        "Model-routing authority never authorizes Fast/priority service",
+        "Fast requires separate explicit user approval for one objective",
+        "never infer it from the Low-risk lane, Spark, or urgency",
+        "dispatch cannot verify a Standard child, stop and ask the user to disable Fast",
+        "Prompt text cannot change the transport service tier",
+    ),
     "## Architecture routing": (
         "Missing evidence means inspect or ask",
         "do not review every draft",
     ),
-    "### Fast lane — default": (
+    "### Low-risk lane — default": (
         "`independent_review: none`",
         "Do not create an independent reviewer",
         "controller verification is acceptance",
@@ -89,6 +97,16 @@ CORE_REQUIRED = {
         "Read `references/skill-installation-safety.md` only after the user approves an exact candidate",
     ),
     "## Monitoring and blockers": (
+        "immediately enter `wait_threads`",
+        "Do not send a final answer while any promised target is accepted, queued, or running",
+        "A timeout is not a state change; reuse the returned cursor",
+        "relay it in commentary and keep waiting for the rest",
+        "automatic relay cannot be guaranteed",
+        "one project-scoped read-only Luna assistant task",
+        "large or repetitive enough to materially reduce controller context or cost",
+        "A Luna result is advisory",
+        "cannot write or modify code, choose execution models or review lanes",
+        "Do not use Luna for a few lines, routine updates, or to appear busy",
         "After 30 minutes without substantive progress",
         "never create heartbeat, cron, or polling",
         "`blocked_on_user` and `blocked_on_capability` may coexist",
@@ -232,6 +250,119 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                 ValidationError(
                     "inherited-model",
                     f"line {line_number_at(text, match.start())}: execution model cannot carry into a new objective",
+                )
+            )
+
+    fast_for_scope = re.compile(
+        r"\b(?:use|enable|select|apply)\b[^.\n]{0,50}\b(?:fast mode|priority service tier)\b"
+        r"[^.\n]{0,60}\b(?:every|all|low[- ]risk)\b"
+        r"|\b(?:every|all|low[- ]risk)\b[^.\n]{0,60}\b(?:use|enable|select|apply)\b"
+        r"[^.\n]{0,50}\b(?:fast mode|priority service tier)\b"
+    )
+    for match in fast_for_scope.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "fast-service-tier",
+                    f"line {line_number_at(text, match.start())}: Fast cannot be the automatic service tier",
+                )
+            )
+
+    fast_authority = re.compile(
+        r"\b(?:automatic )?model[- ]routing authority\b[^.\n]{0,80}"
+        r"\b(?:authorizes?|includes?|covers?)\b[^.\n]{0,45}"
+        r"\b(?:fast(?: mode)?|priority service tier)\b"
+    )
+    for match in fast_authority.finditer(lowered):
+        action = re.search(r"\b(?:authorizes?|includes?|covers?)\b", match.group(0))
+        action_start = match.start() + (action.start() if action else 0)
+        if not directly_negated(lowered, action_start):
+            errors.append(
+                ValidationError(
+                    "fast-authority",
+                    f"line {line_number_at(text, match.start())}: model routing cannot authorize Fast service",
+                )
+            )
+
+    fast_inheritance = re.compile(
+        r"\b(?:inherit|reuse|carry)\b[^.\n]{0,80}\b(?:parent|controller|current)\b"
+        r"[^.\n]{0,60}\b(?:fast mode|priority service tier)\b[^.\n]{0,80}"
+        r"\b(?:child|subagent|task|turn)\b"
+    )
+    for match in fast_inheritance.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "fast-inheritance",
+                    f"line {line_number_at(text, match.start())}: child speed cannot inherit Fast service",
+                )
+            )
+
+    luna = re.compile(r"\bluna\b")
+    luna_action = re.compile(
+        r"\b(?:write|modify|implement|review|accept)\b"
+        r"|\bmark\b[^.\n]{0,30}\bcomplete\b"
+        r"|\bchoose\b[^.\n]{0,50}\b(?:execution models?|review lanes?)\b"
+        r"|\bmake\b[^.\n]{0,30}\barchitecture decisions?\b"
+        r"|\bcall\b[^.\n]{0,30}\bmutating tools?\b"
+    )
+    permission = re.compile(r"\b(?:may|can|should|will|must)\b")
+    for obj in luna.finditer(lowered):
+        start, end = clause_span(lowered, obj.start(), obj.end(), 140)
+        clause = lowered[start:end]
+        for action in luna_action.finditer(lowered, start, end):
+            permitted = list(permission.finditer(lowered, start, action.start()))
+            if permitted and not directly_negated(lowered, action.start()):
+                errors.append(
+                    ValidationError(
+                        "luna-authority",
+                        f"line {line_number_at(text, obj.start())}: Luna cannot receive execution, review, or acceptance authority",
+                    )
+                )
+                break
+
+        use_action = governing_action(lowered, obj.start(), obj.end(), re.compile(r"\b(?:use|invoke|call)\b"), 120)
+        if (
+            use_action
+            and not directly_negated(lowered, use_action.start())
+            and re.search(r"\b(?:always|every|all|routine|short)\b", clause)
+        ):
+            errors.append(
+                ValidationError(
+                    "luna-overuse",
+                    f"line {line_number_at(text, obj.start())}: Luna cannot be mandatory for routine or short updates",
+                )
+            )
+
+    early_exit = re.compile(
+        r"(?:"
+        r"\b(?:send|give|return|issue)\b[^.\n]{0,40}\bfinal answer\b"
+        r"|\b(?:finish|end|close)\b[^.\n]{0,45}\bcontroller turn\b"
+        r"|\breturn control\b[^.\n]{0,35}\buser\b"
+        r"|\bcontroller\b[^.\n]{0,35}\bgo idle\b"
+        r")[^.\n]{0,120}\b(?:accepted|queued|running|continues?)\b"
+    )
+    for match in early_exit.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "early-controller-exit",
+                    f"line {line_number_at(text, match.start())}: controller cannot end while promised work is active",
+                )
+            )
+
+    self_wake = re.compile(
+        r"\b(?:luna|30[- ]minute (?:rule|fallback)|heartbeat|cron|timer|idle controller)\b[^.\n]{0,100}"
+        r"\b(?:wake|wakes|waking|reactivate|reactivates)\b"
+    )
+    for match in self_wake.finditer(lowered):
+        start, _ = clause_span(lowered, match.start(), match.end(), 150)
+        prefix = lowered[start : match.end()]
+        if not re.search(r"\b(?:cannot|can not|never|do not|does not)\b", prefix):
+            errors.append(
+                ValidationError(
+                    "false-self-wake",
+                    f"line {line_number_at(text, match.start())}: an idle controller cannot self-wake",
                 )
             )
     return errors
