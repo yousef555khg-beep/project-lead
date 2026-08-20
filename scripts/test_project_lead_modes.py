@@ -142,15 +142,18 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Execution-model routing never changes the review lane", routing)
         self.assertIn("Spark never reviews its own implementation", routing)
 
-    def test_child_speed_is_standard_without_changing_controller_speed(self) -> None:
+    def test_child_speed_defaults_to_standard_without_fast_prompt(self) -> None:
         speed = section(self.skill, "## Speed tier")
         for phrase in (
-            "Standard/default is mandatory for every new child task and child follow-up",
+            "Standard/default is the unconditional child default",
             "The controller's own service tier is user-configured and grants no child authority",
             "Model-routing authority never authorizes Fast/priority child service",
-            "Fast requires separate explicit user approval for one child objective",
-            "never infer it from the Low-risk lane, Spark, urgency, or the parent controller",
-            "dispatch cannot set and verify a Standard child, stop and ask the user",
+            "Never ask, suggest, recommend, or offer Fast",
+            "Fast is allowed only after an explicit user request for the exact child objective",
+            "When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default",
+            "Absence of a speed field is not a reason to block or ask",
+            "A new child objective resets to Standard/default",
+            "observable evidence shows unexpected Fast/priority, stop further child follow-ups and report",
             "Prompt text cannot change the transport service tier",
         ):
             self.assertIn(phrase, speed)
@@ -248,7 +251,9 @@ class ProjectLeadModeTests(unittest.TestCase):
             "Fast speed is not the Low-risk lane",
             "The controller may keep its user-configured speed",
             "every new child task starts at Standard/default",
-            "separate explicit approval",
+            "never asks whether to use Fast",
+            "explicitly requests Fast",
+            "omits any Fast/priority override and uses the platform Standard/default",
         ):
             self.assertIn(phrase, readme_en)
 
@@ -258,7 +263,9 @@ class ProjectLeadModeTests(unittest.TestCase):
             "Fast 速度不等于低风险通道",
             "总控本身可以保留用户当前设置的速度",
             "每个新执行任务默认使用 Standard/普通速度",
-            "单独明确授权",
+            "不会主动询问是否使用 Fast",
+            "用户主动明确要求",
+            "不传入任何 Fast/priority 覆盖",
         ):
             self.assertIn(phrase, readme_zh)
 

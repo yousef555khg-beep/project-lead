@@ -34,7 +34,9 @@ Spark eligibility and Spark capacity are checked separately. If the research-pre
 
 ## Child tasks use Standard speed by default
 
-Fast speed is not the Low-risk lane. The controller may keep its user-configured speed, but that setting grants no speed authority to delegated work. Model routing chooses a model and reasoning level; every new child task starts at Standard/default, including follow-ups, unless the user gives separate explicit approval for Fast on that child objective. The approval expires with the objective and never carries forward.
+Fast speed is not the Low-risk lane. The controller may keep its user-configured speed, but that setting grants no speed authority to delegated work. By default, every new child task starts at Standard/default, including follow-ups, and Project Lead never asks whether to use Fast. Fast is used only when the user explicitly requests Fast for that exact child objective; the permission expires with the objective.
+
+When the dispatch API has no speed field, Project Lead omits any Fast/priority override and uses the platform Standard/default. The missing field does not block ordinary dispatch. If runtime evidence later shows unexpected Fast/priority, the controller stops further follow-ups and reports it.
 
 ## Luna as a read-only information assistant
 

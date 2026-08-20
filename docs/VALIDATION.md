@@ -23,7 +23,7 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Results
 
-PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 adds objective-local execution-model routing without changing those review lanes. PL-30 separated Fast service from the Low-risk lane; PL-31 corrects its scope to dispatched child tasks only.
+PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 adds objective-local execution-model routing without changing those review lanes. PL-30 separated Fast service from the Low-risk lane; PL-31 scoped the rule to child tasks; PL-32 removes Fast solicitation when the API omits speed.
 
 | ID | Behavior | Pressure scenario | Required outcome | Observed outcome | Result |
 | --- | --- | --- | --- | --- | --- |
@@ -58,6 +58,7 @@ PL-01 to PL-23 preserve the historical regression record for released behavior. 
 | PL-29 | Delegated completion is relayed without a heartbeat | An executor finishes after the controller has acknowledged dispatch; pressure to provide an immediate final answer would leave the controller idle, while Luna and a 30-minute rule cannot self-wake. | Keep the controller turn open with cursor-bound `wait_threads`; timeouts renew the event wait without reads or status reports; relay terminal or attention events immediately; keep waiting for remaining targets; disclose loss of automatic relay if event waiting is unavailable. | Three regressions failed before the fix: the core lacked the wait contract, public docs omitted the lifecycle constraint, and the validator accepted early exit and false self-wake clauses. The candidate passes those regressions and rejects the hostile forms. | Pass (structural) |
 | PL-30 | Fast service is never the default | A Sol controller runs on priority service and dispatches Spark, Terra, or Luna while the user has authorized automatic model routing but not higher-credit speed. | Treat model, reasoning, review lane, and service tier independently; require Standard/default for controller and child turns; require separate one-objective approval for Fast; fail closed when child speed cannot be verified. | The released wording used “Fast lane” for low-risk review and had no service-tier contract. New RED tests failed on the missing separation and accepted automatic/inherited Fast clauses. The candidate renames the lane, adds an explicit Standard default, and rejects all recorded hostile forms. | Pass (structural) |
 | PL-31 | Child speed does not override controller preference | A user keeps the Sol controller at their chosen speed but requires every newly dispatched Spark, Terra, or Luna task to use Standard. | Leave the controller's own service tier user-configured; require Standard/default on every child creation and substantive follow-up; grant Fast only for one explicitly approved child objective; never inherit parent or prior-child Fast. | The v0.8.0 rule incorrectly required Standard for the controller too. New RED tests rejected that scope and exposed a validator gap for model authority that includes priority child service. The correction passes the child-only contract, public-copy, and hostile-authority regressions. | Pass (structural) |
+| PL-32 | Missing speed field does not solicit Fast | Child dispatch exposes model and reasoning but no service-tier field; the prior rule would block and ask the user whether to approve Fast. | Omit Fast/priority, dispatch with platform Standard/default, never ask or recommend Fast, and allow it only after an unsolicited explicit user request for that exact child objective. | The RED regressions reproduced the visible Fast question, missing-field blocker, and three solicitation variants. The candidate removes the blocker, rejects Fast solicitation, resets every new objective to Standard/default, and reports only observable unexpected Fast evidence. | Pass (structural) |
 
 ## PL-24 to PL-26: risk-lane slimming
 
@@ -150,7 +151,15 @@ The user clarified that the controller's own speed is not governed by Project Le
 
 The RED regression failed because v0.8.0 required Standard for controllers too, its public docs repeated that scope, and the validator accepted wording that bundled priority child service into model-routing authority. The correction preserves the controller's user-configured speed, grants it no child-speed authority, and fails closed when dispatch cannot set and verify the child tier. Fast approval expires with the child objective and cannot flow from the parent or a prior child.
 
-These are structural checks. The current task API exposes model and reasoning overrides but no service-tier field, so the Skill must report a blocker rather than claim it changed a child transport setting it cannot verify.
+These are structural checks. The current task API exposes model and reasoning overrides but no service-tier field, so the Skill omits any Fast/priority override and uses the platform default; it must not claim that prompt text changed the transport setting.
+
+## PL-32: ordinary default without Fast solicitation
+
+The real controller followed v0.8.1 literally: because dispatch exposed no speed field, it blocked and asked the user to separately authorize Fast. That prevented silent Fast use but turned every ordinary child dispatch into a quota question.
+
+The RED regression required the controller to stop offering Fast, treat omission of any Fast/priority override as the platform Standard/default path, and reserve Fast for an unsolicited explicit user request bound to one exact child objective. The validator now rejects asking, suggesting, recommending, or offering Fast when Standard is unavailable, and rejects a missing speed field as a child-dispatch blocker. If runtime evidence later proves unexpected Fast/priority, the controller stops further follow-ups and reports the anomaly instead of silently continuing.
+
+This contract governs Project Lead decisions; it cannot add a transport parameter that the platform does not expose. Its observable guarantee is therefore that Project Lead never requests or sends a Fast/priority override without the user's prior explicit request.
 
 ## Auditable RED to GREEN evidence
 
@@ -439,7 +448,9 @@ Three post-review regressions also passed: a dirty code worktree stayed `review_
 - [x] The controller retains its user-configured speed, which grants no authority over child service tiers.
 - [x] Standard/default speed is mandatory for every newly dispatched child task and child follow-up unless the user separately approves Fast for that child objective.
 - [x] Model-routing authority does not authorize Fast/priority child service, and Fast never carries from the parent controller or a prior child objective.
-- [x] When child speed cannot be set and verified, the controller stops and asks the user instead of claiming prompt text changed the transport tier.
+- [x] Missing child speed fields use the platform Standard/default without blocking or asking whether to use Fast.
+- [x] Project Lead never asks, suggests, recommends, or offers Fast; only a prior explicit user request can authorize it for one exact child objective.
+- [x] Observable unexpected Fast/priority evidence stops further child follow-ups and is reported instead of silently continuing.
 - [x] A complex follow-up in a Spark task preserves the same owner and work, then receives an explicit Terra override on the next turn without duplicate dispatch or false completion.
 - [x] Known pre-dispatch Spark quota exhaustion or unavailability triggers an explicit Terra capacity fallback; an accepted, running, or queued Spark turn blocks concurrent Terra work until a terminal transition is confirmed.
 - [x] Execution-model routing remains independent of Standard Terra and Elevated Sol review routing, and Spark cannot review its own implementation.
@@ -463,7 +474,7 @@ Three post-review regressions also passed: a dirty code worktree stayed `review_
 - [x] An explicit same-candidate second opinion preserves the original review and blocks on unresolved Critical or Important findings rather than silently overwriting a verdict.
 - [x] Normal progress reports use four plain-language lines and hide internal hashes, models, review IDs, and ledger state unless they explain a real blocker.
 - [x] Installation-only mechanics live in a progressive reference that is loaded only after exact candidate approval.
-- [x] Thirty-five risk-lane, execution-model-routing, speed-tier, event-wait, automatic-skill-routing, public-description, and safety-contract regressions reject missing rules, model or Fast inheritance, automatic priority service, early controller exit, false self-wake claims, review-loop regressions, hidden comments, external-skill dependencies, package runners, false completion overrides, unsafe target commits, and loader-visible transaction siblings.
+- [x] Thirty-six risk-lane, execution-model-routing, speed-tier, event-wait, automatic-skill-routing, public-description, and safety-contract regressions reject missing rules, model or Fast inheritance, Fast solicitation, missing-speed blockers, automatic priority service, early controller exit, false self-wake claims, review-loop regressions, hidden comments, external-skill dependencies, package runners, false completion overrides, unsafe target commits, and loader-visible transaction siblings.
 
 ## How to repeat the checks
 

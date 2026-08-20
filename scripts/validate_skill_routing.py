@@ -61,11 +61,14 @@ CORE_REQUIRED = {
     ),
     "## Speed tier": (
         "The controller's own service tier is user-configured and grants no child authority",
-        "Standard/default is mandatory for every new child task and child follow-up",
+        "Standard/default is the unconditional child default",
         "Model-routing authority never authorizes Fast/priority child service",
-        "Fast requires separate explicit user approval for one child objective",
-        "never infer it from the Low-risk lane, Spark, urgency, or the parent controller",
-        "dispatch cannot set and verify a Standard child, stop and ask the user",
+        "Never ask, suggest, recommend, or offer Fast",
+        "Fast is allowed only after an explicit user request for the exact child objective",
+        "When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default",
+        "Absence of a speed field is not a reason to block or ask",
+        "A new child objective resets to Standard/default",
+        "observable evidence shows unexpected Fast/priority, stop further child follow-ups and report",
         "Prompt text cannot change the transport service tier",
     ),
     "## Architecture routing": (
@@ -299,6 +302,32 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                 ValidationError(
                     "fast-inheritance",
                     f"line {line_number_at(text, match.start())}: child speed cannot inherit Fast service",
+                )
+            )
+
+    fast_solicitation = re.compile(
+        r"\b(?:ask|suggest|recommend|offer|propose)\b[^.\n]{0,100}"
+        r"\b(?:fast(?: mode)?|priority service)\b"
+    )
+    for match in fast_solicitation.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "fast-solicitation",
+                    f"line {line_number_at(text, match.start())}: controller cannot solicit Fast service",
+                )
+            )
+
+    missing_speed_block = re.compile(
+        r"\bmissing\b[^.\n]{0,50}\b(?:speed|service[- ]tier)\b[^.\n]{0,40}"
+        r"\b(?:blocks?|stops?|waits?|asks?)\b"
+    )
+    for match in missing_speed_block.finditer(lowered):
+        if not directly_negated(lowered, match.start()):
+            errors.append(
+                ValidationError(
+                    "missing-speed-block",
+                    f"line {line_number_at(text, match.start())}: missing speed field must use platform default",
                 )
             )
 
