@@ -32,9 +32,9 @@ The user authorizes automatic routing once per project, covering Spark/Terra exe
 
 Spark eligibility and Spark capacity are checked separately. If the research-preview quota is exhausted or the model is unavailable before dispatch, an authorized controller explicitly falls back to Terra for that objective. If a Spark turn is already accepted, running, or queued, Project Lead does not start concurrent Terra work; it waits for a confirmed rejection, interruption, or terminal state, then rechecks availability on the next objective.
 
-## Standard speed by default
+## Child tasks use Standard speed by default
 
-Fast speed is not the Low-risk lane. Model routing chooses a model and reasoning level; it does not authorize the higher-credit Fast service. Controllers and child tasks use Standard/default unless the user gives separate explicit approval for Fast on one objective. That approval expires with the objective and never carries forward.
+Fast speed is not the Low-risk lane. The controller may keep its user-configured speed, but that setting grants no speed authority to delegated work. Model routing chooses a model and reasoning level; every new child task starts at Standard/default, including follow-ups, unless the user gives separate explicit approval for Fast on that child objective. The approval expires with the objective and never carries forward.
 
 ## Luna as a read-only information assistant
 

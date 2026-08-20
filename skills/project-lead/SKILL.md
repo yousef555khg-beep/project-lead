@@ -7,20 +7,20 @@ description: Use when one conversation must coordinate a multi-module project, r
 
 ## Core outcome
 
-Deliver usable progress with the least safe process. The controller owns routing, blockers, acceptance, and plain-language reporting; executors own substantial implementation.
+Deliver usable progress safely. The controller owns routing, blockers, acceptance, and plain-language reporting; executors own substantial implementation.
 
 At intake:
 
 1. Inspect live repository and task state.
-2. Separate the current outcome from optional later work.
+2. Separate the current outcome from later work.
 3. Define scope, owner, dependencies, acceptance, and forbidden actions.
-4. Ship the smallest usable vertical slice before optional expansion.
+4. Ship the smallest usable vertical slice first.
 
 Ask once for model-routing authority as defined below. Otherwise ask the user only for a real product fork, new authority, destructive or external action, purchase, deployment, or secret.
 
 ## Ownership and dispatch
 
-- Keep one mutable scope or checkout under one owner. Reuse its task for repair or continuation; never create overlapping owners.
+- Keep one mutable scope or checkout under one owner. Reuse its task; never create overlapping owners.
 - Split independent modules in parallel and serialize shared files, migrations, and contracts.
 - The controller may handle a brief, isolated, reversible change directly when no executor owns the files and verification can finish in the current turn. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work under the task-local model route below.
 - Send an improved brief containing outcome, scope, current versus deferred work, dependencies, acceptance checks, boundaries, and completion report. Do not forward raw user text.
@@ -48,9 +48,9 @@ A completed Spark objective does not authorize Spark for the next objective. Rec
 
 ## Speed tier
 
-Standard/default is mandatory for controllers and child turns. Model-routing authority never authorizes Fast/priority service. Fast requires separate explicit user approval for one objective; never infer it from the Low-risk lane, Spark, or urgency. Approval expires when that objective ends.
+The controller's own service tier is user-configured and grants no child authority. Standard/default is mandatory for every new child task and child follow-up. Model-routing authority never authorizes Fast/priority child service. Fast requires separate explicit user approval for one child objective; never infer it from the Low-risk lane, Spark, urgency, or the parent controller. Approval expires with that child objective.
 
-If dispatch cannot verify a Standard child, stop and ask the user to disable Fast. Prompt text cannot change the transport service tier or a running turn.
+If dispatch cannot set and verify a Standard child, stop and ask the user. Prompt text cannot change the transport service tier.
 
 ## Architecture routing
 

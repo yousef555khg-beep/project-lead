@@ -142,14 +142,15 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Execution-model routing never changes the review lane", routing)
         self.assertIn("Spark never reviews its own implementation", routing)
 
-    def test_standard_speed_is_default_and_fast_needs_separate_authority(self) -> None:
+    def test_child_speed_is_standard_without_changing_controller_speed(self) -> None:
         speed = section(self.skill, "## Speed tier")
         for phrase in (
-            "Standard/default is mandatory for controllers and child turns",
-            "Model-routing authority never authorizes Fast/priority service",
-            "Fast requires separate explicit user approval for one objective",
-            "never infer it from the Low-risk lane, Spark, or urgency",
-            "dispatch cannot verify a Standard child, stop and ask the user to disable Fast",
+            "Standard/default is mandatory for every new child task and child follow-up",
+            "The controller's own service tier is user-configured and grants no child authority",
+            "Model-routing authority never authorizes Fast/priority child service",
+            "Fast requires separate explicit user approval for one child objective",
+            "never infer it from the Low-risk lane, Spark, urgency, or the parent controller",
+            "dispatch cannot set and verify a Standard child, stop and ask the user",
             "Prompt text cannot change the transport service tier",
         ):
             self.assertIn(phrase, speed)
@@ -240,19 +241,23 @@ class ProjectLeadModeTests(unittest.TestCase):
         ):
             self.assertIn(phrase, readme_zh)
 
-    def test_public_docs_separate_low_risk_work_from_fast_speed(self) -> None:
+    def test_public_docs_separate_child_speed_from_controller_speed(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
         for phrase in (
-            "## Standard speed by default",
+            "## Child tasks use Standard speed by default",
             "Fast speed is not the Low-risk lane",
+            "The controller may keep its user-configured speed",
+            "every new child task starts at Standard/default",
             "separate explicit approval",
         ):
             self.assertIn(phrase, readme_en)
 
         readme_zh = README_ZH.read_text(encoding="utf-8")
         for phrase in (
-            "## 默认使用普通速度",
+            "## 下发任务默认使用普通速度",
             "Fast 速度不等于低风险通道",
+            "总控本身可以保留用户当前设置的速度",
+            "每个新执行任务默认使用 Standard/普通速度",
             "单独明确授权",
         ):
             self.assertIn(phrase, readme_zh)
