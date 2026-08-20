@@ -22,9 +22,9 @@ Ask once for model-routing authority as defined below. Otherwise ask the user on
 
 - Keep one mutable scope or checkout under one owner. Reuse its task; never create overlapping owners.
 - Split independent modules in parallel and serialize shared files, migrations, and contracts.
-- The controller may handle a brief, isolated, reversible change directly when no executor owns the files and verification can finish in the current turn. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work under the task-local model route below.
-- Send an improved brief containing outcome, scope, current versus deferred work, dependencies, acceptance checks, boundaries, and completion report. Do not forward raw user text.
-- Keep a compact private ledger: task, owner, scope, status, blocker, last real evidence, execution-model decision, and review lane. Do not make the user read the ledger.
+- The controller may handle a brief, isolated, reversible change directly when unowned and verifiable now. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work.
+- Send outcome, scope, current versus deferred work, dependencies, checks, boundaries, and completion report; never raw user text.
+- Keep a compact private ledger of task, owner, scope, status, blocker, evidence, model, and review lane; keep it private.
 
 ## Execution model routing
 
@@ -48,9 +48,9 @@ A completed Spark objective does not authorize Spark for the next objective. Rec
 
 ## Speed tier
 
-The controller's own service tier is user-configured and grants no child authority. Standard/default is mandatory for every new child task and child follow-up. Model-routing authority never authorizes Fast/priority child service. Fast requires separate explicit user approval for one child objective; never infer it from the Low-risk lane, Spark, urgency, or the parent controller. Approval expires with that child objective.
+The controller's own service tier is user-configured and grants no child authority. Standard/default is the unconditional child default for every creation and substantive follow-up. Model-routing authority never authorizes Fast/priority child service. Never ask, suggest, recommend, or offer Fast. Fast is allowed only after an explicit user request for the exact child objective. A new child objective resets to Standard/default.
 
-If dispatch cannot set and verify a Standard child, stop and ask the user. Prompt text cannot change the transport service tier.
+When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default. Absence of a speed field is not a reason to block or ask. If observable evidence shows unexpected Fast/priority, stop further child follow-ups and report. Prompt text cannot change the transport service tier.
 
 ## Architecture routing
 

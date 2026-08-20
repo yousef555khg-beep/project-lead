@@ -98,6 +98,19 @@ class SkillRoutingContractTests(unittest.TestCase):
             with self.subTest(statement=statement):
                 self.assertIn(expected_code, self.codes(self.core + f"\n{statement}\n"))
 
+    def test_fast_cannot_be_offered_when_speed_field_is_missing(self) -> None:
+        hostile_cases = (
+            "If Standard cannot be verified, ask the user whether to use Fast.",
+            "Offer Fast when the dispatch API has no service-tier field.",
+            "Recommend priority service when Standard is unavailable.",
+        )
+        for statement in hostile_cases:
+            with self.subTest(statement=statement):
+                self.assertIn("fast-solicitation", self.codes(self.core + f"\n{statement}\n"))
+
+        blocked = self.core + "\nA missing speed field blocks child dispatch until the user answers.\n"
+        self.assertIn("missing-speed-block", self.codes(blocked))
+
     def test_luna_cannot_gain_execution_or_blanket_routing_authority(self) -> None:
         for statement in (
             "Luna may write code, review it, and accept completion.",

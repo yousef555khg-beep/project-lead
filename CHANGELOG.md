@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-08-20
+
+### Changed
+
+- Child dispatch now uses the platform Standard/default when no service-tier field exists, instead of blocking and asking whether to use Fast.
+
+### Safety
+
+- Project Lead never asks, suggests, recommends, or offers Fast. Fast is used only after an explicit user request for one exact child objective and resets to Standard/default on the next objective.
+- Unexpected observable Fast/priority evidence stops further child follow-ups and is reported to the user.
+
 ## [0.8.1] - 2026-08-20
 
 ### Fixed
