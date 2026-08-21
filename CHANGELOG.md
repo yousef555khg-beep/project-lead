@@ -4,6 +4,33 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.8.3] - 2026-08-21
+
+### Added
+
+- Before every task creation or substantive follow-up, the controller now announces the task, selected model, reasoning effort, and actual speed in one non-blocking line; speed is ordinary unless the exact objective already has explicit Fast authorization.
+- Automatic routing now chooses supported reasoning effort as well as model: bounded Spark high/xhigh, Terra high/xhigh/Ultra, and read-only Luna medium/high/xhigh.
+
+### Fixed
+
+- Cross-model dispatch no longer uses full-history inheritance, which can silently preserve the controller's Sol route instead of the requested child route.
+- Every created task now receives no or bounded history, including a same-route independent reviewer, so review isolation does not depend on model differences.
+- Dispatch now verifies an atomically exposed route before work or uses a no-project-access handshake before sending the substantive brief; an unobservable route fails closed as `blocked_on_routing`.
+- Spark-to-Terra capacity guards are local to the same objective or logical scope and no longer block unrelated Terra work.
+- A follow-up without model and effort fields is no longer treated as an in-place route switch; the logical scope is handed off only after the prior turn is terminal or interrupted, with one active owner.
+- Accepted task model and effort are verified before substantive work; any corrected route is announced before redispatch without asking for approval.
+- Approval now follows the proposed action and missing authority; Elevated review, local reversible preparation, normal dispatch, and in-scope repair no longer create prose approval requests by themselves.
+- `blocked_on_user` is bound to one objective, candidate or scope version, exact action, and authority gap, then cleared or superseded when that identity or need changes.
+- Repository plans, designs, source, tests, complex debugging, repeated repair, and long or broad validation must stay with executor tasks instead of accumulating in the controller.
+- Elevated risk now strengthens review without automatically creating a separate architecture phase.
+- The two-return circuit breaker now has an explicit closeout: Standard uses one evidence-bound root-cause repair without another review; Elevated gets one final independent closure review, never a fourth, and stays `blocked_on_quality` if unresolved.
+- Routing validation now covers cross-line follow-up switches, universal Ultra defaults, approval-gated notice synonyms, and bounded Ultra exceptions without false positives.
+- The validator now binds the complete core Skill to its reviewed SHA-256, so even a short unknown override fails closed until the changed core and bound digest are reviewed together; semantic scanners remain a second defense.
+
+### Safety
+
+- Real product or security-policy forks, new authority or secrets, irreversible or destructive actions, external side effects, purchases, deployment, release, and user-only platform approval cards still require the user.
+
 ## [0.8.2] - 2026-08-20
 
 ### Changed
@@ -188,7 +215,9 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
-[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.8.3...HEAD
+[0.8.3]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.8.3
+[0.8.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.8.2
 [0.7.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.7.0
 [0.6.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.6.0
 [0.5.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.5.0
