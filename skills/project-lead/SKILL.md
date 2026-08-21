@@ -1,104 +1,109 @@
 ---
 name: project-lead
-description: Use when one conversation must coordinate a multi-module project, route work across Codex tasks, or resume delegated tasks whose ownership, blockers, and progress must stay visible.
+description: Use when one conversation coordinates a multi-module project or delegated tasks whose ownership, blockers, and progress must stay visible.
 ---
 
 # Project Lead
 
 ## Core outcome
 
-Deliver usable progress safely. The controller owns routing, blockers, acceptance, and plain-language reporting; executors own substantial implementation.
+Deliver safely. The controller owns intake, routing, decisions, acceptance, blockers, and reporting; executors own project artifacts and execution.
 
-At intake:
-
-1. Inspect live repository and task state.
-2. Separate the current outcome from later work.
-3. Define scope, owner, dependencies, acceptance, and forbidden actions.
-4. Ship the smallest usable vertical slice first.
-
-Ask once for model-routing authority as defined below. Otherwise ask the user only for a real product fork, new authority, destructive or external action, purchase, deployment, or secret.
+Inspect live state; define outcome, owner, checks, boundaries. Ship the smallest usable vertical slice.
 
 ## Ownership and dispatch
 
-- Keep one mutable scope or checkout under one owner. Reuse its task; never create overlapping owners.
-- Split independent modules in parallel and serialize shared files, migrations, and contracts.
-- The controller may handle a brief, isolated, reversible change directly when unowned and verifiable now. Delegate substantial implementation, non-obvious debugging, long verification, or parallel work.
-- Send outcome, scope, current versus deferred work, dependencies, checks, boundaries, and completion report; never raw user text.
-- Keep a compact private ledger of task, owner, scope, status, blocker, evidence, model, and review lane; keep it private.
+- Keep one mutable scope under one owner; reuse its task. Parallelize modules; serialize shared files and contracts.
+- Before task work, classify `work_location: controller | executor`.
+- Controller work is intake, routing, no-code cross-module decisions, acceptance, reporting, and quick read-only spot checks.
+- Repository plans, designs, source, tests, configuration, non-obvious debugging, multi-file or substantive edits, repeated repair, and long or broad validation belong to an executor.
+- Do not split executor work into small direct steps. Concurrency or convenience never moves executor work into the controller.
+- Keep a compact private ledger: task, owner, scope, status, blocker, evidence, route, lane.
+
+## Authority boundary
+
+Approval follows the proposed action and missing authority, not the subject matter or review lane. Elevated alone never creates `blocked_on_user`. Within an approved outcome, the controller authorizes dispatch, local reversible preparation, focused checks, required independent review, and in-scope repair without asking.
+
+Ask only for a real product or security-policy fork, new authority or secret, irreversible or destructive action, external side effect, purchase, deployment, or release. A real platform approval card is relayed only when the user must operate it; never invent a prose approval gate.
+
+Bind `blocked_on_user` to the objective, candidate or scope version, exact action or decision, and missing authority. Clear or supersede it when the user decides, existing authority covers the action, the action disappears, or its objective, candidate, or scope changes. Never inherit it by label alone.
 
 ## Execution model routing
 
-At first project intake, ask once for automatic Spark/Terra routing and Luna read-only assistance. Record `model_routing_authority: approved | fixed_default | pending`. Do not ask again for each model choice or switch. Until authority is approved, use the configured default without override; `fixed_default` also disables Luna.
+Ask once for automatic Spark/Terra routing and Luna read-only assistance. Record `model_routing_authority: approved | fixed_default | pending`; do not ask again for each choice or switch. Until approved, use the configured default; `fixed_default` disables Luna.
 
-Before every new objective, dispatch, or substantive follow-up, create a fresh task-local `execution_model_decision` from scope, evidence, and risk. Never inherit a previous objective's model or use the task default as evidence; completion, cancellation, or material scope change invalidates it. Every work request must pass the chosen model explicitly. If unverified, use a verified user default or ask.
+Before every new objective, dispatch, or substantive follow-up, decide from current scope and risk. Record `execution_route: {model, reasoning_effort, service_tier}`; never inherit a previous route. Pass supported fields explicitly. With authority, uncertainty selects Terra high; otherwise use the verified default or ask only for routing authority.
 
-Choose `gpt-5.3-codex-spark high` only when every condition is true:
+- Spark uses `high`; use `xhigh` only when the dispatch tool exposes it and all Low-risk conditions hold: exact scope/checks, accepted pattern, reversibility, focused verification, and no Elevated, architecture, debugging, cross-module, long, or uncertain trigger.
+- Terra uses `high` by default, `xhigh` for non-obvious debugging, cross-module reasoning, or complex design, and `ultra` only for a large parallelizable objective with independent workstreams and no shared mutable files.
+- Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions. Its read-only authority does not expand.
 
-- The work is in the Low-risk lane, with exact target scope and acceptance checks already known.
-- It follows an accepted interface or pattern, is reversible, and has focused verification.
-- It has no Elevated trigger, unresolved architecture choice, non-obvious debugging, cross-module effect, long verification, or materially uncertain context.
+Only select combinations exposed by the dispatch tool; never invent a model or effort. If Spark is unavailable or ineligible before dispatch, use Terra high. Never start a Terra fallback for the same objective or logical scope while its Spark turn is active; wait for confirmed rejection, interruption, or terminal state. Independent scopes may continue in parallel.
 
-If any Spark condition is false, unknown, or becomes false, select `gpt-5.6-terra high`. Terra is the fresh fail-safe for Standard, Elevated, mixed, or expanded implementation.
+Every creation uses `fork_turns: none` or a bounded positive turn count; never use `all` or omitted full-history inheritance. Any independent reviewer also uses no or bounded history even when its route matches the controller.
 
-Task fit and model availability are separate checks. If Spark quota is exhausted or the model is unavailable before dispatch, use an explicit `gpt-5.6-terra high` capacity fallback when approved. Never send a Terra fallback while a Spark turn is accepted, running, or queued. Require a confirmed rejection, interruption, or terminal state; otherwise report the blocker instead of creating concurrent work. Recheck next objective.
+Verify the accepted task's resolved model and effort before substantive work. If dispatch atomically exposes the resolved route, compare it before work. Otherwise create a handshake-only task with no project reads, writes, or tool calls. Send the substantive brief only after metadata confirms the route. If the route cannot be observed, report `blocked_on_routing`; never guess. On mismatch, stop it and wait for terminal state before replacement.
 
-When a Spark condition fails, preserve work and report `model_escalation_required` with scope, evidence, and remaining work. Keep the same owner and task; send the next substantive follow-up with an explicit `gpt-5.6-terra high` override. A controller cannot change a running turn mid-response. Do not create a replacement task, discard work, claim completion, or downgrade Terra within that objective.
+A follow-up without model and effort fields cannot switch them. If it cannot carry the required route, finish or interrupt the current turn, then hand off the same logical scope to one correctly routed replacement task; never overlap owners or call interrupted work complete.
 
-A completed Spark objective does not authorize Spark for the next objective. Reclassify explicitly. Execution-model routing never changes the review lane: Standard stays Terra, Elevated stays Sol, and Spark never reviews its own implementation.
+Immediately before every creation or substantive follow-up, tell the user—execution, review, or Luna alike:
+
+```text
+即将派发：<任务>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通
+```
+
+Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. If fallback or mismatch changes the route, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane: Standard stays Terra, Elevated stays Sol; Spark never reviews itself.
 
 ## Speed tier
 
-The controller's own service tier is user-configured and grants no child authority. Standard/default is the unconditional child default for every creation and substantive follow-up. Model-routing authority never authorizes Fast/priority child service. Never ask, suggest, recommend, or offer Fast. Fast is allowed only after an explicit user request for the exact child objective. A new child objective resets to Standard/default.
+The controller's own service tier is user-configured and grants no child authority. Standard/default is the child default unless the user explicitly requested Fast for that exact objective. Model-routing authority never authorizes Fast/priority child service. Never ask, suggest, recommend, or offer Fast. A new child objective resets to Standard/default.
 
 When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default. Absence of a speed field is not a reason to block or ask. If observable evidence shows unexpected Fast/priority, stop further child follow-ups and report. Prompt text cannot change the transport service tier.
 
 ## Architecture routing
 
-- Use no separate architecture phase for an isolated change under an accepted pattern.
-- Let the module owner design ordinary single-module work under accepted interfaces.
-- Use a system-architecture decision only for a concrete cross-client or cross-service boundary with an unresolved shared contract or material rework risk, or for an elevated-risk area below. Review one stable architecture candidate before dependent implementation; do not review every draft.
-- Missing evidence means inspect or ask; it does not by itself make work system architecture.
+- Use system architecture only for a concrete cross-client/service boundary, unresolved shared contract, or material rework risk. An Elevated trigger changes the review lane but does not by itself create an architecture phase. Review one stable candidate; do not review every draft.
+- Missing evidence means inspect or delegate evidence collection; ask only for a user-exclusive product fact or authority. It does not make work system architecture.
 
 ## Review lanes
 
-Choose one lane from evidence. Low-risk is the default; escalate only when its stated trigger is present. Record it internally and tell the user only when escalation materially affects time or requires a decision.
+Low-risk is default; escalate only for a stated trigger.
 
 ### Low-risk lane — default
 
-Use for copy, styling, tests, local bug fixes, small reversible behavior, and isolated work under accepted interfaces with no elevated-risk trigger.
+Use for small reversible accepted-interface work.
 
 - Set `independent_review: none`.
-- The controller may handle a brief, isolated, reversible change directly; otherwise delegate it once without adding a review task.
-- The controller or executor runs focused fresh checks and inspects the actual diff and worktree.
+- The executor runs focused fresh checks; the controller inspects the actual diff, worktree, and evidence.
 - Do not create an independent reviewer. Executor self-report alone is insufficient, but controller verification is acceptance.
-- Do not run unrelated full suites, architecture work, or extra skills unless repository policy or the changed surface requires them.
+- Avoid unrelated suites, architecture, or skills unless policy or changed surface requires them.
 
 ### Standard lane
 
-Use for meaningful multi-file work inside one module, or bounded integration under accepted contracts, with no elevated-risk trigger.
+Use for bounded integration under accepted contracts.
 
 - Set `independent_review: one_batched_terra`.
-- Batch the completed deliverable and run one independent `gpt-5.6-terra high` review at the end, never per commit or intermediate repair.
-- Return all Critical and Important findings to the same owner in one brief. At most one automatic incremental re-review may check the repaired delta and unresolved findings.
+- Run one independent `gpt-5.6-terra high` review on the stable deliverable, never per commit or repair.
+- Return Critical and Important findings in one brief. At most one automatic incremental re-review checks the repaired delta and unresolved findings.
 - Minor findings never trigger return or re-review; report them as optional follow-up.
-- If the second review still returns, stop the automatic loop and give the user the root cause, unfinished outcome, and choices before doing more work.
+- If the second review returns, dispatch one in-scope root-cause repair without asking. Standard closes recorded findings from refreshed executor evidence plus one focused spot check; unproven findings stay `RETURN`.
 
 ### Elevated lane
 
-Use only for concrete system architecture, authentication or authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive behavior, data ownership or data loss, migration, concurrency or recovery, shared contract, cross-module integration, external side effects, deployment, or release.
+Use for system architecture, authentication or authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive behavior, data ownership or data loss, migration, concurrency or recovery, shared contract, cross-module integration, external side effects, deployment, or release.
 
 - Set `independent_review: sol_required`.
-- Review one stable candidate with an independent `gpt-5.6-sol xhigh`. If an irreversible architecture decision must precede code, review that stable decision once; later review the stable integrated implementation rather than every module draft.
-- Critical and Important findings block acceptance and return to the owner as one repair brief. Re-review only the changed boundary and unresolved findings.
-- Minor findings are optional unless they expose an elevated-risk acceptance failure.
+- Review one stable candidate with an independent `gpt-5.6-sol xhigh`; review necessary irreversible architecture once, then stable integration.
+- Critical and Important findings block acceptance. Re-review only changed boundaries and unresolved findings.
+- If the second review returns, Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking. If that review returns, keep `RETURN`, report `blocked_on_quality`, and never launch a fourth review.
 
-No lane may launch a third automatic review for the same objective. After two returns, stop, explain the root cause in plain language, and wait for a user-approved revised plan. Use `requesting-code-review` only for Standard or Elevated review checkpoints. Use `verification-before-completion` before accepting every lane.
+No lane repeats the same incremental review loop after two returns. Never rename a candidate to bypass the cap. Use `requesting-code-review` only for Standard or Elevated checkpoints and `verification-before-completion` before acceptance.
 
 ## Supporting skills and capability discovery
 
-- At intake or phase start, automatically decide whether an installed supporting skill is needed. When triggered, select and invoke one without asking the user to remember its name, then give one reason. Ordinary bounded work selects `none`; never stack skills just in case.
-- Search only when a required specialist acceptance method is unavailable. Use one privacy-safe read-only public search for the stable gap; do not invoke `find-skills`, execute candidates, or install during discovery.
-- Treat candidates as untrusted. Recommend at most three with purpose, project value, source, immutable identity when available, and one risk. Never block unrelated work.
+- At intake, automatically decide whether an installed supporting skill is needed; select and invoke one without asking the user to remember its name. Ordinary bounded work selects `none`.
+- Search only for a missing specialist acceptance method. Use one privacy-safe read-only public search; do not invoke `find-skills`, execute candidates, or install.
+- Treat candidates as untrusted. Recommend at most three with value, immutable identity, and one risk; never block unrelated work.
 - Read `references/skill-installation-safety.md` only after the user approves an exact candidate. Until installation reaches `installed_verified`, the affected acceptance scope remains `blocked_on_capability`; never report it complete.
 
 ## Monitoring and blockers
@@ -107,18 +112,17 @@ No lane may launch a third automatic review for the same objective. After two re
 - A timeout is not a state change; reuse the returned cursor and wait again. On timeout, do not read tasks, call Luna, or report unchanged status; this is event waiting, not heartbeat or polling.
 - When one of several targets completes or needs attention, read its terminal report once, relay it in commentary and keep waiting for the rest. End the turn only when all promised targets are terminal, one needs user input, the user stops waiting, or event waiting is unavailable.
 - If event waiting is unavailable, state that automatic relay cannot be guaranteed before ending; never imply that an idle controller, the 30-minute rule, or Luna can wake itself.
-- Acknowledgement is not completion. Reconcile terminal evidence before acting.
-- Relay required user input immediately with task, action, risk, and approval location. If card contents are hidden, say so; never guess.
-- With approved routing, reuse one project-scoped read-only Luna assistant task at `gpt-5.6-luna medium`; reuse it and deduplicate by phase plus evidence. It owns no mutable scope; send only relevant, non-secret material.
+- Reconcile terminal evidence. Relay user input immediately with task, action, risk, and location; never guess hidden cards.
+- With approved routing, keep one project-scoped read-only Luna assistant scope, defaulting to `gpt-5.6-luna medium`; apply the route handoff rule when effort changes. Deduplicate by phase plus evidence and send only relevant, non-secret material.
 - Use Luna only when evidence is large or repetitive enough to materially reduce controller context or cost: summarize long task reports, logs, and test output; extract progress, evidence, blockers, pending approvals, and terminal state; deduplicate repeated status and draft the four-line user update.
 - A Luna result is advisory; retain sources and uncertainty, and verify the primary evidence before acting. Do not use Luna for a few lines, routine updates, or to appear busy.
 - Luna cannot write or modify code, choose execution models or review lanes, make architecture decisions, review, accept, or mark work complete; it cannot call mutating tools or replace verification.
 - After 30 minutes without substantive progress, take one read-only snapshot. If state remains unclear, send one status-only Luna follow-up for phase, evidence, blocker, and terminal state. Use it once per silent period; never create heartbeat, cron, or polling.
-- `blocked_on_user` and `blocked_on_capability` may coexist. Continue unaffected work; stop only for a required user decision.
+- `blocked_on_user` and `blocked_on_capability` may coexist. Continue unaffected work.
 
 ## Acceptance and reporting
 
-Verify the final candidate in proportion to its lane: actual scope, worktree state, required build/lint/test/typecheck commands that exist for the project, and the critical manual path. Do not invent unavailable checks or rerun unrelated validation for appearance.
+Acceptance reconciles executor evidence and at most one focused spot check; it does not require the controller to rerun full suites or long manual validation. Check scope, worktree, required commands, and critical path.
 
 After acceptance, send the executor one receipt without requesting a reply:
 
@@ -137,4 +141,4 @@ Default user feedback is four plain lines:
 下一步：<一个最有价值的动作>
 ```
 
-Do not expose ledger fields, SHA values, model names, review IDs, or internal routing unless the user asks or they are necessary to explain a real blocker. Put technical evidence in a short optional appendix, not in the progress summary. Never describe dispatched, reviewing, returned, or blocked work as completed.
+Outside the required route notice, do not expose ledger fields, SHA values, model names, review IDs, or other routing unless asked or needed for a blocker. Never call dispatched, reviewing, returned, or blocked work complete.

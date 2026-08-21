@@ -8,7 +8,15 @@ A Codex skill for coordinating multi-module projects, automatically routing Spar
 
 Project Lead now follows one rule: **use the least process that is safe for the actual risk**. Progress is measured by usable outcomes, not by task count, review count, or long technical reports.
 
-The controller still owns scope, task ownership, blockers, acceptance, and reporting. Executors own substantial implementation. Small work can move directly; high-risk work keeps independent gates.
+The controller owns scope, task ownership, blockers, acceptance, and reporting. Executors own project artifacts and substantive execution. Ordinary work moves through one clear owner without unnecessary review; high-risk work keeps independent gates.
+
+## Controller authority and execution boundary
+
+Inside an approved project outcome, the controller authorizes normal dispatch, local reversible preparation, focused checks, required review, and in-scope repair. Elevated review does not itself require user approval: review risk determines review strength, while the proposed action and missing authority determine approval. The user is asked only for a real product or security-policy fork, new authority or secret, irreversible or destructive action, external side effect, purchase, deployment, or release. A genuine platform approval card is still relayed when only the user can operate it.
+
+The controller remains the control plane: intake, routing, no-code cross-module decisions, acceptance, reporting, and quick read-only spot checks. Repository plans, designs, source, tests, complex debugging, and long validation belong to executor tasks. Executor work cannot be split into small steps and kept in the controller. Old approval blockers are bound to one objective, candidate, action, and authority gap; they expire when that identity or need changes.
+
+Elevated risk strengthens the independent review lane; it does not automatically create a separate architecture phase. Architecture work begins only for a concrete cross-client or cross-service boundary, unresolved shared contract, or material rework risk.
 
 ## Automatic skill routing and discovery
 
@@ -23,14 +31,18 @@ For example, it may use `apple-design` for a gesture-driven Apple interface, `co
 
 ## Automatic execution-model routing
 
-The user authorizes automatic routing once per project, covering Spark/Terra execution and bounded Luna read-only assistance; Project Lead does not ask again for every switch. Every new objective is classified again from its current scope, evidence, and risk, and it never inherits the previous objective's model.
+The user authorizes automatic routing once per project. For every new objective, Project Lead chooses both the model and reasoning effort from the current scope, evidence, risk, and the combinations actually exposed by the dispatch tool. It never inherits the previous objective's route.
 
-- Spark is used only for Low-risk work whose target, accepted pattern, reversibility, and focused verification are all clear.
-- Terra is the conservative choice whenever a Spark condition is false or unknown, and for Standard or Elevated implementation, non-obvious debugging, cross-module effects, or expanded scope.
-- Spark-to-Terra escalation reuses the same task and sends an explicit Terra override on the next turn. A running response is not switched mid-turn, and the interrupted work is not reported complete.
-- Execution routing does not weaken review independence: Standard review remains Terra, Elevated review remains Sol, and Spark never reviews its own implementation.
+- Spark uses high for narrow Low-risk work; xhigh is allowed only when the tool exposes it and the task remains inside the Spark allowlist.
+- Terra high is the safe execution default. Terra xhigh is reserved for non-obvious debugging, cross-module reasoning, or complex design. Terra Ultra is reserved for a large objective that genuinely benefits from independent parallel workstreams and has no shared mutable files.
+- Luna defaults to medium for read-only extraction, may use high for dense multi-source evidence, and uses xhigh only for difficult contradictions. Its authority stays read-only at every effort.
+- Standard review remains independent Terra; Elevated review remains independent Sol. Execution routing never weakens review gates.
 
-Spark eligibility and Spark capacity are checked separately. If the research-preview quota is exhausted or the model is unavailable before dispatch, an authorized controller explicitly falls back to Terra for that objective. If a Spark turn is already accepted, running, or queued, Project Lead does not start concurrent Terra work; it waits for a confirmed rejection, interruption, or terminal state, then rechecks availability on the next objective.
+Project Lead announces the task, model, effort, and actual speed immediately before dispatch in one short line and does not wait for approval. This is a notice, not a decision request. Speed is ordinary by default and shows Fast only after an explicit request for that exact objective. If capacity or route verification changes the choice, it sends a corrected notice before redispatch.
+
+Every created task, including an independent reviewer whose route matches the controller, receives no or bounded history; full-history inheritance is never used. If dispatch exposes the resolved route atomically, Project Lead verifies it before work. Otherwise it starts a handshake-only task with no project reads, writes, or tool calls, verifies the metadata, and only then sends the substantive brief. An unobservable route is reported as `blocked_on_routing`, never guessed.
+
+A follow-up API without route fields cannot switch an existing task in place; after the current turn ends or is interrupted, the logical scope is handed to one correctly routed task without overlapping owners. A Spark-to-Terra fallback waits only for the active Spark turn on the same objective or logical scope; independent scopes may continue in parallel.
 
 ## Child tasks use Standard speed by default
 
@@ -40,7 +52,7 @@ When the dispatch API has no speed field, Project Lead omits any Fast/priority o
 
 ## Luna as a read-only information assistant
 
-When large or repetitive evidence would materially expand controller context or cost, Project Lead may reuse one project-scoped `gpt-5.6-luna medium` assistant. It summarizes long task reports, logs, and test output; extracts progress, blockers, approvals, and terminal state; deduplicates repeated status; and drafts the plain-language update.
+When large or repetitive evidence would materially expand controller context or cost, Project Lead keeps one logical project-scoped `gpt-5.6-luna` assistant scope, normally at medium. If effort must change, it uses the same no-overlap handoff rule as other routes. Luna summarizes long task reports, logs, and test output; extracts progress, blockers, approvals, and terminal state; deduplicates repeated status; and drafts the plain-language update.
 
 Luna is not used for a few lines or routine updates. Its result remains advisory and source-bound, so the controller verifies primary evidence before acting. Luna never writes code, selects models, reviews, accepts, or marks work complete, and it never replaces required verification.
 
@@ -58,7 +70,7 @@ The controller ends early only for required user input, an explicit user stop, o
 | Standard | Meaningful multi-file work inside one module or bounded integration under accepted contracts | One batched `gpt-5.6-terra high` review after the deliverable is stable. At most one incremental repair review. Minor findings never cause a return. |
 | Elevated | Authentication, authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive actions, data loss or ownership, migration, concurrency or recovery, shared contracts, cross-module integration, deployment, release, or system architecture | One stable candidate receives an independent `gpt-5.6-sol xhigh` review. A necessary irreversible architecture decision may be reviewed once before implementation. |
 
-No lane launches a third automatic review for the same objective. After two returns, the controller stops the loop and explains the root cause and choices to the user.
+No lane repeats the same incremental review loop after two returns. After a second Standard return, the controller dispatches one in-scope root-cause repair and closes each recorded finding from fresh executor evidence plus one focused spot check; anything unproven stays `RETURN`. After a second Elevated return, the controller automatically dispatches one in-scope root-cause repair and one final independent closure review. It never launches a fourth review; another `RETURN` remains `blocked_on_quality` and unfinished.
 
 ## How it works
 
@@ -69,9 +81,9 @@ No lane launches a third automatic review for the same objective. After two retu
 5. Run only the checks required by the changed surface and repository policy.
 6. Report progress in plain language.
 
-The controller may handle a brief, isolated, reversible change directly when no executor owns the files. Delegated Low-risk work may use Spark only when every allowlist condition is proven; substantial implementation, non-obvious debugging, long verification, and parallel modules go to Terra.
+Delegated Low-risk work may use Spark only when every allowlist condition is proven; substantive project work, non-obvious debugging, and long validation stay in executor tasks.
 
-Missing information does not automatically create a system-architecture phase. The controller first inspects or asks. System architecture is reserved for a real cross-client or cross-service boundary with an unresolved shared contract, material rework risk, or an Elevated trigger.
+Missing information does not automatically create a system-architecture phase or a user question. The controller first inspects or delegates evidence collection; it asks only for a user-exclusive product fact or authority. System architecture is reserved for a real cross-client or cross-service boundary with an unresolved shared contract or material rework risk.
 
 ## Plain-language reporting
 
@@ -84,7 +96,7 @@ The default user update is deliberately short:
 下一步：<一个最有价值的动作>
 ```
 
-Internal fields such as Base/Head, SHA, model, review request, and ledger state stay hidden unless the user asks or they explain a real blocker.
+Outside the required pre-dispatch route notice, internal fields such as Base/Head, SHA, review request, and ledger state stay hidden unless the user asks or they explain a real blocker.
 
 After an accepted delegated task, the controller leaves one receipt in its original task:
 
@@ -99,7 +111,7 @@ After an accepted delegated task, the controller leaves one receipt in its origi
 - One checkout or mutable scope has one owner.
 - Independent modules may run in parallel; shared files, migrations, and contracts are serialized.
 - Dispatch acknowledgement is not completion. The controller reads the terminal report and verifies evidence.
-- Approval requests are surfaced immediately with the task name, exact action, effect or risk, and where the user should act. Hidden approval-card contents are never guessed.
+- Only genuine approval-boundary crossings are surfaced with the task, exact action, risk, and where the user should act. Hidden platform-card contents are never guessed; ordinary review or local work is never repackaged as a prose approval request.
 - After 30 minutes without substantive progress, the controller may take one read-only snapshot and one status-only Luna follow-up. It never creates heartbeat, cron, or polling.
 
 ## Supporting skills and discovery
