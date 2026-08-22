@@ -93,6 +93,23 @@ class SkillRoutingContractTests(unittest.TestCase):
         )
         self.assertIn("missing-section", self.codes(hostile))
 
+    def test_task_local_effort_and_reverse_check_cannot_be_removed(self) -> None:
+        for phrase in (
+            "route only from current child actions, uncertainty, coupling, consequences, and checks",
+            "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+        ):
+            with self.subTest(phrase=phrase):
+                hostile = self.core.replace(phrase, "obsolete routing text", 1)
+                self.assertIn("missing-rule", self.codes(hostile))
+
+    def test_formal_executor_visibility_contract_cannot_be_removed(self) -> None:
+        hostile = self.core.replace(
+            "Formal executor work uses a titled user-visible standalone Codex task created with `create_thread`",
+            "Formal executor work uses any task",
+            1,
+        )
+        self.assertIn("missing-rule", self.codes(hostile))
+
     def test_previous_executor_model_cannot_be_reused_for_a_new_objective(self) -> None:
         hostile = self.core + (
             "\nFor speed, reuse the executor task's current model for the next objective "

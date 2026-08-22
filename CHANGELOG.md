@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-22
+
+### Added
+
+- Formal implementation, independent review, and long validation now use titled, sidebar-visible standalone Codex tasks created with `create_thread`.
+- Every dispatch now selects model and reasoning effort from the current child task's actions, uncertainty, coupling, consequences, and checks, then includes one short task-specific reason in the route notice.
+- Before `xhigh` or `ultra`, the controller performs one bounded internal reverse check at the next lower effort; it creates no task and calls no tool, Luna assistant, or comparison model.
+
+### Fixed
+
+- Internal subagents are limited to short read-only helper checks. If a visible task cannot be created, Project Lead reports `blocked_on_visibility` instead of claiming that work was dispatched.
+- Parent-project complexity, review lanes, prior routes, and earlier effort levels no longer force new executor tasks into `xhigh`; uncertainty alone also cannot justify escalation.
+
 ## [0.8.3] - 2026-08-21
 
 ### Added
