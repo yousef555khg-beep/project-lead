@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "6a93fd54ab25bb970ef2ff070c0de2608f96d50479fc8cd07e8b5033cb72b090"
+EXPECTED_CORE_SHA256 = "a149345133ec7694d9c823d408a91c8d38580e4084f1ad838027dfde47e98654"
 
 
 EXPECTED_CONTRACT = {
@@ -53,6 +53,11 @@ CORE_REQUIRED = {
         "Repository plans, designs, source, tests, configuration",
         "Do not split executor work into small direct steps",
         "Concurrency or convenience never moves executor work into the controller",
+        "Formal executor work uses a titled user-visible standalone Codex task created with `create_thread`",
+        "never an internal subagent",
+        "If `create_thread` is unavailable, report `blocked_on_visibility`",
+        "Internal subagents are limited to short read-only helper checks",
+        "cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal",
         "compact private ledger",
     ),
     "## Authority boundary": (
@@ -68,11 +73,23 @@ CORE_REQUIRED = {
         "Before every new objective, dispatch, or substantive follow-up",
         "`execution_route: {model, reasoning_effort, service_tier}`",
         "never inherit a previous route",
-        "Spark uses `high`; use `xhigh` only when the dispatch tool exposes it",
-        "Terra uses `high` by default, `xhigh` for non-obvious debugging, cross-module reasoning, or complex design",
-        "`ultra` only for a large parallelizable objective with independent workstreams",
+        "route only from current child actions, uncertainty, coupling, consequences, and checks",
+        "Ignore parent complexity, review lane, prior route and effort",
+        "No blanket effort default",
+        "Spark `high`: exact reversible scope, one path, deterministic checks",
+        "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
+        "Low-risk alone is insufficient",
+        "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
+        "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
+        "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
         "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
+        "uncertainty alone never selects `xhigh`",
+        "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+        "one controller judgment: no tool, task, Luna, or parallel model comparison",
+        "Without a task-specific risk, reselect from current evidence",
         "Only select combinations exposed by the dispatch tool; never invent a model or effort",
+        "If Spark is unavailable or ineligible, reselect from the same evidence",
+        "Formal `create_thread` tasks start fresh",
         "`fork_turns: none` or a bounded positive turn count",
         "never use `all` or omitted full-history inheritance",
         "Any independent reviewer also uses no or bounded history even when its route matches the controller",
@@ -83,7 +100,7 @@ CORE_REQUIRED = {
         "A follow-up without model and effort fields cannot switch them",
         "hand off the same logical scope to one correctly routed replacement task",
         "Immediately before every creation or substantive follow-up, tell the user",
-        "即将派发：<任务>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通",
+        "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
         "informational, never an approval gate",
         "dispatch immediately without waiting for a reply",
         "issue a corrected notice before redispatch",

@@ -18,6 +18,10 @@ The controller remains the control plane: intake, routing, no-code cross-module 
 
 Elevated risk strengthens the independent review lane; it does not automatically create a separate architecture phase. Architecture work begins only for a concrete cross-client or cross-service boundary, unresolved shared contract, or material rework risk.
 
+## Visible executor tasks
+
+Formal implementation, independent review, and long validation use a titled, user-visible standalone Codex task created with `create_thread`, not an internal subagent. This lets the user find it in the sidebar, inspect its history, and act on approval cards. If `create_thread` is unavailable, Project Lead reports `blocked_on_visibility` instead of claiming dispatch. Internal subagents are only short read-only helper checks; they cannot own mutable scope, wait for approval, review, accept, or close formal work.
+
 ## Automatic skill routing and discovery
 
 **You describe the outcome, not the skill name.** At project intake and before each new phase, Project Lead:
@@ -31,16 +35,18 @@ For example, it may use `apple-design` for a gesture-driven Apple interface, `co
 
 ## Automatic execution-model routing
 
-The user authorizes automatic routing once per project. For every new objective, Project Lead chooses both the model and reasoning effort from the current scope, evidence, risk, and the combinations actually exposed by the dispatch tool. It never inherits the previous objective's route.
+The user authorizes automatic routing once per project. For every new objective, Project Lead chooses both the model and reasoning effort from the current bounded child objective: its actions, uncertainty, coupling, consequences, checks, and combinations exposed by the dispatch tool. It never inherits the previous objective's route and never inherits effort from the parent project, review lane, or previous task.
 
-- Spark uses high for narrow Low-risk work; xhigh is allowed only when the tool exposes it and the task remains inside the Spark allowlist.
-- Terra high is the safe execution default. Terra xhigh is reserved for non-obvious debugging, cross-module reasoning, or complex design. Terra Ultra is reserved for a large objective that genuinely benefits from independent parallel workstreams and has no shared mutable files.
+- Spark high handles an exact reversible path with deterministic checks. Spark xhigh additionally requires a named hard local reasoning risk; Low-risk classification alone is not enough.
+- Terra high handles one coherent implementation, debugging, or design problem with known contracts and checks. Terra xhigh requires multiple plausible causes or designs, or inseparable interacting constraints. Terra Ultra requires one objective that actually runs large independent workstreams with no shared mutable files.
 - Luna defaults to medium for read-only extraction, may use high for dense multi-source evidence, and uses xhigh only for difficult contradictions. Its authority stays read-only at every effort.
 - Standard review remains independent Terra; Elevated review remains independent Sol. Execution routing never weakens review gates.
 
-Project Lead announces the task, model, effort, and actual speed immediately before dispatch in one short line and does not wait for approval. This is a notice, not a decision request. Speed is ordinary by default and shows Fast only after an explicit request for that exact objective. If capacity or route verification changes the choice, it sends a corrected notice before redispatch.
+Before xhigh or Ultra, Project Lead performs one silent controller judgment: it names a concrete failure risk at the next lower effort. This uses no tool call, extra task, Luna call, or parallel model comparison. Without a task-specific risk, it reselects from current evidence, so uncertainty or the parent project's complexity cannot silently force xhigh.
 
-Every created task, including an independent reviewer whose route matches the controller, receives no or bounded history; full-history inheritance is never used. If dispatch exposes the resolved route atomically, Project Lead verifies it before work. Otherwise it starts a handshake-only task with no project reads, writes, or tool calls, verifies the metadata, and only then sends the substantive brief. An unobservable route is reported as `blocked_on_routing`, never guessed.
+Project Lead announces the task, model, effort, and actual speed immediately before dispatch, adds one short task-specific reason, and does not wait for approval. This is a notice, not a decision request. Speed is ordinary by default and shows Fast only after an explicit request for that exact objective. If capacity or route verification changes the choice, it sends a corrected notice before redispatch.
+
+Formal `create_thread` executor tasks start fresh. Internal helper and reviewer tasks receive no or bounded history; full-history inheritance is never used. If dispatch exposes the resolved route atomically, Project Lead verifies it before work. Otherwise it starts a handshake-only task with no project reads, writes, or tool calls, verifies the metadata, and only then sends the substantive brief. An unobservable route is reported as `blocked_on_routing`, never guessed.
 
 A follow-up API without route fields cannot switch an existing task in place; after the current turn ends or is interrupted, the logical scope is handed to one correctly routed task without overlapping owners. A Spark-to-Terra fallback waits only for the active Spark turn on the same objective or logical scope; independent scopes may continue in parallel.
 

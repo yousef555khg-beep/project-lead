@@ -75,6 +75,19 @@ class ProjectLeadModeTests(unittest.TestCase):
         ):
             self.assertIn(phrase, self.skill)
 
+    def test_formal_executor_work_uses_a_user_visible_standalone_task(self) -> None:
+        ownership = section(self.skill, "## Ownership and dispatch")
+        for phrase in (
+            "Formal executor work uses a titled user-visible standalone Codex task created with `create_thread`",
+            "never an internal subagent",
+            "If `create_thread` is unavailable, report `blocked_on_visibility`",
+            "Internal subagents are limited to short read-only helper checks",
+            "cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal",
+        ):
+            self.assertIn(phrase, ownership)
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Formal `create_thread` tasks start fresh", routing)
+
     def test_standard_lane_batches_one_review_and_one_repair_review(self) -> None:
         standard = section(self.skill, "### Standard lane")
         self.assertIn("`independent_review: one_batched_terra`", standard)
@@ -105,7 +118,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             self.skill,
         )
         self.assertIn(
-            "An Elevated trigger changes the review lane but does not by itself create an architecture phase.",
+            "An Elevated trigger changes the review lane but does not by itself create an architecture phase; do not review every draft.",
             self.skill,
         )
         self.assertNotIn(
@@ -140,21 +153,16 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Pass supported fields explicitly", routing)
         self.assertIn("A completed objective authorizes nothing for the next", routing)
 
-    def test_spark_is_an_all_conditions_allowlist_with_terra_fallback(self) -> None:
+    def test_spark_effort_is_calibrated_from_the_current_child_task(self) -> None:
         routing = section(self.skill, "## Execution model routing")
-        self.assertIn("Spark uses `high`; use `xhigh` only when the dispatch tool exposes it", routing)
         for phrase in (
-            "Low-risk conditions",
-            "exact scope/checks",
-            "accepted pattern",
-            "reversibility",
-            "focused verification",
-            "no Elevated",
-            "non-obvious debugging",
-            "cross-module",
+            "Spark `high`: exact reversible scope, one path, deterministic checks",
+            "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
+            "Low-risk alone is insufficient",
+            "Ignore parent complexity, review lane, prior route and effort",
+            "If Spark is unavailable or ineligible, reselect from the same evidence",
         ):
             self.assertIn(phrase, routing)
-        self.assertIn("If Spark is unavailable or ineligible before dispatch, use Terra high", routing)
 
     def test_complex_follow_up_uses_a_verified_route_without_duplicate_ownership(self) -> None:
         routing = section(self.skill, "## Execution model routing")
@@ -166,10 +174,10 @@ class ProjectLeadModeTests(unittest.TestCase):
 
     def test_unavailable_spark_capacity_falls_back_explicitly_to_terra(self) -> None:
         routing = section(self.skill, "## Execution model routing")
-        self.assertIn("If Spark is unavailable or ineligible before dispatch, use Terra high", routing)
-        self.assertIn("Never start a Terra fallback for the same objective or logical scope while its Spark turn is active", routing)
+        self.assertIn("If Spark is unavailable or ineligible, reselect from the same evidence", routing)
+        self.assertIn("Never start Terra fallback in the same logical scope while Spark is active", routing)
         self.assertIn("Independent scopes may continue in parallel", routing)
-        self.assertIn("confirmed rejection, interruption, or terminal state", routing)
+        self.assertIn("wait for rejection, interruption, or terminal state", routing)
 
     def test_execution_and_review_model_choices_are_independent(self) -> None:
         routing = section(self.skill, "## Execution model routing")
@@ -180,11 +188,27 @@ class ProjectLeadModeTests(unittest.TestCase):
         routing = section(self.skill, "## Execution model routing")
         for phrase in (
             "`execution_route: {model, reasoning_effort, service_tier}`",
-            "Terra uses `high` by default, `xhigh` for non-obvious debugging, cross-module reasoning, or complex design",
-            "`ultra` only for a large parallelizable objective with independent workstreams",
-            "Spark uses `high`; use `xhigh` only when the dispatch tool exposes it",
+            "route only from current child actions, uncertainty, coupling, consequences, and checks",
+            "Ignore parent complexity, review lane, prior route and effort",
+            "No blanket effort default",
+            "Spark `high`: exact reversible scope, one path, deterministic checks",
+            "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
+            "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
+            "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
+            "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
             "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
+            "uncertainty alone never selects `xhigh`",
             "Only select combinations exposed by the dispatch tool; never invent a model or effort",
+        ):
+            self.assertIn(phrase, routing)
+        self.assertNotIn("Terra uses `high` by default", routing)
+
+    def test_high_effort_reverse_check_is_bounded_and_cost_free(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        for phrase in (
+            "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+            "one controller judgment: no tool, task, Luna, or parallel model comparison",
+            "Without a task-specific risk, reselect from current evidence",
         ):
             self.assertIn(phrase, routing)
 
@@ -209,7 +233,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         routing = section(self.skill, "## Execution model routing")
         for phrase in (
             "Immediately before every creation or substantive follow-up, tell the user",
-            "即将派发：<任务>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通",
+            "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
             "informational, never an approval gate",
             "dispatch immediately without waiting for a reply",
             "issue a corrected notice before redispatch",
@@ -238,15 +262,15 @@ class ProjectLeadModeTests(unittest.TestCase):
             "`gpt-5.6-luna medium`",
             "one project-scoped read-only Luna assistant scope",
             "large or repetitive enough to materially reduce controller context or cost",
-            "summarize long task reports, logs, and test output",
-            "extract progress, evidence, blockers, pending approvals, and terminal state",
-            "deduplicate repeated status and draft the four-line user update",
+            "summarize reports, logs, tests",
+            "extract progress, evidence, blockers, approvals, terminal state",
+            "deduplicate status and draft the update",
             "A Luna result is advisory",
-            "verify the primary evidence before acting",
+            "verify primary evidence",
             "Do not use Luna for a few lines, routine updates, or to appear busy",
             "cannot write or modify code, choose execution models or review lanes, make architecture decisions, review, accept, or mark work complete",
-            "Deduplicate by phase plus evidence",
-            "apply the route handoff rule when effort changes",
+            "deduplicate source-bound material",
+            "hand off on effort change",
         ):
             self.assertIn(phrase, monitoring)
 
@@ -306,6 +330,10 @@ class ProjectLeadModeTests(unittest.TestCase):
             "For every new objective",
             "never inherits the previous objective's route",
             "chooses both the model and reasoning effort",
+            "current bounded child objective",
+            "never inherits effort from the parent project, review lane, or previous task",
+            "one silent controller judgment",
+            "no tool call, extra task, Luna call, or parallel model comparison",
             "announces the task, model, effort, and actual speed immediately before dispatch",
             "does not wait for approval",
             "full-history inheritance is never used",
@@ -322,6 +350,10 @@ class ProjectLeadModeTests(unittest.TestCase):
             "每个新目标都会根据",
             "绝不继承上一个目标的路由",
             "同时选择模型和推理档位",
+            "当前边界明确的子任务",
+            "不会继承父项目、审查通道或上一个任务的档位",
+            "一次总控内部静默判断",
+            "不会调用工具、新建任务、调用 Luna 或并行比较模型",
             "派发前会告知任务、模型、档位和实际速度",
             "不会等待批准",
             "不能继承完整历史",
@@ -372,6 +404,27 @@ class ProjectLeadModeTests(unittest.TestCase):
             "计划、设计、源码、测试、复杂调试和长验证都属于执行任务",
         ):
             self.assertIn(phrase, readme_zh)
+
+    def test_public_docs_explain_visible_executor_tasks(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Visible executor tasks",
+            "user-visible standalone Codex task",
+            "`create_thread`",
+            "not an internal subagent",
+            "`blocked_on_visibility`",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## 可见的执行任务",
+            "侧边栏可见的独立 Codex 任务",
+            "`create_thread`",
+            "不能用内部子智能体替代",
+            "`blocked_on_visibility`",
+        ):
+            self.assertIn(phrase, readme_zh)
         self.assertNotIn("or an Elevated trigger", readme_en)
         self.assertNotIn("或高风险触发项", readme_zh)
 
@@ -387,7 +440,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "Outside the required route notice, do not expose ledger fields, SHA values, model names, review IDs, or other routing",
             self.skill,
         )
-        self.assertIn("Ship the smallest usable vertical slice", self.skill)
+        self.assertIn("Ship a usable slice", self.skill)
 
     def test_installation_detail_is_progressively_disclosed(self) -> None:
         self.assertTrue(INSTALL_REFERENCE.is_file())
