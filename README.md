@@ -23,6 +23,7 @@ Project Lead is a decision and coordination skill, not a replacement for missing
 | Risk-proportionate review | Low-risk work has no independent review; Standard and Elevated work retain bounded independent gates. |
 | Capability discovery | One installed supporting skill may be selected automatically; missing skills are only searched and recommended until the user approves installation. |
 | Completion reliability | `wait_threads` relays terminal events while the client provides it; unavailable event waiting degrades honestly instead of pretending to monitor in the background. |
+| Context rollover | Long executor or reviewer histories move to a fresh visible successor before relay reliability degrades. |
 
 ## Controller authority and execution boundary
 
@@ -35,6 +36,12 @@ Elevated risk strengthens the independent review lane; it does not automatically
 ## Visible executor tasks
 
 Formal implementation, independent review, and long validation use a titled, user-visible standalone Codex task created with `create_thread`, not an internal subagent. This lets the user find it in the sidebar, inspect its history, and act on approval cards. If `create_thread` is unavailable, Project Lead reports `blocked_on_visibility` instead of claiming dispatch. Internal subagents are only short read-only helper checks; they cannot own mutable scope, wait for approval, review, accept, or close formal work.
+
+## Context rollover for long tasks
+
+At 80,000 observed tokens, an executor or reviewer task reaches a soft threshold: it finishes the current bounded step but receives no new phase. At 100,000 observed tokens or 5 MB of task history, Project Lead retires it before the next phase. The following are also hard triggers: pagination, compression, truncated history, or an empty/null completion relay, even when numeric telemetry is unavailable.
+
+Project Lead creates a fresh titled, user-visible successor and sends a compact handoff containing only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route. It never copies the complete transcript, verifies live state before mutation, names the retired predecessor, and never overlaps mutable ownership. If a visible successor cannot be created, it reports `blocked_on_visibility` instead of reusing the overlong task.
 
 ## Automatic skill routing and discovery
 
@@ -55,6 +62,7 @@ The user authorizes automatic routing once per project. For every new objective,
 - Terra high handles one coherent implementation, debugging, or design problem with known contracts and checks. Terra xhigh requires multiple plausible causes or designs, or inseparable interacting constraints. Terra Ultra requires one objective that actually runs large independent workstreams with no shared mutable files.
 - Luna defaults to medium for read-only extraction, may use high for dense multi-source evidence, and uses xhigh only for difficult contradictions. Its authority stays read-only at every effort.
 - Standard review remains independent Terra; Elevated review remains independent Sol. Execution routing never weakens review gates.
+- Sol never executes delegated project work; it is reserved for controller decisions and independent Elevated review.
 
 Before xhigh or Ultra, Project Lead performs one silent controller judgment: it names a concrete failure risk at the next lower effort. This uses no tool call, extra task, Luna call, or parallel model comparison. Without a task-specific risk, it reselects from current evidence, so uncertainty or the parent project's complexity cannot silently force xhigh.
 

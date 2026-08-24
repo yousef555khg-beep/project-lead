@@ -93,6 +93,15 @@ class SkillRoutingContractTests(unittest.TestCase):
         )
         self.assertIn("missing-section", self.codes(hostile))
 
+    def test_context_rollover_contract_cannot_be_removed(self) -> None:
+        hostile = re.sub(
+            r"\n## Context rollover\n.*?(?=\n## Monitoring and blockers\n)",
+            "\n",
+            self.core,
+            flags=re.DOTALL,
+        )
+        self.assertIn("missing-section", self.codes(hostile))
+
     def test_task_local_effort_and_reverse_check_cannot_be_removed(self) -> None:
         for phrase in (
             "route only from current child actions, uncertainty, coupling, consequences, and checks",
@@ -116,6 +125,22 @@ class SkillRoutingContractTests(unittest.TestCase):
             "without a new routing decision.\n"
         )
         self.assertIn("inherited-model", self.codes(hostile))
+
+    def test_sol_is_reserved_for_controller_and_independent_review(self) -> None:
+        hostile_cases = (
+            "Route this complex executor task to gpt-5.6-sol xhigh.",
+            "Use Sol to execute an architecture diagnosis because Terra xhigh may be insufficient.",
+            "When create_thread fails for a new objective, reuse an existing task under Sol xhigh.",
+        )
+        for statement in hostile_cases:
+            with self.subTest(statement=statement):
+                self.assertIn("sol-executor-route", self.codes(self.core + f"\n{statement}\n"))
+
+        legal = self.core + (
+            "\nSol is reserved for the controller and an independent Elevated reviewer; "
+            "it never executes an executor task.\n"
+        )
+        self.assertNotIn("sol-executor-route", self.codes(legal))
 
     def test_cross_model_route_cannot_use_full_history_inheritance(self) -> None:
         hostile_cases = (

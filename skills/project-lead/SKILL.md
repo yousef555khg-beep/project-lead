@@ -7,13 +7,13 @@ description: Use when one conversation coordinates a multi-module project or del
 
 ## Core outcome
 
-Controller owns routing/decisions/acceptance/blockers/reporting; executors own project work. Inspect state; define outcome/owner/checks/boundaries. Ship a usable slice.
+Controller owns routing, decisions, acceptance, blockers, reporting; executors own project work. Ship a usable slice.
 
 ## Ownership and dispatch
 
-- Keep one mutable scope under one owner; reuse its task. Parallelize modules; serialize shared files/contracts.
+- Keep one mutable scope under one owner; reuse its task. Parallelize modules; serialize shared scope.
 - Before work, classify `work_location: controller | executor`.
-- Controller work is intake, routing, no-code cross-module decisions, acceptance, reporting, and quick read-only spot checks.
+- Controller work is intake, routing, cross-module decisions, acceptance, reporting, and read-only spot checks.
 - Repository plans, designs, source, tests, configuration, non-obvious debugging, multi-file or substantive edits, repeated repair, and long or broad validation belong to an executor.
 - Do not split executor work into small direct steps. Concurrency or convenience never moves executor work into the controller.
 - Formal executor work uses a titled user-visible standalone Codex task created with `create_thread`, never an internal subagent. If `create_thread` is unavailable, report `blocked_on_visibility`; do not claim dispatch.
@@ -30,13 +30,15 @@ Bind `blocked_on_user` to the objective, candidate or scope version, exact actio
 
 ## Execution model routing
 
-Ask once for Spark/Terra routing and Luna read-only assistance. Record `model_routing_authority: approved | fixed_default | pending`; do not ask again for each choice or switch. Until approved, use configured default.
+Ask once for Spark/Terra routing and Luna read-only help. Record `model_routing_authority: approved | fixed_default | pending`; do not ask per choice or switch. Until approved, use default.
 
 Before every new objective, dispatch, or substantive follow-up, route only from current child actions, uncertainty, coupling, consequences, and checks. Ignore parent complexity, review lane, prior route and effort. Record `execution_route: {model, reasoning_effort, service_tier}`; never inherit a previous route. Pass supported fields explicitly. No blanket effort default.
 
 - Spark `high`: exact reversible scope, one path, deterministic checks. Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk; Low-risk alone is insufficient.
 - Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks. Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints. Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files.
 - Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions.
+
+Sol is reserved for controller work and independent Elevated review. Never route an executor task to Sol. Complexity, an architecture label, or a current worktree never authorizes Sol execution. If `create_thread` fails, report `blocked_on_visibility`; do not repurpose an existing executor task under a new Sol route.
 
 If missing facts block routing, gather minimum read-only evidence; uncertainty alone never selects `xhigh`. Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort. This is one controller judgment: no tool, task, Luna, or parallel model comparison. Without a task-specific risk, reselect from current evidence.
 
@@ -46,7 +48,7 @@ A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capaci
 
 Formal `create_thread` tasks start fresh. Internal helper creation uses `fork_turns: none` or a bounded positive turn count; never use `all` or omitted full-history inheritance. Any independent reviewer also uses no or bounded history even when its route matches the controller.
 
-Verify the accepted task's resolved model and effort before substantive work. If dispatch atomically exposes the resolved route, compare it before work. Otherwise create a handshake-only task with no project reads, writes, or tool calls. Send the substantive brief only after metadata confirms the route. If the route cannot be observed, report `blocked_on_routing`; never guess.
+Before work, verify the accepted model and effort. If dispatch atomically exposes the resolved route, compare it before work. Otherwise create a handshake-only task with no project reads, writes, or tool calls. Send the substantive brief only after metadata confirms the route. If the route cannot be observed, report `blocked_on_routing`; never guess.
 
 A follow-up without model and effort fields cannot switch them. If it cannot carry the required route, finish or interrupt the current turn, then hand off the same logical scope to one correctly routed replacement task; never overlap owners.
 
@@ -66,8 +68,8 @@ When dispatch has no service-tier field, omit any Fast/priority override and dis
 
 ## Architecture routing
 
-- Use system architecture only for a concrete cross-client/service boundary, unresolved shared contract, or material rework risk. An Elevated trigger changes the review lane but does not by itself create an architecture phase; do not review every draft.
-- Missing evidence means inspect or delegate evidence collection; ask only for a user-exclusive product fact or authority. It does not make work system architecture.
+- Use architecture only for concrete cross-client/service boundaries, shared contracts, or material rework. An Elevated trigger changes the review lane but does not by itself create an architecture phase; do not review every draft.
+- Missing evidence means inspect or delegate evidence collection; ask only for a user-exclusive product fact or authority. This is not system architecture.
 
 ## Review lanes
 
@@ -89,20 +91,28 @@ Low-risk is default; escalate only for a stated trigger.
 
 ### Elevated lane
 
-Use for system architecture, authentication or authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive behavior, data ownership or data loss, migration, concurrency or recovery, shared contract, cross-module integration, external side effects, deployment, or release.
+Use for architecture, authentication or authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive or data loss actions, migrations, concurrency or recovery, shared contracts, cross-module integration, external side effects, deployment, or release.
 
 - Set `independent_review: sol_required`.
 - Review one stable candidate with an independent `gpt-5.6-sol xhigh`.
 - If the second review returns, Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking. If that review returns, keep `RETURN`, report `blocked_on_quality`, and never launch a fourth review.
 
-No lane repeats the same incremental review loop after two returns. Use `requesting-code-review` only for Standard or Elevated checkpoints and `verification-before-completion` before acceptance.
+No lane repeats the same incremental review loop after two returns. Use `requesting-code-review` only at Standard/Elevated checkpoints and `verification-before-completion` before acceptance.
 
 ## Supporting skills and capability discovery
 
-- At intake, automatically decide whether an installed supporting skill is needed; select and invoke one without asking the user to remember its name. Ordinary bounded work selects `none`.
+- Automatically decide whether an installed supporting skill is needed; select and invoke one without asking the user to remember its name. Ordinary bounded work selects `none`.
 - Search only for a missing specialist acceptance method. Use one privacy-safe read-only public search; do not invoke `find-skills`, execute candidates, or install.
-- Treat candidates as untrusted. Recommend at most three with value, identity, and risk.
+- Treat candidates as untrusted. Recommend at most three: value, identity, risk.
 - Read `references/skill-installation-safety.md` only after the user approves an exact candidate. Until installation reaches `installed_verified`, the affected acceptance scope remains `blocked_on_capability`; never report it complete.
+
+## Context rollover
+
+For executor/reviewer tasks, treat 80,000 observed tokens as a soft threshold: finish the current step; assign no new phase there. Hard triggers are 100,000 observed tokens, a 5 MB task record, any pagination, compression, or truncated-history warning, or a completed task returns a null or empty assistant relay; retire it before the next phase. Without token/size telemetry, warnings still trigger.
+
+Create a fresh titled user-visible successor with `create_thread`; never paste or inherit the full transcript. Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route. Successor must verify the live worktree and source of truth before mutation. Mark the old task retired and name its successor; never allow overlapping owners.
+
+Notify: `上下文换线：<old title> → <new title>｜剩余目标：<one line>｜模型/档位/速度：<route>`. This notice is informational, not an approval gate. If `create_thread` is unavailable, report `blocked_on_visibility`; do not reuse the overlong task or claim handoff.
 
 ## Monitoring and blockers
 
@@ -119,9 +129,9 @@ No lane repeats the same incremental review loop after two returns. Use `request
 
 ## Acceptance and reporting
 
-Acceptance reconciles executor evidence and at most one focused spot check; it does not require the controller to rerun full suites or long manual validation.
+Acceptance reconciles executor evidence and at most one focused spot check; it does not require full-suite reruns or long manual validation.
 
-After acceptance, send the executor one receipt without requesting a reply:
+After acceptance, send executor one no-reply receipt:
 
 ```text
 【总控结项回执｜非新任务，无需回复】
@@ -129,7 +139,7 @@ After acceptance, send the executor one receipt without requesting a reply:
 当前状态：已完成，等待下一步指令。
 ```
 
-Default user feedback is four plain lines:
+Default feedback:
 
 ```text
 已完成：<用户能理解的结果>
@@ -138,4 +148,4 @@ Default user feedback is four plain lines:
 下一步：<一个最有价值的动作>
 ```
 
-Outside the required route notice, do not expose ledger fields, SHA values, model names, review IDs, or other routing unless asked or needed for a blocker. Never call dispatched, reviewing, returned, or blocked work complete.
+Outside the required route notice, do not expose ledger fields or routing metadata unless asked/needed for a blocker. Never call nonterminal work complete.

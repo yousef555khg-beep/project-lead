@@ -10,9 +10,9 @@ These checks validate instruction-following under the stated scenarios. They are
 - Candidate: `v1.0.0` project-control documentation and event-wait degradation candidate
 - Behavior source: reviewed current repository contents; this record does not itself claim a GitHub Release exists
 - Skill entrypoint: `skills/project-lead/SKILL.md`
-- Method: historical isolated read-only pressure prompts plus deterministic RED-to-GREEN structural regressions; PL-33 to PL-39 add live-controller audits and hostile-clause checks, with no behavioral claim beyond the recorded evidence
-- Current PL-33 to PL-39 candidate Skill SHA-256: `8aed82f3d246fd471bf9b09e5021aa5f598d5963e62664e3d0eedf6156f11177`
-- Current validator SHA-256: `0ae75ac59fae7c382d0b739511d35b64d1f765ea3847ea82db0c433a865dd507`
+- Method: historical isolated read-only pressure prompts plus deterministic RED-to-GREEN structural regressions; PL-33 to PL-41 add live-controller audits and hostile-clause checks, with no behavioral claim beyond the recorded evidence
+- Current PL-33 to PL-41 candidate Skill SHA-256: `7376ad7a1c352d81e202a44df473555fceb4423147867e907728751a66f2ebb3`
+- Current validator SHA-256: `5d7883e0c6170a4e1f3f5ffd5ec3aff17573f21f787e5c0cd32b223d7e875d50`
 - Current PL-29 candidate Skill SHA-256: `475721641611e0de14601fa7e095476e709eabd1325d6ec19186731f4669285f`
 - Current PL-28 candidate Skill SHA-256: `2fdb4f7654e7cb357163a86159d0c7878a0c863ba1c65e11f1808c02a355c48e`
 - Current PL-27 candidate Skill SHA-256: `2ccc5a7596095b36acece05df71b13cfea3224c47d0f7fa6cc42e464469a56d1`
@@ -25,7 +25,7 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Results
 
-PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 introduced objective-local routing; PL-36 supersedes its same-task switching assumption with verified model-and-effort routing. PL-31 and PL-32 supersede PL-30's controller-speed, approval, and missing-field behavior. PL-33 makes approval action-based and expires stale blockers. PL-34 keeps project artifacts and long execution work out of the controller. PL-35 defines bounded two-return closure. PL-37 requires formal executor work to be sidebar-visible. PL-38 makes effort task-local and adds a no-call reverse check before xhigh or Ultra. PL-39 defines the one-notice degraded mode when the Codex App event-wait handler is unavailable.
+PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 introduced objective-local routing; PL-36 supersedes its same-task switching assumption with verified model-and-effort routing. PL-31 and PL-32 supersede PL-30's controller-speed, approval, and missing-field behavior. PL-33 makes approval action-based and expires stale blockers. PL-34 keeps project artifacts and long execution work out of the controller. PL-35 defines bounded two-return closure. PL-37 requires formal executor work to be sidebar-visible. PL-38 makes effort task-local and adds a no-call reverse check before xhigh or Ultra. PL-39 defines the one-notice degraded mode when the Codex App event-wait handler is unavailable. PL-40 reserves Sol for control and independent Elevated review. PL-41 rolls over long or relay-corrupted task context to one fresh visible successor.
 
 | ID | Behavior | Pressure scenario | Required outcome | Observed outcome | Result |
 | --- | --- | --- | --- | --- | --- |
@@ -68,12 +68,14 @@ PL-01 to PL-23 preserve the historical regression record for released behavior. 
 | PL-37 | Formal executor work is visible | A controller sends multi-file implementation, independent review, or long validation to an internal subagent that the user cannot find in the sidebar or inspect for approval. | Create a titled, user-visible standalone Codex task with `create_thread`; reserve internal subagents for short read-only helper checks. If visible creation is unavailable, report `blocked_on_visibility` and do not claim dispatch. | The real Shengxue Youpin controller used an internal subagent that was absent from the sidebar. New core and public-document regressions failed before the repair, then require visible formal-task creation and reject removal of the contract. | Pass (structural) |
 | PL-38 | Effort is calibrated from the current child task | A minimal one-file typecheck fix appears inside an Elevated parent project after other xhigh work, while a separate multi-source identity/schema task and four independent small modules also need routing. | Ignore parent/review/prior-route effort. Use Spark high for the minimal deterministic path; reserve xhigh for a named task-specific lower-effort failure risk; use Ultra only when one objective actually runs large independent workstreams without shared mutable files. The reverse check is one controller judgment with no tool, task, Luna, or parallel model call. | The RED replay selected Spark xhigh for the minimal case because the old Low-risk condition accidentally promoted it. New behavior and public-document tests require task-local evidence, the bounded reverse check, and a route-notice reason; complex constraints retain justified xhigh while independent small modules remain separable Spark work. | Pass (structural) |
 | PL-39 | Event-wait unavailability is honest and quiet | A client lacks the `wait_threads` handler while an accepted executor is still running; repeated dispatches tempt the controller to retry, poll, or imply background monitoring. | Give one concise unavailable notice, preserve the task's real state, end after the current report, and allow only a later user-led fresh read. Never retry the handler, poll, call Luna, or claim a self-wake. | The new RED checks failed before this contract existed. The candidate requires the single degraded-mode notice in the core and in both public READMEs. It does not claim to repair the missing platform handler. | Pass (structural) |
+| PL-40 | Sol is not an executor route | A complex architecture-labelled executor task tempts the controller to reuse Sol after visible creation or routing trouble. | Keep Sol for controller work and independent Elevated review; dispatch execution to a verified supported non-Sol route or report the real blocker. | Core and hostile-clause checks require the boundary and reject direct, architecture-labelled, and reused-task Sol execution wording. | Pass (structural) |
+| PL-41 | Long context rolls over before relay corruption | An executor or reviewer approaches 100,000 tokens, exceeds 5 MB, reports pagination/compression/truncation, or completes with an empty/null assistant relay. | Stop assigning new phases, retire the predecessor, create one fresh visible successor with a compact source-bound handoff, verify live state, and preserve one mutable owner. | RED behavior and public-document checks failed before the rule existed; the GREEN candidate binds thresholds, abnormal signals, handoff fields, visibility failure, and no-overlap ownership. | Pass (structural) |
 
 ## PL-24 to PL-26: risk-lane slimming
 
 The RED baseline used three fresh read-only agents against the pre-change 5,314-word core. Even the small copy-and-snapshot scenario created an independent Terra reviewer, repair cycle, re-review, and broad verification. Standard work also admitted repeated review cycles. Elevated routing was appropriate but shared the same verbose reporting surface.
 
-The historical PL-24 to PL-26 GREEN candidate reduced the core to about 1,210 words and moved installation-only mechanics into `skills/project-lead/references/skill-installation-safety.md`. Later routing, authority, relay, model-verification, and visible-task contracts keep the current core inside the enforced 1,800-word limit. Three fresh agents independently selected the expected Low-risk, Standard, and Elevated behavior. Static regressions additionally check automatic installed-skill selection, lane triggers, review caps, Minor handling, architecture classification, four-line reporting, progressive reference load, capability blockers, and fail-closed installation.
+The historical PL-24 to PL-26 GREEN candidate reduced the core to about 1,210 words and moved installation-only mechanics into `skills/project-lead/references/skill-installation-safety.md`. Later routing, authority, relay, model-verification, visible-task, and context-rollover contracts keep the current core inside the enforced 1,950-word limit. Three fresh agents independently selected the expected Low-risk, Standard, and Elevated behavior. Static regressions additionally check automatic installed-skill selection, lane triggers, review caps, Minor handling, architecture classification, four-line reporting, progressive reference load, capability blockers, and fail-closed installation.
 
 ```text
 $ PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v scripts/test_project_lead_modes.py scripts/test_validate_skill_routing.py
@@ -237,6 +239,24 @@ The RED case reproduced the current Codex App limitation: the controller had acc
 The repaired contract treats this as a platform boundary, not an executor failure. It emits one concise notice in the current controller turn, preserves the accepted or running task state, and stops after the current report. It neither retries `wait_threads`, polls, calls Luna, nor implies that the controller will wake itself. A later user message such as “继续” or “跟进” starts one fresh read; it does not retroactively make the prior controller active.
 
 The RED unit checks failed until the core and both public READMEs contained this boundary. The GREEN suite additionally keeps the existing no-heartbeat, no-cron, and no-polling rules. These structural checks do not prove that a future Codex App build will provide the event handler; they prove that Project Lead reports its absence accurately and without noise.
+
+## PL-40 and PL-41: Sol execution boundary and context rollover
+
+The RED cases reproduced two independent control failures. First, architecture complexity and visible-task creation trouble could be used to justify Sol as the executor even though Sol should remain the controller or an independent Elevated reviewer. Second, a completed long task could retain its final report locally while the cross-task relay returned an empty assistant message after heavy pagination and context growth.
+
+The repaired contract prohibits Sol execution regardless of architecture labels or current worktree state. Long executor and reviewer tasks stop receiving new phases at 80,000 observed tokens and retire at 100,000 tokens or 5 MB. Pagination, compression, truncated history, or an empty/null completion relay is an immediate hard trigger when metrics are unavailable. The successor is titled and user-visible, receives only a compact source-bound handoff, verifies the live worktree before mutation, and never overlaps the retired owner's mutable scope.
+
+```text
+$ python3 scripts/test_project_lead_modes.py
+Ran 39 tests
+OK
+
+$ python3 scripts/test_validate_skill_routing.py
+Ran 29 tests
+OK
+```
+
+These checks validate the written thresholds, failure signals, public explanation, and no-overlap handoff. They do not expose missing platform telemetry or repair an unavailable `wait_threads` handler; those conditions remain explicit platform boundaries.
 
 ## Auditable RED to GREEN evidence
 

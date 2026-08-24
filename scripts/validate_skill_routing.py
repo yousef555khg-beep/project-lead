@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "8aed82f3d246fd471bf9b09e5021aa5f598d5963e62664e3d0eedf6156f11177"
+EXPECTED_CORE_SHA256 = "7376ad7a1c352d81e202a44df473555fceb4423147867e907728751a66f2ebb3"
 
 
 EXPECTED_CONTRACT = {
@@ -83,6 +83,10 @@ CORE_REQUIRED = {
         "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
         "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
         "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
+        "Sol is reserved for controller work and independent Elevated review",
+        "Never route an executor task to Sol",
+        "Complexity, an architecture label, or a current worktree never authorizes Sol execution",
+        "do not repurpose an existing executor task under a new Sol route",
         "uncertainty alone never selects `xhigh`",
         "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
         "one controller judgment: no tool, task, Luna, or parallel model comparison",
@@ -155,12 +159,30 @@ CORE_REQUIRED = {
         "No lane repeats the same incremental review loop after two returns",
     ),
     "## Supporting skills and capability discovery": (
-        "automatically decide whether an installed supporting skill is needed",
+        "Automatically decide whether an installed supporting skill is needed",
         "select and invoke one without asking the user to remember its name",
         "Ordinary bounded work selects `none`",
         "do not invoke `find-skills`",
         "Recommend at most three",
         "Read `references/skill-installation-safety.md` only after the user approves an exact candidate",
+    ),
+    "## Context rollover": (
+        "80,000 observed tokens as a soft threshold",
+        "assign no new phase there",
+        "100,000 observed tokens",
+        "a 5 MB task record",
+        "pagination, compression, or truncated-history warning",
+        "a completed task returns a null or empty assistant relay",
+        "retire it before the next phase",
+        "fresh titled user-visible successor with `create_thread`",
+        "never paste or inherit the full transcript",
+        "Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route",
+        "verify the live worktree and source of truth before mutation",
+        "Mark the old task retired and name its successor",
+        "never allow overlapping owners",
+        "If `create_thread` is unavailable, report `blocked_on_visibility`",
+        "do not reuse the overlong task or claim handoff",
+        "informational, not an approval gate",
     ),
     "## Monitoring and blockers": (
         "immediately enter `wait_threads`",
@@ -180,7 +202,7 @@ CORE_REQUIRED = {
     ),
     "## Acceptance and reporting": (
         "Acceptance reconciles executor evidence and at most one focused spot check",
-        "does not require the controller to rerun full suites or long manual validation",
+        "does not require full-suite reruns or long manual validation",
         "已完成：<用户能理解的结果>",
         "当前结果：<能否使用或验证>",
         "阻塞：无 | <需要用户处理的唯一事项>",
@@ -298,6 +320,7 @@ def line_number_at(text: str, offset: int) -> int:
 def unsafe_language_errors(text: str) -> list[ValidationError]:
     errors: list[ValidationError] = []
     lowered = text.lower()
+    statement_pattern = re.compile(r"[^.!?。！？\n]+")
 
     for line_number, line in enumerate(lowered.splitlines(), start=1):
         if re.search(r"\bnpx\b", line):
@@ -474,6 +497,40 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                     )
                 )
 
+    sol_executor_patterns = (
+        re.compile(
+            r"\b(?P<action>route)\w*\b[^.!?。！？;\n]{0,90}"
+            r"\b(?:executor|execution|implementation|debug|diagnos|design|source|test|worktree|task)\w*\b"
+            r"[^.!?。！？;\n]{0,90}\b(?:to|under)\s+(?:gpt-5\.6-)?sol\b"
+        ),
+        re.compile(
+            r"\b(?P<action>use|choose|dispatch|assign)\w*\b[^.!?。！？;\n]{0,80}"
+            r"\b(?:gpt-5\.6-)?sol\b[^.!?。！？;\n]{0,80}"
+            r"\b(?:executor|execution|execute|implementation|implement|debug|diagnos|design|source|test|worktree|task)\w*\b"
+        ),
+        re.compile(
+            r"\b(?P<action>repurpose|reuse)\w*\b[^.!?。！？;\n]{0,100}"
+            r"\b(?:existing\s+)?(?:executor\s+)?task\b[^.!?。！？;\n]{0,80}"
+            r"\b(?:under|to|with)\s+(?:a\s+new\s+)?(?:gpt-5\.6-)?sol\b"
+        ),
+    )
+    seen_sol_executor: set[int] = set()
+    for pattern in sol_executor_patterns:
+        for match in pattern.finditer(lowered):
+            absolute_start = match.start("action")
+            absolute_end = match.end("action")
+            if action_is_forbidden(lowered, absolute_start, absolute_end):
+                continue
+            if absolute_start not in seen_sol_executor:
+                seen_sol_executor.add(absolute_start)
+                errors.append(
+                    ValidationError(
+                        "sol-executor-route",
+                        f"line {line_number_at(text, absolute_start)}: Sol is reserved for controller work or independent review, not executor work",
+                    )
+                )
+            break
+
     capacity_patterns = (
         re.compile(
             r"\b(?:while|when)\b[^.]{0,55}\b(?:any|a)\b[^.]{0,20}\bspark\b[^.]{0,35}\bactive\b"
@@ -600,7 +657,6 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                     )
                 )
 
-    statement_pattern = re.compile(r"[^.!?。！？\n]+")
     for statement_match in statement_pattern.finditer(lowered):
         statement = statement_match.group(0)
         if "ultra" not in statement:
@@ -863,8 +919,8 @@ def validate_text(text: str) -> list[ValidationError]:
     if HTML_COMMENT.search(text):
         errors.append(ValidationError("html-comment", "HTML comments are forbidden"))
     visible = visible_text(text)
-    if len(visible.split()) > 1800:
-        errors.append(ValidationError("context-budget", "core skill exceeds 1800 words"))
+    if len(visible.split()) > 1950:
+        errors.append(ValidationError("context-budget", "core skill exceeds 1950 words"))
     for heading, phrases in CORE_REQUIRED.items():
         body = section(visible, heading)
         if body is None:

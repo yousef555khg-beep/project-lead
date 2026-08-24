@@ -10,15 +10,18 @@ All notable changes to this project are documented in this file.
 
 - Reworked the public English and Chinese README files into a current capability guide: visible executor ownership, approval boundaries, objective-local routing, risk-based review, capability discovery, completion relay, and explicit platform limits.
 - Event-wait unavailability now has a single degraded-mode message per controller turn. It never retries `wait_threads`, polls, invokes Luna, or implies that background monitoring continues.
+- Long executor and reviewer tasks now roll over after an 80,000-token soft threshold or a 100,000-token/5 MB hard threshold. Pagination, compression, truncated history, and empty/null completion relays also force a fresh visible successor.
 
 ### Changed
 
 - Project Lead is now documented as a project-control layer rather than a generic task prompt. The public guide distinguishes verified Skill behavior from Codex App capabilities that a prompt cannot provide.
+- Sol is reserved for controller work and independent Elevated review; delegated executor work must use a verified non-Sol route.
 
 ### Fixed
 
 - A Spark usage, quota, or capacity-limit failure now hands the remaining objective to one Terra successor without asking the user, after Spark is terminal and any partial work is reconciled.
 - Spark-to-Terra fallback is limited to the current objective, selects Terra effort from remaining work, never overlaps owners or bounces between models, and reports `blocked_on_capacity` if Terra capacity also fails.
+- Context rollover transfers only a compact source-bound handoff, verifies live state before mutation, retires the predecessor, and never overlaps mutable ownership or reuses an overlong task when visible creation fails.
 
 ## [0.9.0] - 2026-08-22
 
@@ -244,7 +247,8 @@ All notable changes to this project are documented in this file.
 - Initial public release of `project-lead`.
 - Controller/executor role separation, ownership-aware routing, independent code review, and evidence-based acceptance.
 
-[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/yousef555khg-beep/project-lead/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v1.0.0
 [0.8.3]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.8.3
 [0.8.2]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.8.2
 [0.7.0]: https://github.com/yousef555khg-beep/project-lead/releases/tag/v0.7.0
