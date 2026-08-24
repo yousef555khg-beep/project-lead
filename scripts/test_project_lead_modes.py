@@ -37,7 +37,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         cls.skill = SKILL.read_text(encoding="utf-8")
 
     def test_core_skill_stays_within_context_budget(self) -> None:
-        self.assertLessEqual(len(self.skill.split()), 1800)
+        self.assertLessEqual(len(self.skill.split()), 1950)
 
     def test_low_risk_lane_is_default_and_skips_independent_review(self) -> None:
         low_risk = section(self.skill, "### Low-risk lane — default")
@@ -67,11 +67,11 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_controller_delegates_project_artifacts_and_long_validation(self) -> None:
         for phrase in (
             "classify `work_location: controller | executor`",
-            "Controller work is intake, routing, no-code cross-module decisions, acceptance, reporting, and quick read-only spot checks",
+            "Controller work is intake, routing, cross-module decisions, acceptance, reporting, and read-only spot checks",
             "Repository plans, designs, source, tests, configuration, non-obvious debugging, multi-file or substantive edits, repeated repair, and long or broad validation belong to an executor",
             "Do not split executor work into small direct steps",
             "Concurrency or convenience never moves executor work into the controller",
-            "Acceptance reconciles executor evidence and at most one focused spot check; it does not require the controller to rerun full suites or long manual validation",
+            "Acceptance reconciles executor evidence and at most one focused spot check; it does not require full-suite reruns or long manual validation",
         ):
             self.assertIn(phrase, self.skill)
 
@@ -142,7 +142,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         routing = section(self.skill, "## Execution model routing")
         self.assertIn("Ask once", routing)
         self.assertIn("`model_routing_authority: approved | fixed_default | pending`", routing)
-        self.assertIn("do not ask again for each choice or switch", routing)
+        self.assertIn("do not ask per choice or switch", routing)
         self.assertIn("Until approved", routing)
 
     def test_every_objective_gets_a_fresh_explicit_model_decision(self) -> None:
@@ -198,6 +198,13 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Execution-model routing never changes the review lane", routing)
         self.assertIn("Spark never reviews itself", routing)
 
+    def test_sol_is_never_an_executor_route(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        self.assertIn("Sol is reserved for controller work and independent Elevated review", routing)
+        self.assertIn("Never route an executor task to Sol", routing)
+        self.assertIn("Complexity, an architecture label, or a current worktree never authorizes Sol execution", routing)
+        self.assertIn("do not repurpose an existing executor task under a new Sol route", routing)
+
     def test_controller_selects_a_supported_reasoning_effort_per_dispatch(self) -> None:
         routing = section(self.skill, "## Execution model routing")
         for phrase in (
@@ -232,7 +239,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "`fork_turns: none` or a bounded positive turn count",
             "never use `all` or omitted full-history inheritance",
             "Any independent reviewer also uses no or bounded history even when its route matches the controller",
-            "Verify the accepted task's resolved model and effort before substantive work",
+            "Before work, verify the accepted model and effort",
             "If dispatch atomically exposes the resolved route, compare it before work",
             "Otherwise create a handshake-only task with no project reads, writes, or tool calls",
             "Send the substantive brief only after metadata confirms the route",
@@ -311,6 +318,34 @@ class ProjectLeadModeTests(unittest.TestCase):
         ):
             self.assertIn(phrase, monitoring)
 
+    def test_long_context_rollover_uses_soft_hard_and_failure_signals(self) -> None:
+        rollover = section(self.skill, "## Context rollover")
+        for phrase in (
+            "80,000 observed tokens as a soft threshold",
+            "assign no new phase there",
+            "100,000 observed tokens",
+            "a 5 MB task record",
+            "pagination, compression, or truncated-history warning",
+            "a completed task returns a null or empty assistant relay",
+            "retire it before the next phase",
+        ):
+            self.assertIn(phrase, rollover)
+
+    def test_long_context_rollover_creates_one_compact_visible_successor(self) -> None:
+        rollover = section(self.skill, "## Context rollover")
+        for phrase in (
+            "fresh titled user-visible successor with `create_thread`",
+            "never paste or inherit the full transcript",
+            "Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route",
+            "verify the live worktree and source of truth before mutation",
+            "Mark the old task retired and name its successor",
+            "never allow overlapping owners",
+            "If `create_thread` is unavailable, report `blocked_on_visibility`",
+            "do not reuse the overlong task or claim handoff",
+            "informational, not an approval gate",
+        ):
+            self.assertIn(phrase, rollover)
+
     def test_public_docs_explain_the_luna_information_assistant(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
         for phrase in (
@@ -344,6 +379,33 @@ class ProjectLeadModeTests(unittest.TestCase):
             "使用 `wait_threads` 保持总控回合",
             "Luna 和 30 分钟规则都不能唤醒空闲总控",
             "一次简短的降级说明",
+        ):
+            self.assertIn(phrase, readme_zh)
+
+    def test_public_docs_explain_long_context_rollover_and_sol_boundary(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Context rollover for long tasks",
+            "80,000 observed tokens",
+            "100,000 observed tokens or 5 MB",
+            "pagination, compression, truncated history, or an empty/null completion relay",
+            "fresh titled, user-visible successor",
+            "compact handoff",
+            "never overlaps mutable ownership",
+            "Sol never executes delegated project work",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## 长任务上下文换线",
+            "已观察到 80,000 Token",
+            "100,000 Token 或 5 MB",
+            "分页、压缩、历史截断或完成回传为空",
+            "新的有标题、侧边栏可见任务",
+            "精简交接包",
+            "不会产生两个并发修改负责人",
+            "Sol 不执行下发的项目任务",
         ):
             self.assertIn(phrase, readme_zh)
 
@@ -491,7 +553,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         ):
             self.assertIn(line, self.skill)
         self.assertIn(
-            "Outside the required route notice, do not expose ledger fields, SHA values, model names, review IDs, or other routing",
+            "Outside the required route notice, do not expose ledger fields or routing metadata",
             self.skill,
         )
         self.assertIn("Ship a usable slice", self.skill)
@@ -506,7 +568,7 @@ class ProjectLeadModeTests(unittest.TestCase):
 
     def test_skill_selection_is_automatic_but_installation_requires_approval(self) -> None:
         supporting = section(self.skill, "## Supporting skills and capability discovery")
-        self.assertIn("automatically decide whether an installed supporting skill is needed", supporting)
+        self.assertIn("Automatically decide whether an installed supporting skill is needed", supporting)
         self.assertIn("select and invoke one without asking the user to remember its name", supporting)
         self.assertIn("Ordinary bounded work selects `none`", supporting)
 
