@@ -179,6 +179,20 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Independent scopes may continue in parallel", routing)
         self.assertIn("wait for rejection, interruption, or terminal state", routing)
 
+    def test_spark_usage_limit_uses_one_temporary_terra_successor(self) -> None:
+        routing = section(self.skill, "## Execution model routing")
+        for phrase in (
+            "A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capacity failure for that attempt, not `blocked_on_user`",
+            "If Spark still appears active, interrupt it and wait for terminal state",
+            "reconcile its partial work and exact live worktree before handoff",
+            "redispatch the same remaining objective once to Terra without asking",
+            "Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred",
+            "The fallback is objective-local, not a new project default",
+            "Do not switch back to Spark during that objective",
+            "If the Terra attempt also hits model capacity, report `blocked_on_capacity`; never bounce between models",
+        ):
+            self.assertIn(phrase, routing)
+
     def test_execution_and_review_model_choices_are_independent(self) -> None:
         routing = section(self.skill, "## Execution model routing")
         self.assertIn("Execution-model routing never changes the review lane", routing)
@@ -283,8 +297,17 @@ class ProjectLeadModeTests(unittest.TestCase):
             "do not read tasks, call Luna, or report unchanged status",
             "relay it in commentary and keep waiting for the rest",
             "End the turn only when all promised targets are terminal",
-            "automatic relay cannot be guaranteed",
+            "automatic completion relay is unavailable in this client",
             "an idle controller, the 30-minute rule, or Luna can wake itself",
+        ):
+            self.assertIn(phrase, monitoring)
+
+    def test_event_wait_unavailable_has_one_clear_degraded_mode(self) -> None:
+        monitoring = section(self.skill, "## Monitoring and blockers")
+        for phrase in (
+            "If event waiting is unavailable, give one concise notice: automatic completion relay is unavailable in this client; the task remains accepted or running.",
+            "Do not retry `wait_threads`, poll, call Luna, or repeat it that turn.",
+            "End after reporting; user may later say `继续` or `跟进` for one fresh read.",
         ):
             self.assertIn(phrase, monitoring)
 
@@ -311,6 +334,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "## Event-driven completion relay",
             "keeps the controller turn open with `wait_threads`",
             "Luna and the 30-minute rule cannot wake an idle controller",
+            "one concise degraded-mode notice",
         ):
             self.assertIn(phrase, readme_en)
 
@@ -319,6 +343,26 @@ class ProjectLeadModeTests(unittest.TestCase):
             "## 事件驱动的完成回传",
             "使用 `wait_threads` 保持总控回合",
             "Luna 和 30 分钟规则都不能唤醒空闲总控",
+            "一次简短的降级说明",
+        ):
+            self.assertIn(phrase, readme_zh)
+
+    def test_v1_public_docs_explain_current_control_boundary(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "## Project Lead 1.0",
+            "real project-control layer",
+            "prompt-only workaround",
+            "When `wait_threads` is unavailable",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "## Project Lead 1.0",
+            "真实的项目控制层",
+            "没有可用的提示词补救办法",
+            "`wait_threads` 不可用时",
         ):
             self.assertIn(phrase, readme_zh)
 
@@ -340,6 +384,11 @@ class ProjectLeadModeTests(unittest.TestCase):
             "handshake-only task with no project reads, writes, or tool calls",
             "`blocked_on_routing`",
             "independent scopes may continue in parallel",
+            "hits a usage, quota, or capacity limit",
+            "redispatches the remaining objective once to Terra without asking",
+            "does not become the project default",
+            "will not bounce back to Spark",
+            "`blocked_on_capacity`",
         ):
             self.assertIn(phrase, readme_en)
 
@@ -360,6 +409,11 @@ class ProjectLeadModeTests(unittest.TestCase):
             "禁止读取、修改项目或调用工具的握手任务",
             "`blocked_on_routing`",
             "无关范围仍可并行推进",
+            "用量、额度或容量限制",
+            "不再询问用户",
+            "不会把 Terra 变成项目默认模型",
+            "不会在当前目标中切回 Spark",
+            "`blocked_on_capacity`",
         ):
             self.assertIn(phrase, readme_zh)
 

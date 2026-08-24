@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "a149345133ec7694d9c823d408a91c8d38580e4084f1ad838027dfde47e98654"
+EXPECTED_CORE_SHA256 = "8aed82f3d246fd471bf9b09e5021aa5f598d5963e62664e3d0eedf6156f11177"
 
 
 EXPECTED_CONTRACT = {
@@ -58,7 +58,7 @@ CORE_REQUIRED = {
         "If `create_thread` is unavailable, report `blocked_on_visibility`",
         "Internal subagents are limited to short read-only helper checks",
         "cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal",
-        "compact private ledger",
+        "Keep a ledger.",
     ),
     "## Authority boundary": (
         "Approval follows the proposed action and missing authority",
@@ -89,6 +89,14 @@ CORE_REQUIRED = {
         "Without a task-specific risk, reselect from current evidence",
         "Only select combinations exposed by the dispatch tool; never invent a model or effort",
         "If Spark is unavailable or ineligible, reselect from the same evidence",
+        "A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capacity failure for that attempt, not `blocked_on_user`",
+        "If Spark still appears active, interrupt it and wait for terminal state",
+        "reconcile its partial work and exact live worktree before handoff",
+        "redispatch the same remaining objective once to Terra without asking",
+        "Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred",
+        "The fallback is objective-local, not a new project default",
+        "Do not switch back to Spark during that objective",
+        "If the Terra attempt also hits model capacity, report `blocked_on_capacity`; never bounce between models",
         "Formal `create_thread` tasks start fresh",
         "`fork_turns: none` or a bounded positive turn count",
         "never use `all` or omitted full-history inheritance",
@@ -159,7 +167,8 @@ CORE_REQUIRED = {
         "Do not send a final answer while any promised target is accepted, queued, or running",
         "A timeout is not a state change; reuse the returned cursor",
         "relay it in commentary and keep waiting for the rest",
-        "automatic relay cannot be guaranteed",
+        "automatic completion relay is unavailable in this client",
+        "Do not retry `wait_threads`, poll, call Luna, or repeat it that turn.",
         "one project-scoped read-only Luna assistant scope",
         "large or repetitive enough to materially reduce controller context or cost",
         "A Luna result is advisory",

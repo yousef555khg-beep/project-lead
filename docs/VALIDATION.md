@@ -6,13 +6,13 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Validation environment
 
-- Date: 2026-08-12 to 2026-08-22
-- Candidate: `v0.9.0` sidebar-visible executor-task and task-local effort-routing release
-- Release behavior source: reviewed `v0.9.0` release contents
+- Date: 2026-08-12 to 2026-08-24
+- Candidate: `v1.0.0` project-control documentation and event-wait degradation candidate
+- Behavior source: reviewed current repository contents; this record does not itself claim a GitHub Release exists
 - Skill entrypoint: `skills/project-lead/SKILL.md`
-- Method: historical isolated read-only pressure prompts plus deterministic RED-to-GREEN structural regressions; PL-33 to PL-38 add live-controller audits and hostile-clause checks, with no behavioral claim beyond the recorded evidence
-- Current PL-33 to PL-38 candidate Skill SHA-256: `a149345133ec7694d9c823d408a91c8d38580e4084f1ad838027dfde47e98654`
-- Current validator SHA-256: `1634b423f17dc373df2c8b57eec2d2e56dfb7ad5e598156f11ce5ec95fea3f4f`
+- Method: historical isolated read-only pressure prompts plus deterministic RED-to-GREEN structural regressions; PL-33 to PL-39 add live-controller audits and hostile-clause checks, with no behavioral claim beyond the recorded evidence
+- Current PL-33 to PL-39 candidate Skill SHA-256: `8aed82f3d246fd471bf9b09e5021aa5f598d5963e62664e3d0eedf6156f11177`
+- Current validator SHA-256: `0ae75ac59fae7c382d0b739511d35b64d1f765ea3847ea82db0c433a865dd507`
 - Current PL-29 candidate Skill SHA-256: `475721641611e0de14601fa7e095476e709eabd1325d6ec19186731f4669285f`
 - Current PL-28 candidate Skill SHA-256: `2fdb4f7654e7cb357163a86159d0c7878a0c863ba1c65e11f1808c02a355c48e`
 - Current PL-27 candidate Skill SHA-256: `2ccc5a7596095b36acece05df71b13cfea3224c47d0f7fa6cc42e464469a56d1`
@@ -25,7 +25,7 @@ These checks validate instruction-following under the stated scenarios. They are
 
 ## Results
 
-PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 introduced objective-local routing; PL-36 supersedes its same-task switching assumption with verified model-and-effort routing. PL-31 and PL-32 supersede PL-30's controller-speed, approval, and missing-field behavior. PL-33 makes approval action-based and expires stale blockers. PL-34 keeps project artifacts and long execution work out of the controller. PL-35 defines bounded two-return closure. PL-37 requires formal executor work to be sidebar-visible. PL-38 makes effort task-local and adds a no-call reverse check before xhigh or Ultra.
+PL-01 to PL-23 preserve the historical regression record for released behavior. Where an older scenario says every candidate required independent review, PL-24 to PL-26 supersede that policy. PL-27 introduced objective-local routing; PL-36 supersedes its same-task switching assumption with verified model-and-effort routing. PL-31 and PL-32 supersede PL-30's controller-speed, approval, and missing-field behavior. PL-33 makes approval action-based and expires stale blockers. PL-34 keeps project artifacts and long execution work out of the controller. PL-35 defines bounded two-return closure. PL-37 requires formal executor work to be sidebar-visible. PL-38 makes effort task-local and adds a no-call reverse check before xhigh or Ultra. PL-39 defines the one-notice degraded mode when the Codex App event-wait handler is unavailable.
 
 | ID | Behavior | Pressure scenario | Required outcome | Observed outcome | Result |
 | --- | --- | --- | --- | --- | --- |
@@ -67,6 +67,7 @@ PL-01 to PL-23 preserve the historical regression record for released behavior. 
 | PL-36 | Model, effort, and route notice are real | A Sol controller requests Terra, but full-history inheritance preserves Sol; a later plain follow-up claims it can switch effort; the user wants visibility without another approval gate. | Select a supported model and effort per dispatch; start formal user-visible tasks fresh and use no or bounded history for internal helper/reviewer creation; verify an atomically exposed route or use a no-project-access handshake; fail closed if unobservable; hand off only after the old turn is terminal or interrupted; keep fallback guards scope-local; announce route, then dispatch without approval. | The repaired candidate rejects full-history inheritance, same-route reviewer leakage, global Spark capacity blocking, in-place switching, approval-gated notices, and blanket Ultra while retaining one active owner. | Pass (structural) |
 | PL-37 | Formal executor work is visible | A controller sends multi-file implementation, independent review, or long validation to an internal subagent that the user cannot find in the sidebar or inspect for approval. | Create a titled, user-visible standalone Codex task with `create_thread`; reserve internal subagents for short read-only helper checks. If visible creation is unavailable, report `blocked_on_visibility` and do not claim dispatch. | The real Shengxue Youpin controller used an internal subagent that was absent from the sidebar. New core and public-document regressions failed before the repair, then require visible formal-task creation and reject removal of the contract. | Pass (structural) |
 | PL-38 | Effort is calibrated from the current child task | A minimal one-file typecheck fix appears inside an Elevated parent project after other xhigh work, while a separate multi-source identity/schema task and four independent small modules also need routing. | Ignore parent/review/prior-route effort. Use Spark high for the minimal deterministic path; reserve xhigh for a named task-specific lower-effort failure risk; use Ultra only when one objective actually runs large independent workstreams without shared mutable files. The reverse check is one controller judgment with no tool, task, Luna, or parallel model call. | The RED replay selected Spark xhigh for the minimal case because the old Low-risk condition accidentally promoted it. New behavior and public-document tests require task-local evidence, the bounded reverse check, and a route-notice reason; complex constraints retain justified xhigh while independent small modules remain separable Spark work. | Pass (structural) |
+| PL-39 | Event-wait unavailability is honest and quiet | A client lacks the `wait_threads` handler while an accepted executor is still running; repeated dispatches tempt the controller to retry, poll, or imply background monitoring. | Give one concise unavailable notice, preserve the task's real state, end after the current report, and allow only a later user-led fresh read. Never retry the handler, poll, call Luna, or claim a self-wake. | The new RED checks failed before this contract existed. The candidate requires the single degraded-mode notice in the core and in both public READMEs. It does not claim to repair the missing platform handler. | Pass (structural) |
 
 ## PL-24 to PL-26: risk-lane slimming
 
@@ -228,6 +229,14 @@ The RED replay exposed an inverted incentive: the old rule permitted Spark `xhig
 The repaired contract ignores parent-project complexity, review lane, prior route, and prior effort. Spark `high` owns an exact reversible path with deterministic checks; Spark `xhigh` needs an additional named hard local reasoning risk. Terra `high` owns one coherent problem with known contracts and checks; Terra `xhigh` needs multiple plausible causes/designs or inseparable constraints. Terra `ultra` requires one objective that actually runs large independent workstreams with no shared mutable files. Before `xhigh` or `ultra`, the controller silently names the concrete failure risk at the next lower effort; this is one internal judgment with no tool call, extra task, Luna call, or parallel model comparison.
 
 Three isolated GREEN replays read the exact bound candidate. The minimal `tsconfig` case moved to Spark `high`; the multi-source constraint case retained justified high-effort routing; and four independent small modules remained four Spark `high` tasks rather than one artificial Terra `ultra` objective. Deterministic regressions also require a task-specific route-notice reason and fail when either task-local routing or the bounded reverse check is removed.
+
+## PL-39: one-notice event-wait degradation
+
+The RED case reproduced the current Codex App limitation: the controller had accepted an executor task, but `wait_threads` had no registered handler. Earlier wording correctly refused to promise an automatic wake-up, but it still left room to repeat the unavailable warning or describe a read-only snapshot as ongoing supervision.
+
+The repaired contract treats this as a platform boundary, not an executor failure. It emits one concise notice in the current controller turn, preserves the accepted or running task state, and stops after the current report. It neither retries `wait_threads`, polls, calls Luna, nor implies that the controller will wake itself. A later user message such as “继续” or “跟进” starts one fresh read; it does not retroactively make the prior controller active.
+
+The RED unit checks failed until the core and both public READMEs contained this boundary. The GREEN suite additionally keeps the existing no-heartbeat, no-cron, and no-polling rules. These structural checks do not prove that a future Codex App build will provide the event handler; they prove that Project Lead reports its absence accurately and without noise.
 
 ## Auditable RED to GREEN evidence
 
@@ -550,7 +559,7 @@ Three post-review regressions also passed: a dirty code worktree stayed `review_
 - [x] An explicit same-candidate second opinion preserves the original review and blocks on unresolved Critical or Important findings rather than silently overwriting a verdict.
 - [x] Normal progress reports use four plain-language lines and, outside the required route notice, hide internal hashes, model details, review IDs, and ledger state unless they explain a real blocker.
 - [x] Installation-only mechanics live in a progressive reference that is loaded only after exact candidate approval.
-- [x] Fifty-nine risk-lane, model-and-effort-routing, visible-task, route-notice, speed-tier, event-wait, authority, work-location, automatic-skill-routing, public-description, and safety-contract regressions reject missing rules, any unreviewed core digest change, inherited or blanket effort, missing reverse checks, invisible formal dispatch, stale blockers, subject-based approval, controller work hoarding, model or Fast inheritance, full-history creation or reviewer leakage, unverified route starts, unsafe handshakes, global fallback blocking, fake in-place switching, approval-gated notices, blanket Ultra, Fast solicitation, missing-speed blockers, automatic priority service, early controller exit, false self-wake claims, review-loop regressions, hidden comments, external-skill dependencies, package runners, false completion overrides, unsafe target commits, and loader-visible transaction siblings.
+- [x] The current risk-lane, model-and-effort-routing, visible-task, route-notice, speed-tier, event-wait, authority, work-location, automatic-skill-routing, public-description, and safety-contract regressions reject missing rules, any unreviewed core digest change, inherited or blanket effort, missing reverse checks, invisible formal dispatch, stale blockers, subject-based approval, controller work hoarding, model or Fast inheritance, full-history creation or reviewer leakage, unverified route starts, unsafe handshakes, global fallback blocking, fake in-place switching, approval-gated notices, blanket Ultra, Fast solicitation, missing-speed blockers, automatic priority service, early controller exit, false self-wake claims, repeated unavailable-event warnings, review-loop regressions, hidden comments, external-skill dependencies, package runners, false completion overrides, unsafe target commits, and loader-visible transaction siblings.
 
 ## How to repeat the checks
 
