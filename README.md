@@ -4,11 +4,25 @@ English | [简体中文](README.zh-CN.md)
 
 A Codex skill for coordinating multi-module projects, automatically routing Spark or Terra execution, using Luna for bounded read-only information assistance, selecting useful supporting skills, and keeping ordinary work out of unnecessary review loops.
 
-## What changed
+## Project Lead 1.0
 
-Project Lead now follows one rule: **use the least process that is safe for the actual risk**. Progress is measured by usable outcomes, not by task count, review count, or long technical reports.
+Project Lead 1.0 turns a capable Codex conversation into a **real project-control layer**: it keeps ownership visible, routes execution by the current objective, limits review to real risk, and reports a usable result rather than a stream of agent activity.
 
-The controller owns scope, task ownership, blockers, acceptance, and reporting. Executors own project artifacts and substantive execution. Ordinary work moves through one clear owner without unnecessary review; high-risk work keeps independent gates.
+It follows one operating principle: **use the least process that is safe for the actual risk**. The controller owns scope, task ownership, blockers, acceptance, and reporting; executors own project artifacts and substantive execution. Ordinary work moves through one clear owner without unnecessary review, while high-risk work retains independent gates.
+
+Project Lead is a decision and coordination skill, not a replacement for missing Codex App features. A prompt-only workaround cannot register a platform handler, change an unavailable service tier, or make an idle controller wake itself. The sections below distinguish its verified behavior from those platform boundaries.
+
+## What Project Lead controls
+
+| Capability | Observable result |
+| --- | --- |
+| Visible ownership | Implementation, review, and long validation run in titled sidebar-visible tasks; one mutable scope has one owner. |
+| Approval boundary | The controller approves normal in-scope work itself and asks only for a real authority or product-policy decision. |
+| Objective-local routing | Every new objective receives a fresh Spark, Terra, or Luna route, effort, and ordinary-speed decision; prior routes cannot leak forward. |
+| Capacity recovery | A terminal Spark quota or capacity failure hands the remaining objective once to Terra, with fresh effort selection and no model bounce. |
+| Risk-proportionate review | Low-risk work has no independent review; Standard and Elevated work retain bounded independent gates. |
+| Capability discovery | One installed supporting skill may be selected automatically; missing skills are only searched and recommended until the user approves installation. |
+| Completion reliability | `wait_threads` relays terminal events while the client provides it; unavailable event waiting degrades honestly instead of pretending to monitor in the background. |
 
 ## Controller authority and execution boundary
 
@@ -50,6 +64,8 @@ Formal `create_thread` executor tasks start fresh. Internal helper and reviewer 
 
 A follow-up API without route fields cannot switch an existing task in place; after the current turn ends or is interrupted, the logical scope is handed to one correctly routed task without overlapping owners. A Spark-to-Terra fallback waits only for the active Spark turn on the same objective or logical scope; independent scopes may continue in parallel.
 
+If a Spark attempt hits a usage, quota, or capacity limit, Project Lead first makes that attempt terminal, reconciles any partial work in the live worktree, and redispatches the remaining objective once to Terra without asking. Terra effort is selected from the remaining work instead of inherited from Spark. This objective-local fallback does not become the project default and will not bounce back to Spark during the same objective. If Terra also hits model capacity, Project Lead reports `blocked_on_capacity` instead of bouncing between models.
+
 ## Child tasks use Standard speed by default
 
 Fast speed is not the Low-risk lane. The controller may keep its user-configured speed, but that setting grants no speed authority to delegated work. By default, every new child task starts at Standard/default, including follow-ups, and Project Lead never asks whether to use Fast. Fast is used only when the user explicitly requests Fast for that exact child objective; the permission expires with the objective.
@@ -66,7 +82,7 @@ Luna is not used for a few lines or routine updates. Its result remains advisory
 
 After delegated work is accepted, Project Lead keeps the controller turn open with `wait_threads` until every promised target finishes or needs attention. A timeout only renews the event wait; it does not trigger status polling, repeated reads, or Luna. When one target finishes, the controller relays it in commentary and continues waiting for the others.
 
-The controller ends early only for required user input, an explicit user stop, or an unavailable event-wait tool. In that last case it states that automatic relay cannot be guaranteed. Luna and the 30-minute rule cannot wake an idle controller.
+The controller ends early only for required user input, an explicit user stop, or an unavailable event-wait tool. When `wait_threads` is unavailable, it gives one concise degraded-mode notice: automatic completion relay is unavailable in this client, but the accepted or running task is unchanged. It does not retry the interface, poll, call Luna, or repeat the warning in that controller turn. It ends after the current report; the user can later say `continue` or `follow up` for one fresh read. Luna and the 30-minute rule cannot wake an idle controller.
 
 ## Risk-based review lanes
 
