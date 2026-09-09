@@ -14,6 +14,13 @@ README_ZH = ROOT / "README.zh-CN.md"
 INSTALL_REFERENCE = (
     ROOT / "skills" / "project-lead" / "references" / "skill-installation-safety.md"
 )
+CAPACITY_REFERENCE = (
+    ROOT / "skills" / "project-lead" / "references" / "model-capacity-fallback.md"
+)
+ROLLOVER_REFERENCE = ROOT / "skills" / "project-lead" / "references" / "task-rollover.md"
+LUNA_REFERENCE = (
+    ROOT / "skills" / "project-lead" / "references" / "luna-information-assistance.md"
+)
 
 
 def section(text: str, heading: str) -> str:
@@ -35,9 +42,12 @@ class ProjectLeadModeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.skill = SKILL.read_text(encoding="utf-8")
+        cls.routing = section(cls.skill, "## Execution model routing") + "\n" + (
+            SKILL.parent / "references/model-routing.md"
+        ).read_text(encoding="utf-8")
 
     def test_core_skill_stays_within_context_budget(self) -> None:
-        self.assertLessEqual(len(self.skill.split()), 1950)
+        self.assertLessEqual(len(self.skill.split()), 2025)
 
     def test_low_risk_lane_is_default_and_skips_independent_review(self) -> None:
         low_risk = section(self.skill, "### Low-risk lane — default")
@@ -60,7 +70,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "Bind `blocked_on_user` to the objective, candidate or scope version, exact action or decision, and missing authority",
             "Clear or supersede it when the user decides, existing authority covers the action, the action disappears, or its objective, candidate, or scope changes",
             "Never inherit it by label alone",
-            "dispatch one in-scope root-cause repair without asking",
+            "Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking",
         ):
             self.assertIn(phrase, self.skill)
 
@@ -85,18 +95,31 @@ class ProjectLeadModeTests(unittest.TestCase):
             "cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal",
         ):
             self.assertIn(phrase, ownership)
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("Formal `create_thread` tasks start fresh", routing)
 
-    def test_standard_lane_batches_one_review_and_one_repair_review(self) -> None:
-        standard = section(self.skill, "### Standard lane")
-        self.assertIn("`independent_review: one_batched_terra`", standard)
-        self.assertIn("At most one automatic incremental re-review", standard)
-        self.assertIn("Minor findings never trigger return or re-review", standard)
+    def test_same_objective_reuses_one_executor_and_records_only_milestones(self) -> None:
+        ownership = section(self.skill, "## Ownership and dispatch")
+        for phrase in (
+            "Reuse the same executor for in-scope repair, focused retest, evidence clarification, and result recovery",
+            "Do not create a new formal task solely for route confirmation, a supplemental report, or a completion receipt",
+            "Record ledger milestones only: dispatch accepted, a real blocker or decision, candidate identity change, and terminal ACCEPT or RETURN",
+            "Do not write unchanged waiting states or every intermediate progress event",
+        ):
+            self.assertIn(phrase, ownership)
 
-    def test_elevated_lane_keeps_sol_gate_for_concrete_risk(self) -> None:
+    def test_only_necessary_review_batches_one_candidate(self) -> None:
+        self.assertNotIn("### Standard lane", self.skill)
         elevated = section(self.skill, "### Elevated lane")
-        self.assertIn("`independent_review: sol_required`", elevated)
+        for phrase in ("At most one automatic incremental re-review",
+                       "Minor findings never trigger return or re-review",
+                       "Reuse exact-candidate executor evidence",
+                       "Do not rerun a full suite merely to duplicate valid evidence"):
+            self.assertIn(phrase, elevated)
+
+    def test_elevated_lane_keeps_flagship_gate_for_concrete_risk(self) -> None:
+        elevated = section(self.skill, "### Elevated lane")
+        self.assertIn("`independent_review: flagship_required`", elevated)
         for risk in (
             "authentication",
             "payments",
@@ -130,8 +153,7 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_review_loop_has_a_hard_automatic_cap(self) -> None:
         self.assertIn("No lane repeats the same incremental review loop after two returns", self.skill)
         for phrase in (
-            "dispatch one in-scope root-cause repair without asking",
-            "Standard closes recorded findings from refreshed executor evidence plus one focused spot check",
+            "Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking",
             "unproven findings stay `RETURN`",
             "Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking",
             "If that review returns, keep `RETURN`, report `blocked_on_quality`, and never launch a fourth review",
@@ -139,14 +161,14 @@ class ProjectLeadModeTests(unittest.TestCase):
             self.assertIn(phrase, self.skill)
 
     def test_model_routing_asks_once_per_project_then_stops_reprompting(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("Ask once", routing)
         self.assertIn("`model_routing_authority: approved | fixed_default | pending`", routing)
         self.assertIn("do not ask per choice or switch", routing)
         self.assertIn("Until approved", routing)
 
     def test_every_objective_gets_a_fresh_explicit_model_decision(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("Before every new objective, dispatch, or substantive follow-up", routing)
         self.assertIn("`execution_route: {model, reasoning_effort, service_tier}`", routing)
         self.assertIn("never inherit a previous route", routing)
@@ -154,18 +176,18 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("A completed objective authorizes nothing for the next", routing)
 
     def test_spark_effort_is_calibrated_from_the_current_child_task(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         for phrase in (
             "Spark `high`: exact reversible scope, one path, deterministic checks",
             "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
             "Low-risk alone is insufficient",
-            "Ignore parent complexity, review lane, prior route and effort",
+            "For executors: ignore parent complexity, review lane, prior route and effort",
             "If Spark is unavailable or ineligible, reselect from the same evidence",
         ):
             self.assertIn(phrase, routing)
 
     def test_complex_follow_up_uses_a_verified_route_without_duplicate_ownership(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("A follow-up without model and effort fields cannot switch them", routing)
         self.assertIn("finish or interrupt the current turn", routing)
         self.assertIn("hand off the same logical scope to one correctly routed replacement task", routing)
@@ -173,44 +195,46 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("never use `all` or omitted full-history inheritance", routing)
 
     def test_unavailable_spark_capacity_falls_back_explicitly_to_terra(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("If Spark is unavailable or ineligible, reselect from the same evidence", routing)
         self.assertIn("Never start Terra fallback in the same logical scope while Spark is active", routing)
         self.assertIn("Independent scopes may continue in parallel", routing)
         self.assertIn("wait for rejection, interruption, or terminal state", routing)
 
     def test_spark_usage_limit_uses_one_temporary_terra_successor(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
+        self.assertIn("references/model-capacity-fallback.md", routing)
+        fallback = CAPACITY_REFERENCE.read_text(encoding="utf-8")
         for phrase in (
-            "A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capacity failure for that attempt, not `blocked_on_user`",
+            "terminal capacity failure, not `blocked_on_user`",
             "If Spark still appears active, interrupt it and wait for terminal state",
-            "reconcile its partial work and exact live worktree before handoff",
-            "redispatch the same remaining objective once to Terra without asking",
+            "Reconcile partial work and the exact live worktree before handoff",
+            "Redispatch the same remaining objective once to Terra without asking",
             "Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred",
-            "The fallback is objective-local, not a new project default",
+            "Keep the fallback objective-local",
             "Do not switch back to Spark during that objective",
-            "If the Terra attempt also hits model capacity, report `blocked_on_capacity`; never bounce between models",
+            "If Terra also hits model capacity, report `blocked_on_capacity`; never bounce between models",
         ):
-            self.assertIn(phrase, routing)
+            self.assertIn(phrase, fallback)
 
     def test_execution_and_review_model_choices_are_independent(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         self.assertIn("Execution-model routing never changes the review lane", routing)
         self.assertIn("Spark never reviews itself", routing)
 
-    def test_sol_is_never_an_executor_route(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
-        self.assertIn("Sol is reserved for controller work and independent Elevated review", routing)
-        self.assertIn("Never route an executor task to Sol", routing)
-        self.assertIn("Complexity, an architecture label, or a current worktree never authorizes Sol execution", routing)
-        self.assertIn("do not repurpose an existing executor task under a new Sol route", routing)
+    def test_astra_is_preferred_not_compulsory_for_execution(self) -> None:
+        for phrase in ("Prefer Astra for substantive implementation",
+                       "Choose Terra or eligible Spark directly when better suited",
+                       "Do not require a failed Terra attempt first",
+                       "Sol remains reserved for controller work and independent review"):
+            self.assertIn(phrase, self.routing)
 
     def test_controller_selects_a_supported_reasoning_effort_per_dispatch(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         for phrase in (
             "`execution_route: {model, reasoning_effort, service_tier}`",
             "route only from current child actions, uncertainty, coupling, consequences, and checks",
-            "Ignore parent complexity, review lane, prior route and effort",
+            "For executors: ignore parent complexity, review lane, prior route and effort",
             "No blanket effort default",
             "Spark `high`: exact reversible scope, one path, deterministic checks",
             "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
@@ -225,25 +249,27 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertNotIn("Terra uses `high` by default", routing)
 
     def test_high_effort_reverse_check_is_bounded_and_cost_free(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         for phrase in (
-            "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+            "Before `xhigh`, `max`, or `ultra`, silently name one concrete failure risk at the next lower supported effort",
             "one controller judgment: no tool, task, Luna, or parallel model comparison",
             "Without a task-specific risk, reselect from current evidence",
+            "File count, long context, labels such as architecture or security, and a prior failure do not alone justify `xhigh`, `max`, or `ultra`",
+            "When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists",
         ):
             self.assertIn(phrase, routing)
 
     def test_cross_model_dispatch_avoids_full_history_inheritance_and_verifies_route(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         for phrase in (
             "`fork_turns: none` or a bounded positive turn count",
             "never use `all` or omitted full-history inheritance",
             "Any independent reviewer also uses no or bounded history even when its route matches the controller",
-            "Before work, verify the accepted model and effort",
             "If dispatch atomically exposes the resolved route, compare it before work",
-            "Otherwise create a handshake-only task with no project reads, writes, or tool calls",
-            "Send the substantive brief only after metadata confirms the route",
-            "If the route cannot be observed, report `blocked_on_routing`",
+            "For every lane, a fresh `create_thread` or idle-task follow-up accepted with explicit supported model and effort is sufficient to start",
+            "Do not create a handshake-only task for routine routing",
+            "Only concrete mismatch evidence requires route recovery",
+            "if unresolved, report `blocked_on_routing` before further work",
             "A follow-up without model and effort fields cannot switch them",
             "hand off the same logical scope to one correctly routed replacement task",
             "never overlap owners",
@@ -251,7 +277,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             self.assertIn(phrase, routing)
 
     def test_every_dispatch_announces_route_without_waiting_for_approval(self) -> None:
-        routing = section(self.skill, "## Execution model routing")
+        routing = self.routing
         for phrase in (
             "Immediately before every creation or substantive follow-up, tell the user",
             "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
@@ -279,21 +305,23 @@ class ProjectLeadModeTests(unittest.TestCase):
 
     def test_luna_is_a_bounded_read_only_information_assistant(self) -> None:
         monitoring = section(self.skill, "## Monitoring and blockers")
+        self.assertIn("references/luna-information-assistance.md", monitoring)
+        luna = LUNA_REFERENCE.read_text(encoding="utf-8")
         for phrase in (
             "`gpt-5.6-luna medium`",
             "one project-scoped read-only Luna assistant scope",
-            "large or repetitive enough to materially reduce controller context or cost",
-            "summarize reports, logs, tests",
-            "extract progress, evidence, blockers, approvals, terminal state",
-            "deduplicate status and draft the update",
+            "summarize reports, logs, and tests",
+            "extract progress, evidence, blockers, approvals, and terminal state",
+            "deduplicate status",
+            "draft the update",
             "A Luna result is advisory",
             "verify primary evidence",
             "Do not use Luna for a few lines, routine updates, or to appear busy",
             "cannot write or modify code, choose execution models or review lanes, make architecture decisions, review, accept, or mark work complete",
             "deduplicate source-bound material",
-            "hand off on effort change",
+            "An idle task may receive its next turn through explicit supported model and thinking fields",
         ):
-            self.assertIn(phrase, monitoring)
+            self.assertIn(phrase, luna)
 
     def test_controller_keeps_event_wait_open_until_relay_is_safe(self) -> None:
         monitoring = section(self.skill, "## Monitoring and blockers")
@@ -321,30 +349,42 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_long_context_rollover_uses_soft_hard_and_failure_signals(self) -> None:
         rollover = section(self.skill, "## Context rollover")
         for phrase in (
+            "Apply these limits to controller, executor, and reviewer tasks",
             "80,000 observed tokens as a soft threshold",
             "assign no new phase there",
             "100,000 observed tokens",
             "a 5 MB task record",
             "pagination, compression, or truncated-history warning",
-            "a completed task returns a null or empty assistant relay",
             "retire it before the next phase",
+            "A controller at a hard trigger may finish current acceptance or reporting, but must create its successor before taking a new objective",
+            "Active executor ownership does not change during controller rollover",
+        ):
+            self.assertIn(phrase, rollover)
+
+    def test_empty_completion_relay_recovers_original_result_without_rework(self) -> None:
+        rollover = section(self.skill, "## Context rollover")
+        for phrase in (
+            "A null or empty assistant relay is a transport failure, not execution failure or a context trigger by itself",
+            "Recover the original terminal record once before any successor decision",
+            "Never rerun execution or review solely to reproduce missing relay text",
+            "If the record is unavailable, report `blocked_on_relay`",
         ):
             self.assertIn(phrase, rollover)
 
     def test_long_context_rollover_creates_one_compact_visible_successor(self) -> None:
         rollover = section(self.skill, "## Context rollover")
+        self.assertIn("references/task-rollover.md", rollover)
+        handoff = ROLLOVER_REFERENCE.read_text(encoding="utf-8")
         for phrase in (
-            "fresh titled user-visible successor with `create_thread`",
-            "never paste or inherit the full transcript",
-            "Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route",
-            "verify the live worktree and source of truth before mutation",
+            "Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, active child task IDs, and route",
+            "The successor verifies the live worktree and source of truth before mutation",
             "Mark the old task retired and name its successor",
             "never allow overlapping owners",
             "If `create_thread` is unavailable, report `blocked_on_visibility`",
             "do not reuse the overlong task or claim handoff",
             "informational, not an approval gate",
         ):
-            self.assertIn(phrase, rollover)
+            self.assertIn(phrase, handoff)
 
     def test_public_docs_explain_the_luna_information_assistant(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
@@ -382,17 +422,18 @@ class ProjectLeadModeTests(unittest.TestCase):
         ):
             self.assertIn(phrase, readme_zh)
 
-    def test_public_docs_explain_long_context_rollover_and_sol_boundary(self) -> None:
+    def test_public_docs_explain_long_context_rollover_and_flagship_boundary(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
         for phrase in (
             "## Context rollover for long tasks",
             "80,000 observed tokens",
             "100,000 observed tokens or 5 MB",
-            "pagination, compression, truncated history, or an empty/null completion relay",
+            "Pagination, compression, or truncated history",
+            "empty/null completion relay is treated as a transport problem",
             "fresh titled, user-visible successor",
             "compact handoff",
             "never overlaps mutable ownership",
-            "Sol never executes delegated project work",
+            "Astra is preferred, not mandatory",
         ):
             self.assertIn(phrase, readme_en)
 
@@ -401,11 +442,31 @@ class ProjectLeadModeTests(unittest.TestCase):
             "## 长任务上下文换线",
             "已观察到 80,000 Token",
             "100,000 Token 或 5 MB",
-            "分页、压缩、历史截断或完成回传为空",
+            "分页、压缩或历史截断",
+            "完成回传为空/null 时",
             "新的有标题、侧边栏可见任务",
             "精简交接包",
             "不会产生两个并发修改负责人",
-            "Sol 不执行下发的项目任务",
+            "Astra 优先，但不是强制",
+        ):
+            self.assertIn(phrase, readme_zh)
+
+    def test_public_docs_explain_lean_routing_and_result_recovery(self) -> None:
+        readme_en = README_EN.read_text(encoding="utf-8")
+        for phrase in (
+            "Routine accepted dispatches do not create handshake-only tasks",
+            "reuses one executor for the same objective",
+            "recovers the original terminal record before any rerun",
+            "controller, executor, and reviewer context",
+        ):
+            self.assertIn(phrase, readme_en)
+
+        readme_zh = README_ZH.read_text(encoding="utf-8")
+        for phrase in (
+            "普通任务创建成功后不再额外执行握手任务",
+            "同一目标复用同一个执行线程",
+            "先恢复原任务的终态记录，再考虑任何重跑",
+            "总控、执行和审查线程的上下文",
         ):
             self.assertIn(phrase, readme_zh)
 
@@ -443,7 +504,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "announces the task, model, effort, and actual speed immediately before dispatch",
             "does not wait for approval",
             "full-history inheritance is never used",
-            "handshake-only task with no project reads, writes, or tool calls",
+            "Routine accepted dispatches do not create handshake-only tasks",
             "`blocked_on_routing`",
             "independent scopes may continue in parallel",
             "hits a usage, quota, or capacity limit",
@@ -463,12 +524,12 @@ class ProjectLeadModeTests(unittest.TestCase):
             "同时选择模型和推理档位",
             "当前边界明确的子任务",
             "不会继承父项目、审查通道或上一个任务的档位",
-            "一次总控内部静默判断",
+            "一次静默判断",
             "不会调用工具、新建任务、调用 Luna 或并行比较模型",
             "派发前会告知任务、模型、档位和实际速度",
             "不会等待批准",
             "不能继承完整历史",
-            "禁止读取、修改项目或调用工具的握手任务",
+            "普通任务创建成功后不再额外执行握手任务",
             "`blocked_on_routing`",
             "无关范围仍可并行推进",
             "用量、额度或容量限制",

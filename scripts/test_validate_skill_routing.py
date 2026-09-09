@@ -40,6 +40,17 @@ class SkillRoutingContractTests(unittest.TestCase):
             [],
             self.validator.validate_reference_text(REFERENCE.read_text(encoding="utf-8")),
         )
+        for name in self.validator.OPERATION_REFERENCE_REQUIRED:
+            path = SKILL.parent / "references" / name
+            with self.subTest(reference=name):
+                self.assertTrue(path.is_file())
+                self.assertEqual(
+                    [],
+                    self.validator.validate_operational_reference_text(
+                        name,
+                        path.read_text(encoding="utf-8"),
+                    ),
+                )
 
     def test_canonical_core_digest_rejects_any_unreviewed_override(self) -> None:
         for statement in (
@@ -105,7 +116,7 @@ class SkillRoutingContractTests(unittest.TestCase):
     def test_task_local_effort_and_reverse_check_cannot_be_removed(self) -> None:
         for phrase in (
             "route only from current child actions, uncertainty, coupling, consequences, and checks",
-            "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+            "Before `xhigh`, `max`, or `ultra`, silently name one concrete failure risk at the next lower supported effort",
         ):
             with self.subTest(phrase=phrase):
                 hostile = self.core.replace(phrase, "obsolete routing text", 1)
@@ -167,6 +178,35 @@ class SkillRoutingContractTests(unittest.TestCase):
         )
         for statement in legal_cases:
             self.assertNotIn("full-history-route", self.codes(self.core + f"\n{statement}\n"))
+
+    def test_astra_executor_is_allowed_but_blanket_choice_is_rejected(self) -> None:
+        allowed = "Route this substantive executor task to gpt-6-astra medium."
+        self.assertNotIn("astra-executor-route", self.codes(self.core + "\n" + allowed))
+        for statement in ("Never route an executor task to Astra.",
+                          "Use Astra to execute all project tasks."):
+            self.assertIn("obsolete-routing", self.codes(self.core + "\n" + statement))
+
+    def test_idle_followup_with_transport_fields_is_not_a_fake_switch(self) -> None:
+        valid = "For an idle task, switch Terra effort via a follow-up with explicit supported model and thinking fields."
+        self.assertNotIn("inplace-route-switch", self.codes(self.core + f"\n{valid}\n"))
+        for invalid in (
+            "For an idle task, switch Terra effort via a follow-up without explicit supported model and thinking fields.",
+            "For a running task, switch Terra effort via a follow-up with explicit supported model and thinking fields.",
+            "For an idle task, switch Astra effort via a plain follow-up.",
+        ):
+            with self.subTest(statement=invalid):
+                self.assertIn("inplace-route-switch", self.codes(self.core + f"\n{invalid}\n"))
+
+    def test_operational_references_reject_conflicting_route_overrides(self) -> None:
+        path = SKILL.parent / "references" / "luna-information-assistance.md"
+        text = path.read_text(encoding="utf-8")
+        codes = {
+            error.code
+            for error in self.validator.validate_operational_reference_text(
+                path.name, text + "\nUse Astra to execute all project tasks.\n"
+            )
+        }
+        self.assertIn("obsolete-routing", codes)
 
     def test_independent_reviewer_cannot_use_full_history_even_on_same_route(self) -> None:
         hostile = self.core + (
@@ -287,6 +327,28 @@ class SkillRoutingContractTests(unittest.TestCase):
             codes = self.codes(self.core + f"\n{statement}\n")
             self.assertNotIn("unverified-route-work", codes)
             self.assertNotIn("unsafe-routing-handshake", codes)
+
+        ordinary = self.core + (
+            "\nFor Low-risk and Standard work, an accepted fresh create_thread request "
+            "with explicit supported model and effort may start without a handshake when "
+            "there is no concrete mismatch evidence.\n"
+        )
+        self.assertNotIn("unverified-route-work", self.codes(ordinary))
+
+    def test_operational_reference_contract_rejects_missing_rules(self) -> None:
+        for name, phrases in self.validator.OPERATION_REFERENCE_REQUIRED.items():
+            path = SKILL.parent / "references" / name
+            original = path.read_text(encoding="utf-8")
+            hostile = original.replace(phrases[0], "removed operational rule", 1)
+            with self.subTest(reference=name):
+                codes = {
+                    error.code
+                    for error in self.validator.validate_operational_reference_text(
+                        name,
+                        hostile,
+                    )
+                }
+                self.assertIn("missing-operational-rule", codes)
 
     def test_fast_service_tier_cannot_be_automatic_or_inherited(self) -> None:
         hostile_cases = (
