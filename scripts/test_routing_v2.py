@@ -72,6 +72,15 @@ class RoutingV2Tests(unittest.TestCase):
     def test_stale_checkpoint_does_not_turn_event_wait_into_polling(self):
         self.assertIn("never a wait timeout", self.core)
 
+    def test_dispatch_notice_is_a_rendered_table_not_an_approval_gate(self):
+        self.assertIn("references/dispatch-notice.md", self.core)
+        notice = (ROOT / "skills/project-lead/references/dispatch-notice.md").read_text()
+        for row in ("| 执行任务 |", "| 任务线程 |", "| 模型 |", "| 推理档 |", "| 速度档 |", "| 选择理由 |"):
+            self.assertIn(row, notice)
+        self.assertIn("never inside a code fence", notice)
+        self.assertIn("平台默认（未回读）", notice)
+        self.assertIn("no approval wait", notice)
+
 
 if __name__ == "__main__":
     unittest.main()

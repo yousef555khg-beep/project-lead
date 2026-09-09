@@ -51,11 +51,7 @@ If dispatch atomically exposes the resolved route, compare it before work. For e
 
 A follow-up without model and effort fields cannot switch them. For an idle task, use a follow-up with explicit supported model and thinking fields for the next turn; no replacement is needed just for that change. Do not change a running turn's route. If the API cannot carry the required route, finish or interrupt the current turn, then hand off the same logical scope to one correctly routed replacement task; never overlap owners.
 
-Immediately before every creation or substantive follow-up, tell the user:
-
-```text
-即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>
-```
+Immediately before every creation or substantive follow-up, tell the user using the rendered [dispatch table](references/dispatch-notice.md).
 
 Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. On changed routing, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane; Spark never reviews itself.
 
