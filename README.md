@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-A Codex project-control skill: Astra-first but task-selected execution, optional same-project task communication, and independent review only for material or security risk. The controller keeps ownership visible, selects useful supporting skills, and verifies usable results without routine review loops.
+A Codex project-control skill: Astra-first but task-selected execution, transparent pre-dispatch tables, optional same-project task communication, and independent review only for material or security risk. Before dispatch, see the task, model, reasoning effort, speed and selection reason—without another approval step. The controller keeps ownership visible, selects useful supporting skills, and verifies usable results without routine review loops.
 
 ## Project Lead 1.0
 
@@ -19,6 +19,8 @@ Project Lead is a decision and coordination skill, not a replacement for missing
 | Visible ownership | Implementation, review, and long validation run in titled sidebar-visible tasks; Project Lead reuses one executor for the same objective. |
 | Approval boundary | The controller approves normal in-scope work itself and asks only for a real authority or product-policy decision. |
 | Objective-local routing | Astra is preferred, not mandatory for substantive execution; Terra/Spark remain direct choices. Effort is chosen per task, never inherited. |
+| Transparent dispatch | Before each dispatch or substantive follow-up, a table shows the task, task title, model, effort, speed and reason; it informs rather than asks permission. |
+| Scoped peer communication | Same-project tasks may clarify real dependencies when messaging tools are available, without changing each other's scope, model or acceptance. |
 | Capacity recovery | A terminal Spark quota or capacity failure hands the remaining objective once to Terra, with fresh effort selection and no model bounce. |
 | Risk-proportionate review | Ordinary work has no extra review stage. Material/security consequences trigger one bounded independent review workflow. |
 | Capability discovery | One installed supporting skill may be selected automatically; missing skills are only searched and recommended until the user approves installation. |
