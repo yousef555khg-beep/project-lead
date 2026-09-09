@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "b0f7cb213c278dbf67173d1594a33f6500f7993f7e8ad756bc51b46106aadffb"
+EXPECTED_CORE_SHA256 = "22c34ab8b9be3706f8804dbc0f5aa10ee8573aa3a852583cb711cfe083531c7e"
 
 
 EXPECTED_CONTRACT = {
@@ -107,7 +107,7 @@ CORE_REQUIRED = {
         "Do not change a running turn's route",
         "hand off the same logical scope to one correctly routed replacement task",
         "Immediately before every creation or substantive follow-up, tell the user",
-        "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
+        "references/dispatch-notice.md",
         "informational, never an approval gate",
         "dispatch immediately without waiting for a reply",
         "issue a corrected notice before redispatch",
@@ -238,6 +238,11 @@ OPERATION_REFERENCE_REQUIRED = {
         "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
         "`ultra` is a desktop parallel-work mode, not an API reasoning-effort assumption",
         "When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists",
+    ),
+    "dispatch-notice.md": (
+        "| 执行任务 |", "| 任务线程 |", "| 模型 |", "| 推理档 |",
+        "| 速度档 |", "| 选择理由 |", "never inside a code fence",
+        "no approval wait", "平台默认（未回读）",
     ),
     "peer-communication.md": (
         "same approved project",

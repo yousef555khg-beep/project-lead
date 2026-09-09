@@ -280,7 +280,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         routing = self.routing
         for phrase in (
             "Immediately before every creation or substantive follow-up, tell the user",
-            "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
+            "references/dispatch-notice.md",
             "informational, never an approval gate",
             "dispatch immediately without waiting for a reply",
             "issue a corrected notice before redispatch",

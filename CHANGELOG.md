@@ -6,6 +6,8 @@ All notable changes to this project are documented in this file.
 
 ### Added
 
+- Pre-dispatch notices now render as a concise Markdown table with task, task title, model, reasoning effort, speed and a task-specific reason. Batched dispatches may share one table; notices never add approval waits.
+
 - Optional direct peer clarification for same-project tasks, passed explicitly in dispatch briefs with ownership, model-control, privacy, loop and wake-cost limits.
 
 - Astra-aware roles using the verified `gpt-6-astra` ID and current host capabilities. The user's selected controller remains intact; Astra is preferred but not mandatory for substantive execution, while Terra/Spark remain direct choices and Luna remains read-only.
