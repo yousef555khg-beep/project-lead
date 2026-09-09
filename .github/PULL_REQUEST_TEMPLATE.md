@@ -14,9 +14,8 @@
 
 ## Risk lane / 风险模式
 
-- [ ] Fast — small, reversible, isolated; controller verification is sufficient.
-- [ ] Standard — bounded multi-file or module integration; one batched Terra review.
-- [ ] Elevated — architecture, security, privacy, data, migration, shared contract, deployment, or release; Sol review required.
+- [ ] Low-risk — small, reversible, isolated; controller verification is sufficient.
+- [ ] Elevated — concrete material/security consequence; independent authorized Astra or Sol reviewer.
 
 Reason / 选择理由：
 
@@ -36,8 +35,8 @@ Evidence / 验证证据：
 
 - [ ] The PR contains no credentials, private code, customer data, or unpublished project details.
 - [ ] The change does not grant new network, filesystem, command, deployment, or installation authority without explicit justification.
-- [ ] Fast work does not create an unnecessary independent review.
-- [ ] Standard or Elevated Critical/Important findings are resolved before acceptance.
+- [ ] Low-risk work does not create an unnecessary independent review.
+- [ ] Required-review Critical/Important findings are resolved before acceptance.
 - [ ] No unrelated files are included.
 - [ ] Changelog and release notes are updated when user-facing behavior changes.
 

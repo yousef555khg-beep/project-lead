@@ -4,6 +4,32 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Optional direct peer clarification for same-project tasks, passed explicitly in dispatch briefs with ownership, model-control, privacy, loop and wake-cost limits.
+
+- Astra-aware roles using the verified `gpt-6-astra` ID and current host capabilities. The user's selected controller remains intact; Astra is preferred but not mandatory for substantive execution, while Terra/Spark remain direct choices and Luna remains read-only.
+- A conditional model-routing reference distinguishes desktop Ultra from API efforts, allows justified lower efforts, rejects image-dependent Spark tasks, and permits a separate authorized Sol reviewer for Astra-authored high-risk work.
+- Controller conversations now follow the same 80,000-token soft and 100,000-token/5 MB hard rollover limits as executor and reviewer tasks, without restarting active executors.
+- Empty/null completion relays now recover the original terminal record once and report `blocked_on_relay` when unavailable; they no longer trigger execution or review reruns by themselves.
+- Conditional Spark-capacity, Luna-assistance, and context-handoff details now live in focused references loaded only when their trigger occurs.
+
+### Changed
+
+- Removed the routine Standard/Terra review lane. Independent review now requires a concrete material/security consequence or an explicit user request; ordinary work retains executor checks and controller acceptance.
+- The 30-minute stale checkpoint cannot override cursor-bound event waiting or cause timeout polling; it runs only at an event/user-resumed checkpoint.
+- Astra-first is a task-fit preference, not a forced model or fixed effort. Another model can be selected directly without an Astra trial or a failed Terra attempt. No automatic running-task changes or additional comparison runs.
+
+- Required reviewer effort is selected from the actual task instead of fixed Terra high / Sol xhigh. Model migration does not reopen accepted reviews or grant Fast permission.
+- Idle tasks may receive the next model and effort through explicit supported transport fields; Luna effort changes no longer force a replacement task. Active turns are never rerouted in place.
+- Explicit supported dispatch accepted without mismatch evidence can proceed in every lane, including Elevated. Request acceptance and runtime route verification remain distinct; only a concrete mismatch requires route recovery.
+- Speed without readback is reported as platform default, unverified. Closure receipts are deduplicated and never create a fresh work/wait cycle.
+- Routing validation covers Astra-first flexibility, supported idle-task switches, and conflicting instructions in operational references. The PR template now uses Low-risk rather than confusing it with Fast service.
+- Accepted explicit routing no longer creates a handshake-only stage. The September Astra update extends this lean behavior to Elevated review while retaining checks for concrete mismatches.
+- Necessary review reuses exact-candidate executor evidence and runs focused challenge checks instead of automatically duplicating a valid full suite.
+- The same executor remains owner for in-scope repair, focused retest, evidence clarification, and result recovery. Ledger updates are limited to dispatch, blocker/decision, candidate-change, and terminal milestones.
+- `xhigh` and `ultra` selection explicitly rejects file count, long context, architecture/security labels, and prior failure as standalone reasons, and requires downgrade after the higher-effort risk disappears.
+
 ## [1.0.0] - 2026-08-24
 
 ### Added

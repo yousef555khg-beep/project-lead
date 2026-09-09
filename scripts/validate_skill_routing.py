@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "7376ad7a1c352d81e202a44df473555fceb4423147867e907728751a66f2ebb3"
+EXPECTED_CORE_SHA256 = "b0f7cb213c278dbf67173d1594a33f6500f7993f7e8ad756bc51b46106aadffb"
 
 
 EXPECTED_CONTRACT = {
@@ -58,7 +58,10 @@ CORE_REQUIRED = {
         "If `create_thread` is unavailable, report `blocked_on_visibility`",
         "Internal subagents are limited to short read-only helper checks",
         "cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal",
-        "Keep a ledger.",
+        "Reuse the same executor for in-scope repair, focused retest, evidence clarification, and result recovery",
+        "Do not create a new formal task solely for route confirmation, a supplemental report, or a completion receipt",
+        "Record ledger milestones only: dispatch accepted, a real blocker or decision, candidate identity change, and terminal ACCEPT or RETURN",
+        "Do not write unchanged waiting states or every intermediate progress event",
     ),
     "## Authority boundary": (
         "Approval follows the proposed action and missing authority",
@@ -74,42 +77,34 @@ CORE_REQUIRED = {
         "`execution_route: {model, reasoning_effort, service_tier}`",
         "never inherit a previous route",
         "route only from current child actions, uncertainty, coupling, consequences, and checks",
-        "Ignore parent complexity, review lane, prior route and effort",
+        "For executors: ignore parent complexity, review lane, prior route and effort",
         "No blanket effort default",
-        "Spark `high`: exact reversible scope, one path, deterministic checks",
-        "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
-        "Low-risk alone is insufficient",
-        "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
-        "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
-        "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
-        "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
-        "Sol is reserved for controller work and independent Elevated review",
-        "Never route an executor task to Sol",
-        "Complexity, an architecture label, or a current worktree never authorizes Sol execution",
-        "do not repurpose an existing executor task under a new Sol route",
+        "references/model-routing.md",
+        "Prefer Astra for substantive implementation",
+        "Choose Terra or eligible Spark directly when better suited",
+        "Do not require a failed Terra attempt first",
+        "Sol remains reserved for controller work and independent review",
+        "Honor existing project routing authorization",
+        "never inherit the controller model",
         "uncertainty alone never selects `xhigh`",
-        "Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort",
+        "Before `xhigh`, `max`, or `ultra`, silently name one concrete failure risk at the next lower supported effort",
         "one controller judgment: no tool, task, Luna, or parallel model comparison",
         "Without a task-specific risk, reselect from current evidence",
         "Only select combinations exposed by the dispatch tool; never invent a model or effort",
         "If Spark is unavailable or ineligible, reselect from the same evidence",
-        "A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capacity failure for that attempt, not `blocked_on_user`",
-        "If Spark still appears active, interrupt it and wait for terminal state",
-        "reconcile its partial work and exact live worktree before handoff",
-        "redispatch the same remaining objective once to Terra without asking",
-        "Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred",
-        "The fallback is objective-local, not a new project default",
-        "Do not switch back to Spark during that objective",
-        "If the Terra attempt also hits model capacity, report `blocked_on_capacity`; never bounce between models",
+        "references/model-capacity-fallback.md",
         "Formal `create_thread` tasks start fresh",
         "`fork_turns: none` or a bounded positive turn count",
         "never use `all` or omitted full-history inheritance",
         "Any independent reviewer also uses no or bounded history even when its route matches the controller",
         "If dispatch atomically exposes the resolved route, compare it before work",
-        "Otherwise create a handshake-only task with no project reads, writes, or tool calls",
-        "Send the substantive brief only after metadata confirms the route",
-        "If the route cannot be observed, report `blocked_on_routing`",
+        "For every lane, a fresh `create_thread` or idle-task follow-up accepted with explicit supported model and effort is sufficient to start",
+        "Do not create a handshake-only task for routine routing",
+        "Only concrete mismatch evidence requires route recovery",
+        "if unresolved, report `blocked_on_routing` before further work",
         "A follow-up without model and effort fields cannot switch them",
+        "For an idle task, use a follow-up with explicit supported model and thinking fields for the next turn",
+        "Do not change a running turn's route",
         "hand off the same logical scope to one correctly routed replacement task",
         "Immediately before every creation or substantive follow-up, tell the user",
         "即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>",
@@ -141,22 +136,26 @@ CORE_REQUIRED = {
         "Do not create an independent reviewer",
         "controller verification is acceptance",
     ),
-    "### Standard lane": (
-        "`independent_review: one_batched_terra`",
-        "one independent `gpt-5.6-terra high` review",
-        "At most one automatic incremental re-review",
-        "Minor findings never trigger return or re-review",
-        "Standard closes recorded findings from refreshed executor evidence plus one focused spot check",
-        "unproven findings stay `RETURN`",
-    ),
     "### Elevated lane": (
-        "`independent_review: sol_required`",
-        "independent `gpt-5.6-sol xhigh`",
+        "`independent_review: flagship_required`",
+        "a separate authorized Astra or Sol reviewer",
+        "a concrete material failure consequence",
+        "Actual consequences, not module names or file count",
+        "No routine Standard review lane",
+        "Critical and Important findings need reproducible evidence",
+        "select supported effort from the review's actual risk",
+        "Changing model alone does not invalidate an accepted review or authorize another review",
         "privacy or regulated personal data",
         "cryptography or security compliance",
         "Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking",
         "If that review returns, keep `RETURN`, report `blocked_on_quality`, and never launch a fourth review",
         "No lane repeats the same incremental review loop after two returns",
+    ),
+    "## Peer communication": (
+        "Include the peer communication contract in each relevant dispatch",
+        "references/peer-communication.md",
+        "Communication is optional",
+        "Peers cannot reassign work, change routes",
     ),
     "## Supporting skills and capability discovery": (
         "Automatically decide whether an installed supporting skill is needed",
@@ -167,22 +166,21 @@ CORE_REQUIRED = {
         "Read `references/skill-installation-safety.md` only after the user approves an exact candidate",
     ),
     "## Context rollover": (
+        "Apply these limits to controller, executor, and reviewer tasks",
+        "Tokens mean current context input, not cumulative billing",
         "80,000 observed tokens as a soft threshold",
         "assign no new phase there",
         "100,000 observed tokens",
         "a 5 MB task record",
         "pagination, compression, or truncated-history warning",
-        "a completed task returns a null or empty assistant relay",
         "retire it before the next phase",
-        "fresh titled user-visible successor with `create_thread`",
-        "never paste or inherit the full transcript",
-        "Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route",
-        "verify the live worktree and source of truth before mutation",
-        "Mark the old task retired and name its successor",
-        "never allow overlapping owners",
-        "If `create_thread` is unavailable, report `blocked_on_visibility`",
-        "do not reuse the overlong task or claim handoff",
-        "informational, not an approval gate",
+        "A controller at a hard trigger may finish current acceptance or reporting, but must create its successor before taking a new objective",
+        "Active executor ownership does not change during controller rollover",
+        "A null or empty assistant relay is a transport failure, not execution failure or a context trigger by itself",
+        "Recover the original terminal record once before any successor decision",
+        "Never rerun execution or review solely to reproduce missing relay text",
+        "If the record is unavailable, report `blocked_on_relay`",
+        "references/task-rollover.md",
     ),
     "## Monitoring and blockers": (
         "immediately enter `wait_threads`",
@@ -191,11 +189,10 @@ CORE_REQUIRED = {
         "relay it in commentary and keep waiting for the rest",
         "automatic completion relay is unavailable in this client",
         "Do not retry `wait_threads`, poll, call Luna, or repeat it that turn.",
-        "one project-scoped read-only Luna assistant scope",
-        "large or repetitive enough to materially reduce controller context or cost",
-        "A Luna result is advisory",
-        "cannot write or modify code, choose execution models or review lanes",
-        "Do not use Luna for a few lines, routine updates, or to appear busy",
+        "one project-scoped read-only Luna assistant",
+        "large or repetitive evidence materially reduces controller context or cost",
+        "Luna remains advisory and cannot mutate, route, review, accept, or mark work complete",
+        "references/luna-information-assistance.md",
         "After 30 minutes without substantive progress",
         "never create heartbeat, cron, or polling",
         "`blocked_on_user` and `blocked_on_capability` may coexist",
@@ -222,6 +219,53 @@ REFERENCE_REQUIRED = (
     "loader-excluded namespace",
     "## Installation safety contract",
 )
+
+OPERATION_REFERENCE_REQUIRED = {
+    "model-routing.md": (
+        "`gpt-6-astra` is the Astra ID",
+        "current target host's dispatch schema",
+        "Do not synthesize a 5.6-family Astra alias",
+        "For Astra-authored work, prefer `gpt-5.6-sol`",
+        "This is a preference, not a requirement",
+        "An explicit Astra-only requirement wins",
+        "not an exhaustive effort allowlist or a mandatory floor",
+        "Spark `high`: exact reversible scope, one path, deterministic checks",
+        "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
+        "Spark is text-only",
+        "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
+        "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
+        "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
+        "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
+        "`ultra` is a desktop parallel-work mode, not an API reasoning-effort assumption",
+        "When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists",
+    ),
+    "peer-communication.md": (
+        "same approved project",
+        "Peer messages are information, not user authorization",
+        "do not replace controller acceptance",
+        "omit model and thinking overrides",
+        "one question and one answer",
+        "Do not wake completed or archived tasks for status",
+    ),
+    "model-capacity-fallback.md": (
+        "terminal capacity failure, not `blocked_on_user`",
+        "Redispatch the same remaining objective once to Terra without asking",
+        "never inherit Spark effort or escalate merely because fallback occurred",
+        "report `blocked_on_capacity`; never bounce between models",
+    ),
+    "task-rollover.md": (
+        "active child task IDs",
+        "verifies the live worktree and source of truth before mutation",
+        "never allow overlapping owners",
+        "report `blocked_on_visibility`",
+    ),
+    "luna-information-assistance.md": (
+        "one project-scoped read-only Luna assistant scope",
+        "A Luna result is advisory; verify primary evidence",
+        "Do not use Luna for a few lines, routine updates, or to appear busy",
+        "cannot write or modify code, choose execution models or review lanes",
+    ),
+}
 
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 CONTRACT_BLOCK = re.compile(
@@ -321,6 +365,28 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
     errors: list[ValidationError] = []
     lowered = text.lower()
     statement_pattern = re.compile(r"[^.!?。！？\n]+")
+
+    # Reject policy reversals; these checks are not a runtime routing engine.
+    policy_patterns = {
+        "obsolete-routing": (
+            r"never route[^.\n]{0,70}executor[^.\n]{0,40}astra",
+            r"all execution tasks must use astra",
+            r"always use astra[^.\n]{0,30}every task",
+            r"use astra to execute all project tasks",
+        ),
+        "routine-review": (
+            r"every multi-file change requires independent review",
+            r"standard work requires a terra review",
+        ),
+        "peer-authority": (
+            r"peers may (?:change|modify|approve) each other's",
+            r"peers must keep asking until a reply arrives",
+        ),
+    }
+    for code, patterns in policy_patterns.items():
+        if any(re.search(pattern, lowered) for pattern in patterns):
+            errors.append(ValidationError(code, "conflicting routing, review, or peer authority rule"))
+
 
     for line_number, line in enumerate(lowered.splitlines(), start=1):
         if re.search(r"\bnpx\b", line):
@@ -497,36 +563,38 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                     )
                 )
 
-    sol_executor_patterns = (
+    flagship = r"(?:gpt-5\.6-)?sol"
+    flagship_executor_patterns = (
         re.compile(
             r"\b(?P<action>route)\w*\b[^.!?。！？;\n]{0,90}"
             r"\b(?:executor|execution|implementation|debug|diagnos|design|source|test|worktree|task)\w*\b"
-            r"[^.!?。！？;\n]{0,90}\b(?:to|under)\s+(?:gpt-5\.6-)?sol\b"
+            rf"[^.!?。！？;\n]{{0,90}}\b(?:to|under)\s+(?P<flagship>{flagship})\b"
         ),
         re.compile(
             r"\b(?P<action>use|choose|dispatch|assign)\w*\b[^.!?。！？;\n]{0,80}"
-            r"\b(?:gpt-5\.6-)?sol\b[^.!?。！？;\n]{0,80}"
+            rf"\b(?P<flagship>{flagship})\b[^.!?。！？;\n]{{0,80}}"
             r"\b(?:executor|execution|execute|implementation|implement|debug|diagnos|design|source|test|worktree|task)\w*\b"
         ),
         re.compile(
             r"\b(?P<action>repurpose|reuse)\w*\b[^.!?。！？;\n]{0,100}"
             r"\b(?:existing\s+)?(?:executor\s+)?task\b[^.!?。！？;\n]{0,80}"
-            r"\b(?:under|to|with)\s+(?:a\s+new\s+)?(?:gpt-5\.6-)?sol\b"
+            rf"\b(?:under|to|with)\s+(?:a\s+new\s+)?(?P<flagship>{flagship})\b"
         ),
     )
-    seen_sol_executor: set[int] = set()
-    for pattern in sol_executor_patterns:
+    seen_flagship_executor: set[int] = set()
+    for pattern in flagship_executor_patterns:
         for match in pattern.finditer(lowered):
             absolute_start = match.start("action")
             absolute_end = match.end("action")
             if action_is_forbidden(lowered, absolute_start, absolute_end):
                 continue
-            if absolute_start not in seen_sol_executor:
-                seen_sol_executor.add(absolute_start)
+            if absolute_start not in seen_flagship_executor:
+                seen_flagship_executor.add(absolute_start)
+                model = "astra" if "astra" in match.group("flagship") else "sol"
                 errors.append(
                     ValidationError(
-                        "sol-executor-route",
-                        f"line {line_number_at(text, absolute_start)}: Sol is reserved for controller work or independent review, not executor work",
+                        f"{model}-executor-route",
+                        f"line {line_number_at(text, absolute_start)}: {model.title()} is reserved for controller work or independent review, not executor work",
                     )
                 )
             break
@@ -604,16 +672,16 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
         re.compile(
             r"\b(?P<action>switch|change|move|override|set|promote|retarget|reassign)(?:s|ed|d|ing)?\b"
             r"[^.]{0,85}(?:\.\s*)?(?:the\s+)?"
-            r"\b(?:model|reasoning effort|terra|spark|luna|sol|high|xhigh|ultra)\b"
+            r"\b(?:model|reasoning effort|terra|spark|luna|sol|astra|high|xhigh|max|ultra)\b"
         ),
         re.compile(
             r"\b(?P<action>continue)(?:s|d|ing)?\b[^.]{0,40}\bexisting\b[^.]{0,35}"
             r"\b(?:task|follow[- ]?up)\b[^.]{0,35}\bunder\b[^.]{0,20}"
-            r"\b(?:terra|spark|luna|sol)(?:\s+(?:high|xhigh|ultra|medium))?\b"
+            r"\b(?:terra|spark|luna|sol|astra)(?:\s+(?:low|medium|high|xhigh|max|ultra))?\b"
         ),
         re.compile(
-            r"\b(?:terra|spark|luna|sol)\b[^.]{0,20}\b(?P<action>replaces?)\b[^.]{0,30}"
-            r"\b(?:terra|spark|luna|sol)\b[^.]{0,40}\b(?:same|existing) task\b"
+            r"\b(?:terra|spark|luna|sol|astra)\b[^.]{0,20}\b(?P<action>replaces?)\b[^.]{0,30}"
+            r"\b(?:terra|spark|luna|sol|astra)\b[^.]{0,40}\b(?:same|existing) task\b"
         ),
     )
     seen_switch: set[int] = set()
@@ -626,6 +694,11 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
             context = lowered[context_start:context_end]
             start, end = statement_span(lowered, match.start(), match.end())
             statement = lowered[start:end]
+            explicit_idle_transport = bool(
+                re.search(r"\b(?:an?\s+)?idle task\b", statement)
+                and re.search(r"\bwith explicit supported model and (?:thinking|effort) fields\b", statement)
+                and not re.search(r"\brunning\b|\bnot idle\b|\bwithout\b|\bunsupported\b", statement)
+            )
             impossible_explanation = re.search(
                 r"\bexplains? why\b[^.]{0,85}\b(?:impossible|requires?\s+(?:a\s+)?(?:successor|replacement|new) task)\b",
                 statement,
@@ -645,6 +718,7 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
             )
             if (
                 followup_context.search(context)
+                and not explicit_idle_transport
                 and not impossible_explanation
                 and not positive_handoff
                 and not action_is_forbidden(lowered, match.start("action"), match.end("action"))
@@ -919,8 +993,8 @@ def validate_text(text: str) -> list[ValidationError]:
     if HTML_COMMENT.search(text):
         errors.append(ValidationError("html-comment", "HTML comments are forbidden"))
     visible = visible_text(text)
-    if len(visible.split()) > 1950:
-        errors.append(ValidationError("context-budget", "core skill exceeds 1950 words"))
+    if len(visible.split()) > 2025:
+        errors.append(ValidationError("context-budget", "core skill exceeds 2025 words"))
     for heading, phrases in CORE_REQUIRED.items():
         body = section(visible, heading)
         if body is None:
@@ -957,6 +1031,26 @@ def validate_reference_text(text: str) -> list[ValidationError]:
     return errors
 
 
+def validate_operational_reference_text(name: str, text: str) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    if HTML_COMMENT.search(text):
+        errors.append(ValidationError("html-comment", f"HTML comments are forbidden in {name}"))
+    visible = visible_text(text)
+    required = OPERATION_REFERENCE_REQUIRED.get(name)
+    if required is None:
+        return [ValidationError("unknown-reference", f"unknown operational reference: {name}")]
+    for phrase in required:
+        if phrase not in visible:
+            errors.append(
+                ValidationError(
+                    "missing-operational-rule",
+                    f"{name} is missing: {phrase}",
+                )
+            )
+    errors.extend(unsafe_language_errors(visible))
+    return errors
+
+
 def main(argv: list[str]) -> int:
     root = Path(__file__).resolve().parents[1]
     core = Path(argv[1]) if len(argv) > 1 else root / "skills/project-lead/SKILL.md"
@@ -968,15 +1062,34 @@ def main(argv: list[str]) -> int:
     if not core.is_file() or not reference.is_file():
         print(f"missing Project Lead core or reference: {core}, {reference}", file=sys.stderr)
         return 2
+    operational_references = [
+        core.parent / "references" / name for name in OPERATION_REFERENCE_REQUIRED
+    ]
+    missing_operational = [path for path in operational_references if not path.is_file()]
+    if missing_operational:
+        print(
+            "missing Project Lead operational reference: "
+            + ", ".join(str(path) for path in missing_operational),
+            file=sys.stderr,
+        )
+        return 2
     errors = [
         *(ValidationError(f"core/{e.code}", e.message) for e in validate_text(core.read_text(encoding="utf-8"))),
         *(ValidationError(f"reference/{e.code}", e.message) for e in validate_reference_text(reference.read_text(encoding="utf-8"))),
     ]
+    for operational_reference in operational_references:
+        errors.extend(
+            ValidationError(f"reference/{e.code}", e.message)
+            for e in validate_operational_reference_text(
+                operational_reference.name,
+                operational_reference.read_text(encoding="utf-8"),
+            )
+        )
     if errors:
         for error in errors:
             print(f"{error.code}: {error.message}", file=sys.stderr)
         return 1
-    print("project-lead risk-lane and installation-reference checks passed")
+    print("project-lead core and reference checks passed")
     return 0
 
 

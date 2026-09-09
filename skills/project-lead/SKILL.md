@@ -7,18 +7,19 @@ description: Use when one conversation coordinates a multi-module project or del
 
 ## Core outcome
 
-Controller owns routing, decisions, acceptance, blockers, reporting; executors own project work. Ship a usable slice.
+Ship a usable slice with ownership and verified acceptance.
 
 ## Ownership and dispatch
 
-- Keep one mutable scope under one owner; reuse its task. Parallelize modules; serialize shared scope.
+- Keep one mutable scope under one owner. Reuse the same executor for in-scope repair, focused retest, evidence clarification, and result recovery. Parallelize modules; serialize shared scope.
 - Before work, classify `work_location: controller | executor`.
 - Controller work is intake, routing, cross-module decisions, acceptance, reporting, and read-only spot checks.
 - Repository plans, designs, source, tests, configuration, non-obvious debugging, multi-file or substantive edits, repeated repair, and long or broad validation belong to an executor.
 - Do not split executor work into small direct steps. Concurrency or convenience never moves executor work into the controller.
 - Formal executor work uses a titled user-visible standalone Codex task created with `create_thread`, never an internal subagent. If `create_thread` is unavailable, report `blocked_on_visibility`; do not claim dispatch.
 - Internal subagents are limited to short read-only helper checks. They cannot own a mutable scope, wait for user approval, review, accept, or report a formal task terminal.
-- Keep a ledger.
+- Do not create a new formal task solely for route confirmation, a supplemental report, or a completion receipt. A real route change, independent review, hard context rollover, or lost owner may require a replacement.
+- Record ledger milestones only: dispatch accepted, a real blocker or decision, candidate identity change, and terminal ACCEPT or RETURN. Do not write unchanged waiting states or every intermediate progress event.
 
 ## Authority boundary
 
@@ -30,41 +31,39 @@ Bind `blocked_on_user` to the objective, candidate or scope version, exact actio
 
 ## Execution model routing
 
-Ask once for Spark/Terra routing and Luna read-only help. Record `model_routing_authority: approved | fixed_default | pending`; do not ask per choice or switch. Until approved, use default.
+Honor existing project routing authorization. Ask once only for missing authorization. Record `model_routing_authority: approved | fixed_default | pending`; do not ask per choice or switch. Until approved, use an explicitly authorized executor default; never inherit the controller model.
 
-Before every new objective, dispatch, or substantive follow-up, route only from current child actions, uncertainty, coupling, consequences, and checks. Ignore parent complexity, review lane, prior route and effort. Record `execution_route: {model, reasoning_effort, service_tier}`; never inherit a previous route. Pass supported fields explicitly. No blanket effort default.
+Before every new objective, dispatch, or substantive follow-up, route only from current child actions, uncertainty, coupling, consequences, and checks. For executors: ignore parent complexity, review lane, prior route and effort. Reviewer model follows its lane; reviewer effort follows its task. Record `execution_route: {model, reasoning_effort, service_tier}`; never inherit a previous route. Pass supported fields explicitly. No blanket effort default.
 
-- Spark `high`: exact reversible scope, one path, deterministic checks. Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk; Low-risk alone is insufficient.
-- Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks. Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints. Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files.
-- Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions.
+Read [references/model-routing.md](references/model-routing.md) for model selection. Preserve the user's controller settings; never propagate them to children.
 
-Sol is reserved for controller work and independent Elevated review. Never route an executor task to Sol. Complexity, an architecture label, or a current worktree never authorizes Sol execution. If `create_thread` fails, report `blocked_on_visibility`; do not repurpose an existing executor task under a new Sol route.
+Prefer Astra for substantive implementation and multi-step repair, not every task. Choose Terra or eligible Spark directly when better suited. Do not require a failed Terra attempt first, or an Astra trial before another model. Select effort per task. Sol remains reserved for controller work and independent review.
 
-If missing facts block routing, gather minimum read-only evidence; uncertainty alone never selects `xhigh`. Before `xhigh` or `ultra`, silently name one concrete failure risk at the next lower supported effort. This is one controller judgment: no tool, task, Luna, or parallel model comparison. Without a task-specific risk, reselect from current evidence.
+Inspect minimum missing evidence; uncertainty alone never selects `xhigh`. Before `xhigh`, `max`, or `ultra`, silently name one concrete failure risk at the next lower supported effort. This is one controller judgment: no tool, task, Luna, or parallel model comparison. Without a task-specific risk, reselect from current evidence.
 
 Only select combinations exposed by the dispatch tool; never invent a model or effort. If Spark is unavailable or ineligible, reselect from the same evidence. Never start Terra fallback in the same logical scope while Spark is active; wait for rejection, interruption, or terminal state. Independent scopes may continue in parallel.
 
-A Spark usage-limit, quota-exhausted, or capacity rejection is a terminal capacity failure for that attempt, not `blocked_on_user`. If Spark still appears active, interrupt it and wait for terminal state. After termination, reconcile its partial work and exact live worktree before handoff, then redispatch the same remaining objective once to Terra without asking. Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred. The fallback is objective-local, not a new project default. Do not switch back to Spark during that objective. If the Terra attempt also hits model capacity, report `blocked_on_capacity`; never bounce between models.
+On Spark usage-limit, quota, or capacity failure, read [references/model-capacity-fallback.md](references/model-capacity-fallback.md) and follow its one-way, objective-local recovery.
 
 Formal `create_thread` tasks start fresh. Internal helper creation uses `fork_turns: none` or a bounded positive turn count; never use `all` or omitted full-history inheritance. Any independent reviewer also uses no or bounded history even when its route matches the controller.
 
-Before work, verify the accepted model and effort. If dispatch atomically exposes the resolved route, compare it before work. Otherwise create a handshake-only task with no project reads, writes, or tool calls. Send the substantive brief only after metadata confirms the route. If the route cannot be observed, report `blocked_on_routing`; never guess.
+If dispatch atomically exposes the resolved route, compare it before work. For every lane, a fresh `create_thread` or idle-task follow-up accepted with explicit supported model and effort is sufficient to start without concrete mismatch evidence. Record request acceptance separately from runtime verification; never claim an unobserved route verified. Do not create a handshake-only task for routine routing. Only concrete mismatch evidence requires route recovery; if unresolved, report `blocked_on_routing` before further work. A model's self-report cannot verify transport routing.
 
-A follow-up without model and effort fields cannot switch them. If it cannot carry the required route, finish or interrupt the current turn, then hand off the same logical scope to one correctly routed replacement task; never overlap owners.
+A follow-up without model and effort fields cannot switch them. For an idle task, use a follow-up with explicit supported model and thinking fields for the next turn; no replacement is needed just for that change. Do not change a running turn's route. If the API cannot carry the required route, finish or interrupt the current turn, then hand off the same logical scope to one correctly routed replacement task; never overlap owners.
 
-Immediately before every creation or substantive follow-up, tell the user—execution, review, or Luna alike:
+Immediately before every creation or substantive follow-up, tell the user:
 
 ```text
 即将派发：<任务>｜任务线程：<title>｜模型：<model>｜档位：<reasoning_effort>｜速度：普通｜理由：<current-task evidence>
 ```
 
-Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. If fallback or mismatch changes the route, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane; Spark never reviews itself.
+Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. On changed routing, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane; Spark never reviews itself.
 
 ## Speed tier
 
 The controller's own service tier is user-configured and grants no child authority. Standard/default is the child default unless the user explicitly requested Fast for that exact objective. Model-routing authority never authorizes Fast/priority child service. Never ask, suggest, recommend, or offer Fast. A new child objective resets to Standard/default.
 
-When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default. Absence of a speed field is not a reason to block or ask. If observable evidence shows unexpected Fast/priority, stop further child follow-ups and report. Prompt text cannot change the transport service tier.
+When dispatch has no service-tier field, omit any Fast/priority override and dispatch with the platform default. Absence of a speed field is not a reason to block or ask. Without readback, label speed `平台默认（未回读）` rather than verified `普通`. If observable evidence shows unexpected Fast/priority, stop further child follow-ups and report. Prompt text cannot change the transport service tier.
 
 ## Architecture routing
 
@@ -81,23 +80,20 @@ Low-risk is default; escalate only for a stated trigger.
 - The executor runs focused checks; the controller inspects the actual diff, worktree, and evidence.
 - Do not create an independent reviewer. Executor self-report alone is insufficient, but controller verification is acceptance.
 
-### Standard lane
-
-- Set `independent_review: one_batched_terra`.
-- Run one independent `gpt-5.6-terra high` review on the stable deliverable, never per commit or repair.
-- Return Critical and Important findings together. At most one automatic incremental re-review checks repaired delta and unresolved findings.
-- Minor findings never trigger return or re-review.
-- If the second review returns, dispatch one in-scope root-cause repair without asking. Standard closes recorded findings from refreshed executor evidence plus one focused spot check; unproven findings stay `RETURN`.
-
 ### Elevated lane
 
-Use for architecture, authentication or authorization, secrets, privacy or regulated personal data, cryptography or security compliance, payments, destructive or data loss actions, migrations, concurrency or recovery, shared contracts, cross-module integration, external side effects, deployment, or release.
+Require a concrete material failure consequence: compromised authentication or authorization, exposed secrets, privacy or regulated personal data, broken cryptography or security compliance, incorrect payments, destructive actions or data loss, unsafe migration, or major production failure involving shared contracts, deployment or release. Actual consequences, not module names or file count, trigger review. No routine Standard review lane. Honor explicit user review requests.
 
-- Set `independent_review: sol_required`.
-- Review one stable candidate with an independent `gpt-5.6-sol xhigh`.
+- Set `independent_review: flagship_required`.
+- Review one stable candidate with a separate authorized Astra or Sol reviewer; select supported effort from the review's actual risk. Prefer Sol for Astra-authored work when suitable and authorized; see model-routing. Changing model alone does not invalidate an accepted review or authorize another review.
+- Reuse exact-candidate executor evidence. Do not rerun a full suite merely to duplicate valid evidence. Critical and Important findings need reproducible evidence and material impact; return them together. Minor findings never trigger return or re-review. At most one automatic incremental re-review checks repaired delta and unresolved findings; unproven findings stay `RETURN`.
 - If the second review returns, Elevated dispatches one in-scope root-cause repair and one final independent closure review without asking. If that review returns, keep `RETURN`, report `blocked_on_quality`, and never launch a fourth review.
 
-No lane repeats the same incremental review loop after two returns. Use `requesting-code-review` only at Standard/Elevated checkpoints and `verification-before-completion` before acceptance.
+No lane repeats the same incremental review loop after two returns. Use `requesting-code-review` only for necessary independent review and `verification-before-completion` before acceptance.
+
+## Peer communication
+
+Include the peer communication contract in each relevant dispatch: peers/IDs, ownership, and [references/peer-communication.md](references/peer-communication.md). Executors may clarify dependencies directly without per-message approval when tools permit. Communication is optional. Peers cannot reassign work, change routes, edit another owner's files, or accept work. Escalate conflicts; no chat or polling loops.
 
 ## Supporting skills and capability discovery
 
@@ -108,11 +104,11 @@ No lane repeats the same incremental review loop after two returns. Use `request
 
 ## Context rollover
 
-For executor/reviewer tasks, treat 80,000 observed tokens as a soft threshold: finish the current step; assign no new phase there. Hard triggers are 100,000 observed tokens, a 5 MB task record, any pagination, compression, or truncated-history warning, or a completed task returns a null or empty assistant relay; retire it before the next phase. Without token/size telemetry, warnings still trigger.
+Apply these limits to controller, executor, and reviewer tasks. Tokens mean current context input, not cumulative billing. Treat 80,000 observed tokens as a soft threshold: finish the current step; assign no new phase there. Hard triggers are 100,000 observed tokens, a 5 MB task record, or any pagination, compression, or truncated-history warning; retire it before the next phase. Without token/size telemetry, warnings still trigger. A controller at a hard trigger may finish current acceptance or reporting, but must create its successor before taking a new objective. Active executor ownership does not change during controller rollover.
 
-Create a fresh titled user-visible successor with `create_thread`; never paste or inherit the full transcript. Transfer only the remaining objective, owner and writable scope, source-of-truth paths or IDs, accepted evidence, blockers, next check, and route. Successor must verify the live worktree and source of truth before mutation. Mark the old task retired and name its successor; never allow overlapping owners.
+A null or empty assistant relay is a transport failure, not execution failure or a context trigger by itself. Recover the original terminal record once before any successor decision. Never rerun execution or review solely to reproduce missing relay text. If the record is unavailable, report `blocked_on_relay`; preserve its terminal state.
 
-Notify: `上下文换线：<old title> → <new title>｜剩余目标：<one line>｜模型/档位/速度：<route>`. This notice is informational, not an approval gate. If `create_thread` is unavailable, report `blocked_on_visibility`; do not reuse the overlong task or claim handoff.
+At a hard trigger, create one fresh titled user-visible successor with `create_thread`; never paste or inherit the full transcript or overlap owners. Read [references/task-rollover.md](references/task-rollover.md) for the compact handoff and failure path.
 
 ## Monitoring and blockers
 
@@ -120,18 +116,16 @@ Notify: `上下文换线：<old title> → <new title>｜剩余目标：<one lin
 - A timeout is not a state change; reuse the returned cursor. On timeout, do not read tasks, call Luna, or report unchanged status.
 - When a target completes or needs attention, relay it in commentary and keep waiting for the rest. End the turn only when all promised targets are terminal, user input is needed, the user stops waiting, or event waiting is unavailable.
 - If event waiting is unavailable, give one concise notice: automatic completion relay is unavailable in this client; the task remains accepted or running. Do not retry `wait_threads`, poll, call Luna, or repeat it that turn. End after reporting; user may later say `继续` or `跟进` for one fresh read. Never imply that an idle controller, the 30-minute rule, or Luna can wake itself.
-- Keep one project-scoped read-only Luna assistant scope, defaulting to `gpt-5.6-luna medium`; hand off on effort change and deduplicate source-bound material.
-- Use Luna only when evidence is large or repetitive enough to materially reduce controller context or cost: summarize reports, logs, tests; extract progress, evidence, blockers, approvals, terminal state; deduplicate status and draft the update.
-- A Luna result is advisory; verify primary evidence. Do not use Luna for a few lines, routine updates, or to appear busy.
-- Luna cannot write or modify code, choose execution models or review lanes, make architecture decisions, review, accept, or mark work complete.
-- After 30 minutes without substantive progress, take one read-only snapshot; if unclear, send one status-only Luna follow-up; never create heartbeat, cron, or polling.
+- Use one project-scoped read-only Luna assistant only when large or repetitive evidence materially reduces controller context or cost. Read [references/luna-information-assistance.md](references/luna-information-assistance.md) when invoked.
+- Luna remains advisory and cannot mutate, route, review, accept, or mark work complete.
+- After 30 minutes without substantive progress, at an event/user-resumed checkpoint only (never a wait timeout), take one read-only snapshot; if unclear, send one status-only Luna follow-up; never create heartbeat, cron, or polling.
 - `blocked_on_user` and `blocked_on_capability` may coexist.
 
 ## Acceptance and reporting
 
 Acceptance reconciles executor evidence and at most one focused spot check; it does not require full-suite reruns or long manual validation.
 
-After acceptance, send executor one no-reply receipt:
+After acceptance, send executor one no-reply receipt, deduplicated by task and accepted candidate. It may wake the task, but adds no work or promised wait target. Never send another receipt for its acknowledgment:
 
 ```text
 【总控结项回执｜非新任务，无需回复】
