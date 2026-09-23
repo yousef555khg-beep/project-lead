@@ -16,7 +16,7 @@ class ValidationError(NamedTuple):
     message: str
 
 
-EXPECTED_CORE_SHA256 = "22c34ab8b9be3706f8804dbc0f5aa10ee8573aa3a852583cb711cfe083531c7e"
+EXPECTED_CORE_SHA256 = "3af797304e1b35b07376ea28ab4417e86cde33ec0788d0232e6ab20262467c46"
 
 
 EXPECTED_CONTRACT = {
@@ -80,10 +80,10 @@ CORE_REQUIRED = {
         "For executors: ignore parent complexity, review lane, prior route and effort",
         "No blanket effort default",
         "references/model-routing.md",
-        "Prefer Astra for substantive implementation",
-        "Choose Terra or eligible Spark directly when better suited",
-        "Do not require a failed Terra attempt first",
-        "Sol remains reserved for controller work and independent review",
+        "Prefer GPT-6 Sol or Luna for routine execution when adequate",
+        "No compulsory model ladder or trial failure",
+        "`gpt-5.6-luna` remains read-only",
+        "`gpt-6-sol` and `gpt-6-luna` may implement authorized owned scopes",
         "Honor existing project routing authorization",
         "never inherit the controller model",
         "uncertainty alone never selects `xhigh`",
@@ -91,7 +91,7 @@ CORE_REQUIRED = {
         "one controller judgment: no tool, task, Luna, or parallel model comparison",
         "Without a task-specific risk, reselect from current evidence",
         "Only select combinations exposed by the dispatch tool; never invent a model or effort",
-        "If Spark is unavailable or ineligible, reselect from the same evidence",
+        "If a route is unavailable or ineligible, reselect from the same evidence",
         "references/model-capacity-fallback.md",
         "Formal `create_thread` tasks start fresh",
         "`fork_turns: none` or a bounded positive turn count",
@@ -222,21 +222,20 @@ REFERENCE_REQUIRED = (
 
 OPERATION_REFERENCE_REQUIRED = {
     "model-routing.md": (
-        "`gpt-6-astra` is the Astra ID",
+        "`gpt-6-astra`",
+        "`gpt-6-sol`",
+        "`gpt-6-luna`",
+        "Exact generations and roles",
         "current target host's dispatch schema",
         "Do not synthesize a 5.6-family Astra alias",
-        "For Astra-authored work, prefer `gpt-5.6-sol`",
         "This is a preference, not a requirement",
         "An explicit Astra-only requirement wins",
         "not an exhaustive effort allowlist or a mandatory floor",
-        "Spark `high`: exact reversible scope, one path, deterministic checks",
-        "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
-        "Spark is text-only",
-        "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
-        "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
-        "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
-        "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
-        "`ultra` is a desktop parallel-work mode, not an API reasoning-effort assumption",
+        "Verify required tool/modality support for every model",
+        "New execution and capacity-recovery candidates are limited to supported, authorized GPT-6 Sol, GPT-6 Luna and GPT-6 Astra routes",
+        "lower effort does not guarantee lower total usage",
+        "Public API/credit rates are not included subscription quota percentages",
+        "do not silently substitute generations",
         "When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists",
     ),
     "dispatch-notice.md": (
@@ -254,8 +253,10 @@ OPERATION_REFERENCE_REQUIRED = {
     ),
     "model-capacity-fallback.md": (
         "terminal capacity failure, not `blocked_on_user`",
-        "Redispatch the same remaining objective once to Terra without asking",
-        "never inherit Spark effort or escalate merely because fallback occurred",
+        "Redispatch the same remaining objective once to the selected alternate",
+        "never inherit the failed route's effort or escalate merely because fallback occurred",
+        "current tool-supported, already authorized routes",
+        "record its use in the existing objective ledger",
         "report `blocked_on_capacity`; never bounce between models",
     ),
     "task-rollover.md": (
@@ -373,11 +374,14 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
 
     # Reject policy reversals; these checks are not a runtime routing engine.
     policy_patterns = {
+        "retired-model": (r"\b(?:spark|terra)\b",),
         "obsolete-routing": (
             r"never route[^.\n]{0,70}executor[^.\n]{0,40}astra",
-            r"all execution tasks must use astra",
-            r"always use astra[^.\n]{0,30}every task",
+            r"all execution tasks must use (?:astra|sol|luna|gpt-6-(?:astra|sol|luna))",
+            r"always use (?:astra|sol|luna|gpt-6-(?:astra|sol|luna))[^.\n]{0,30}every task",
             r"use astra to execute all project tasks",
+            r"(?<!5\.6-)\bsol remains reserved for controller work and independent review",
+            r"\bluna is always read-only regardless of task role",
         ),
         "routine-review": (
             r"every multi-file change requires independent review",
@@ -568,7 +572,7 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                     )
                 )
 
-    flagship = r"(?:gpt-5\.6-)?sol"
+    flagship = r"gpt-5\.6-sol"
     flagship_executor_patterns = (
         re.compile(
             r"\b(?P<action>route)\w*\b[^.!?。！？;\n]{0,90}"
@@ -595,29 +599,29 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                 continue
             if absolute_start not in seen_flagship_executor:
                 seen_flagship_executor.add(absolute_start)
-                model = "astra" if "astra" in match.group("flagship") else "sol"
+                model = "sol"
                 errors.append(
                     ValidationError(
                         f"{model}-executor-route",
-                        f"line {line_number_at(text, absolute_start)}: {model.title()} is reserved for controller work or independent review, not executor work",
+                        f"line {line_number_at(text, absolute_start)}: GPT-5.6 Sol retains its legacy controller/review-only policy",
                     )
                 )
             break
 
     capacity_patterns = (
         re.compile(
-            r"\b(?:while|when)\b[^.]{0,55}\b(?:any|a)\b[^.]{0,20}\bspark\b[^.]{0,35}\bactive\b"
+            r"\b(?:while|when)\b[^.]{0,55}\b(?:any|a)\b[^.]{0,20}\b(?:sol|luna|astra)\b[^.]{0,35}\bactive\b"
             r"[^.]{0,80}\b(?:block|stop|forbid|delay)\w*\b[^.]{0,70}"
-            r"\b(?:all|every)\b[^.]{0,45}\bterra\b[^.]{0,65}\b(?:across the project|independent scopes?)\b"
+            r"\b(?:all|every)\b[^.]{0,45}\b(?:sol|luna|astra)\b[^.]{0,65}\b(?:across the project|independent scopes?)\b"
         ),
         re.compile(
-            r"\b(?:one|any|a)\b[^.]{0,30}\bactive spark task\b[^.]{0,45}"
-            r"\b(?:freez|block|stop|forbid|delay)\w*\b[^.]{0,50}\bterra\b[^.]{0,45}"
+            r"\b(?:one|any|a)\b[^.]{0,30}\bactive (?:sol|luna|astra) task\b[^.]{0,45}"
+            r"\b(?:freez|block|stop|forbid|delay)\w*\b[^.]{0,50}\b(?:sol|luna|astra)\b[^.]{0,45}"
             r"\b(?:throughout|across)\b[^.]{0,20}\bproject\b"
         ),
         re.compile(
-            r"\bdo not\s+(?:launch|start|dispatch)\b[^.]{0,30}\bterra\b[^.]{0,55}"
-            r"\b(?:unrelated|independent) scopes?\b[^.]{0,45}\buntil\b[^.]{0,25}\bspark\b"
+            r"\bdo not\s+(?:launch|start|dispatch)\b[^.]{0,30}\b(?:sol|luna|astra)\b[^.]{0,55}"
+            r"\b(?:unrelated|independent) scopes?\b[^.]{0,45}\buntil\b[^.]{0,25}\b(?:sol|luna|astra)\b"
         ),
     )
     seen_capacity: set[int] = set()
@@ -628,7 +632,7 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
                 errors.append(
                     ValidationError(
                         "global-capacity-block",
-                        f"line {line_number_at(text, match.start())}: a Spark fallback guard cannot block independent Terra scopes",
+                        f"line {line_number_at(text, match.start())}: a capacity fallback guard cannot block independent scopes",
                     )
                 )
 
@@ -926,9 +930,24 @@ def unsafe_language_errors(text: str) -> list[ValidationError]:
     permission = re.compile(r"\b(?:may|can|should|will|must)\b")
     for obj in luna.finditer(lowered):
         start, end = clause_span(lowered, obj.start(), obj.end(), 140)
+        # A permission in a different list/table row cannot govern this model.
+        start = max(start, lowered.rfind('\n', 0, obj.start()) + 1)
+        newline = lowered.find('\n', obj.end())
+        if newline != -1:
+            end = min(end, newline)
         clause = lowered[start:end]
         for action in luna_action.finditer(lowered, start, end):
             permitted = list(permission.finditer(lowered, start, action.start()))
+            # A generation-qualified formal executor may mutate its own scope;
+            # helper and legacy permissions never expand merely from model choice.
+            gpt6_executor = (
+                re.search(r"(?:gpt-6-luna|gpt-6 luna)\b", clause)
+                and re.search(r"\bexecutor\b|\bowned scopes?\b", clause)
+                and not re.search(r"read.only|information.helper|assistant|gpt-5\.6-luna", clause)
+            )
+            mutation = re.match(r"(?:write|modify|implement|call)\b", action.group())
+            if gpt6_executor and mutation:
+                continue
             if permitted and not directly_negated(lowered, action.start()):
                 errors.append(
                     ValidationError(

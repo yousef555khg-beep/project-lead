@@ -11,7 +11,7 @@ Show this Markdown table in commentary immediately before each new task or subst
 | 速度档 | <普通 / 平台默认（未回读） / 此目标已授权的 Fast> |
 | 选择理由 | <具体任务特征，以及为什么这个模型和档位足够> |
 
-One sentence is enough for the reason: reference the task's uncertainty, checks, modality or consequences, not merely “stronger” or “as required by skill.” Astra preference does not predetermine the selected model or effort.
+One sentence is enough for the reason: reference the task's uncertainty, checks, modality or consequences, not merely “stronger”, “cheaper” or “as required by skill.” Sol/Luna preference does not predetermine the selected model or effort. Always use the full model ID including generation; bare Luna/Sol is ambiguous. Identify an information-helper role explicitly when relevant.
 
 For a simultaneous batch, one table with a row per task and the same six fields is sufficient. Announce before sending, not after completion; on changed model/effort/speed, correct the table before redispatch. This is information only: no approval wait and no extra model calls to prepare it. A selected/requested route is not proof of the runtime route. Without speed readback use 平台默认（未回读）; never offer Fast.
 

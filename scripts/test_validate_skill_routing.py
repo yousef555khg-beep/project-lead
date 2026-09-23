@@ -137,18 +137,18 @@ class SkillRoutingContractTests(unittest.TestCase):
         )
         self.assertIn("inherited-model", self.codes(hostile))
 
-    def test_sol_is_reserved_for_controller_and_independent_review(self) -> None:
+    def test_legacy_sol_is_reserved_for_controller_and_independent_review(self) -> None:
         hostile_cases = (
             "Route this complex executor task to gpt-5.6-sol xhigh.",
-            "Use Sol to execute an architecture diagnosis because Terra xhigh may be insufficient.",
-            "When create_thread fails for a new objective, reuse an existing task under Sol xhigh.",
+            "Use gpt-5.6-sol to execute an architecture diagnosis because Terra xhigh may be insufficient.",
+            "When create_thread fails for a new objective, reuse an existing task under gpt-5.6-sol xhigh.",
         )
         for statement in hostile_cases:
             with self.subTest(statement=statement):
                 self.assertIn("sol-executor-route", self.codes(self.core + f"\n{statement}\n"))
 
         legal = self.core + (
-            "\nSol is reserved for the controller and an independent Elevated reviewer; "
+            "\nGPT-5.6 Sol is reserved for the controller and an independent Elevated reviewer; "
             "it never executes an executor task.\n"
         )
         self.assertNotIn("sol-executor-route", self.codes(legal))
@@ -217,15 +217,15 @@ class SkillRoutingContractTests(unittest.TestCase):
         legal = self.core + "\nAn independent reviewer never receives full controller history.\n"
         self.assertNotIn("full-history-review", self.codes(legal))
 
-    def test_spark_capacity_fallback_block_is_scope_local(self) -> None:
+    def test_model_capacity_fallback_block_is_scope_local(self) -> None:
         hostile_cases = (
-            "While any Spark task is active, block all independent Terra dispatches across the project.",
-            "One active Spark task freezes Terra throughout the project.",
-            "Do not launch Terra in unrelated scopes until Spark ends.",
+            "While any Luna task is active, block all independent Sol dispatches across the project.",
+            "One active Luna task freezes Sol throughout the project.",
+            "Do not launch Sol in unrelated scopes until Luna ends.",
         )
         for statement in hostile_cases:
             self.assertIn("global-capacity-block", self.codes(self.core + f"\n{statement}\n"))
-        legal = self.core + "\nBlock Terra fallback only for the same logical scope while Spark is active.\n"
+        legal = self.core + "\nBlock Sol fallback only for the same logical scope while Luna is active.\n"
         self.assertNotIn("global-capacity-block", self.codes(legal))
 
     def test_route_notice_cannot_become_an_approval_gate(self) -> None:
