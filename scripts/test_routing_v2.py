@@ -19,8 +19,8 @@ class RoutingV2Tests(unittest.TestCase):
     def test_astra_can_execute_without_a_terra_failure(self):
         self.assertNotIn("astra-executor-route", self.codes(
             "Route this substantive executor task to gpt-6-astra medium."))
-        self.assertIn("Prefer Astra for substantive implementation", self.core)
-        self.assertIn("Do not require a failed Terra attempt first", self.core)
+        self.assertIn("choose Astra directly for task-specific depth or risk", self.core)
+        self.assertIn("No compulsory model ladder or trial failure", self.core)
 
     def test_old_model_bans_and_fixed_effort_are_rejected(self):
         for statement in (

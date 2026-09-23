@@ -1,6 +1,12 @@
 # Behavior Validation Record
 
-## Current update — 2026-09-09 (local, not released)
+## Current update — 2026-09-23
+
+GPT-6 Sol/GPT-6 Luna routine execution and exact-generation permissions supersede the historical Astra-first and family-wide restrictions below. See [current routing scenarios and evidence limits](gpt6-routing-validation-20260923.md). The model names in older entries describe those historical runs, not current dispatch policy.
+
+Validation: 92 regression tests, core/reference contract validation, skill frontmatter validation and `git diff --check` passed. Fresh read-only scenarios selected GPT-6 Luna for a simple edit and GPT-6 Sol for routine implementation while preserving concrete safety review and legacy restrictions. Subsequent user clarification reserves the optional information-helper role exclusively for GPT-5.6 Luna; GPT-6 Luna is an execution candidate. Active execution and recovery now exclude Spark and GPT-5.6 Terra, using task-fit GPT-6 Sol/Luna/Astra only. The two removal regressions failed before the change, then passed; capacity recovery retains one owner, partial work, fresh effort, existing authority and one objective-local attempt. No actual business dispatch was performed during validation.
+
+## Historical update — 2026-09-09
 
 This update supersedes historical Standard-review and Astra-executor-exclusion records below. It prefers Astra without forcing a model or effort, removes routine independent review, and permits bounded same-project peer clarification. Earlier run results remain historical evidence, not current policy.
 
@@ -568,7 +574,9 @@ For the third-review loop, the agent stopped the blind rescan without weakening 
 
 Three post-review regressions also passed: a dirty code worktree stayed `review_ready=false` until a new clean Head and Head-bound evidence existed; a controller-authored non-code ADR used its version and content digest for independent elevated-risk review without permitting author self-approval; and a returned ADR required its original author to create a new artifact/digest for independent artifact-to-artifact repair review.
 
-## Acceptance checklist
+## Historical acceptance checklist (not current routing policy)
+
+These entries record older validation runs, including retired model preferences and review lanes. They do not override the current update above or the live Skill. Historical model names remain as evidence, not available execution candidates.
 
 - [x] A compatible healthy task is reused rather than duplicated.
 - [x] A silent or abnormal nonterminal task cannot gain a second owner for overlapping scope or the same checkout.

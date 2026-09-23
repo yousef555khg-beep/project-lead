@@ -1,31 +1,45 @@
-# Model roles and migration
+# Task-based, cost-aware model routing
 
-Read for the first model decision, then reuse within this turn; refresh after a route rejection or a changed tool catalog. Resolve combinations from the current target host's dispatch schema, not an old transcript or a guessed product name. `gpt-6-astra` is the Astra ID. Do not synthesize a 5.6-family Astra alias, rename Terra/Luna, or assume that API efforts and desktop modes are identical. If the catalog is unavailable, keep only a route already verified and authorized on this surface; otherwise report `blocked_on_routing` for that scope.
+Read for the first model decision, then reuse within this turn; refresh after a route rejection or a changed tool catalog. Resolve combinations from the current target host's dispatch schema, not an old transcript. If the catalog is unavailable, keep only an already verified and authorized route on this surface; otherwise report the scoped `blocked_on_routing`.
 
-## Roles
+## Exact generations and roles
 
-- Controller: retain the user's selected model and effort. This migration supports Astra controllers without changing global settings or running tasks.
-- Formal implementation: consider `gpt-6-astra` first for substantive implementation, repairs and multi-step work. This is a preference, not a requirement: the controller may choose `gpt-5.6-terra` or eligible `gpt-5.3-codex-spark` directly for better task fit, latency or capacity. Do not force a trial or failure on another model. Preserve explicit user model constraints; Sol remains controller/review-only under existing authorization.
-- Independent review: only for a concrete major/security consequence or an explicit user request. For Astra-authored work, prefer `gpt-5.6-sol` when suitable, exposed and authorized; for other authors, consider Astra. An explicit Astra-only requirement wins. A separate fresh Astra reviewer is also independent: different model names alone neither establish nor guarantee independence. Never let the author certify its own required review. If no capable authorized reviewer is available, report the scoped blocker; do not waive the gate or silently change authorization.
-- Ordinary tasks have no extra Standard/Terra review stage. Select reviewer effort separately from execution. A new model release does not reopen an accepted review or add a review round.
-- Information assistance: `gpt-5.6-luna`, read-only and advisory under the Luna reference. Do not convert existing assistance permission into coding or acceptance authority.
+This policy targets the GPT-6 generation. Family names are not dispatch IDs. Show the complete generation and pass the exact ID in every dispatch; do not silently substitute generations or invent aliases. An ambiguous display name is not runtime verification. Do not synthesize a 5.6-family Astra alias. This table is policy, not a guarantee of host availability.
 
-## Effort and modality
+| Generation and name | Exact model ID | Role under this policy |
+| --- | --- | --- |
+| GPT-6 Sol | `gpt-6-sol` | Preferred candidate for routine development, debugging and interacting requirements; may implement; may independently review when assigned separately |
+| GPT-6 Luna | `gpt-6-luna` | Formal implementation of clear bounded edits, tests, straightforward fixes and document work with reliable checks |
+| GPT-6 Astra | `gpt-6-astra` | Direct choice for difficult diagnosis, unresolved architecture or consequential reasoning where extra depth is worthwhile; may implement or independently review |
+| GPT-5.6 Sol (legacy) | `gpt-5.6-sol` | Controller/review-only under retained legacy policy; this restriction does not apply to GPT-6 Sol |
+| GPT-5.6 Luna (legacy) | `gpt-5.6-luna` | Read-only assistance in every role; this restriction does not apply to an authorized GPT-6 Luna executor |
 
-These examples calibrate judgment; they are not an exhaustive effort allowlist or a mandatory floor. Choose any supported level justified by the actual task, including low or medium. Never copy the controller's effort or promote a whole project after one difficult task.
+Retain the user's controller model and effort; do not change global settings or active turns. New execution and capacity-recovery candidates are limited to supported, authorized GPT-6 Sol, GPT-6 Luna and GPT-6 Astra routes; do not restore older execution models from historical instructions or transcripts. For new executor work, prefer GPT-6 Sol or GPT-6 Luna when adequate. This is a preference, not a requirement: select from uncertainty, coupling, consequences, verification strength, modality, capacity and total delivery cost. Explicit user model constraints win. No compulsory model ladder or trial failure. Choose GPT-6 Astra directly when the task merits it; a security label alone is not enough. A capacity error is not proof of weak reasoning.
 
-- Spark `high`: exact reversible scope, one path, deterministic checks. Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk; Low-risk alone is insufficient. Spark is text-only: if the next task must inspect images, screenshots, visual UI state, or use image-dependent computer tools, choose a model with those capabilities, normally Terra. Higher Spark effort cannot supply a missing modality.
-- Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks. Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints. Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files.
-- Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions. Simpler extraction may use a lower supported effort.
-- Astra execution/review: low may fit a well-scoped task with clear checks; medium/high may fit additional planning and analysis; xhigh needs unresolved interacting risks. No level is a default or compulsory starting point. `max` needs a named single-problem depth requirement beyond the lower effort. Sol review effort follows the same task-based principle. These are judgments, not guaranteed performance equivalences between models.
-- `ultra` is a desktop parallel-work mode, not an API reasoning-effort assumption. Use it only when the dispatch interface exposes it and the task has actual independent work suitable for permitted helpers. It never replaces required visible owners, independent review, or serial access to shared files.
+Only concrete material/security consequences or explicit user requests require independent review. Use a separate authorized GPT-6 Sol or GPT-6 Astra reviewer with task-selected effort. An explicit Astra-only requirement wins. Different model names neither establish nor guarantee independence; an author never certifies its own required review. GPT-6 Sol may implement important work with sufficient checks and the required review. Ordinary tasks have no extra review stage, and a model release does not reopen accepted reviews. If no capable authorized reviewer is available, report the scoped blocker rather than waiving the gate.
 
-Apply the core's no-extra-call risk check to execution, review, and assistance. Missing evidence calls for a bounded read, not an automatic effort increase. Reassess the next turn after a scope reduction. Keep child speed Standard/default; Astra migration grants no Fast permission.
+GPT-6 Luna is an execution candidate, not this skill's read-only information assistant. Reserve that legacy helper role for `gpt-5.6-luna`; if unavailable, omit the optional helper instead of assigning GPT-6 Luna to it. Assign implementation an explicit owned scope. All models obey user-requested read-only task boundaries; coding capability never authorizes unrequested changes. No executor accepts its own work. Do not infer authority from the bare word Luna.
 
-File count, long context, labels such as architecture or security, and a prior failure do not alone justify `xhigh`, `max`, or `ultra`. When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists.
+## Effort: choose, do not inherit
 
-## Evidence for this migration
+These examples calibrate judgment; they are not an exhaustive effort allowlist or a mandatory floor. Select model and effort together for the next concrete task using supported combinations, not the parent's settings.
 
-The Astra-first preference is provisional local operating policy, informed by a small real-task sample, not a universal benchmark or quota-saving claim. Assess normal completed work by total delivery time, confirmed defects, and execution plus repair/review usage. Separate input, cached input and output tokens when available; fewer tokens do not establish lower subscription usage. Keep unavailable usage unknown. Do not run duplicate tasks or add reviews just to collect samples; a ten-task checkpoint is a review point, not proof that safety review can be removed.
+| Task characteristics | Effort to consider, not a fixed default |
+| --- | --- |
+| Explicit contract, bounded change, deterministic checks | low may suffice on GPT-6 Luna or GPT-6 Sol; GPT-6 Astra low is possible when specifically justified |
+| Interacting conditions, several plausible causes, planning or less obvious edge cases | medium may be worthwhile; inspect missing evidence rather than automatically escalating |
+| Difficult unresolved reasoning with material consequences or weak verification | high or above only where the task-specific benefit warrants the cost |
 
-Checked 2026-09-06: [OpenAI model selection](https://learn.chatgpt.com/docs/models) identifies Astra, Terra, Luna, and text-only Spark and distinguishes Max from Ultra. [Astra API model details](https://developers.openai.com/api/docs/models/gpt-6-astra) list `low`, `medium`, `high`, `xhigh`, and `max`. The local Codex dispatch schema additionally exposes Astra `ultra`. Host availability remains authoritative for a dispatch; these sources do not prove any account-specific quota saving.
+Before xhigh/max/ultra, apply the core's single silent lower-effort risk check: no extra agent, audit or comparison run. File count, long context, labels such as architecture or security, and a prior failure do not alone justify `xhigh`, `max`, or `ultra`. Higher effort does not guarantee correctness; lower effort does not guarantee lower total usage. When causes or scope narrow, re-evaluate and downgrade the next follow-up when the higher-effort risk no longer exists.
+
+If a focused check fails, first distinguish an implementation mistake from missing requirements, environment/tool failure or a genuine reasoning gap. Reuse the owner for bounded repair where appropriate; reselect model/effort when justified, preserving review limits and one owner. Do not repeatedly retry a cheaper model solely to avoid upgrading. Once accepted, do not rerun work on a stronger model for reassurance.
+
+Verify required tool/modality support for every model. Interpret max/ultra through the live interface description; do not infer parallelism or helper authorization from the name. Child speed remains Standard/default without objective-specific user Fast authorization.
+
+## Evidence and cost limits
+
+Local September 2026 tests used three small synthetic coding tasks, once per model/effort. GPT-6 Sol, GPT-6 Luna and GPT-6 Astra at low/medium/high each passed the original 36 checks. An extra in-flight tenant-reassignment probe was missed by GPT-6 Sol low and GPT-6 Luna low/medium/high; GPT-6 Sol medium/high and GPT-6 Astra passed. This was an exploratory boundary not explicit in the original contract, not a general security ranking. It supports focused consequential-boundary tests, not review on every task or a ban on GPT-6 Luna coding.
+
+Compare total delivery time and verified outcome, plus execution, repair and necessary review usage. Separate noncached input, cached input and output; reasoning tokens may already be included in output. Public API/credit rates are not included subscription quota percentages. Cache and context overhead varied between runs; do not encode a fixed price ratio, guaranteed savings or universal effort optimum. Verify current prices only when needed for a cost claim, not on every dispatch. Keep missing usage unknown.
+
+Learn from ordinary completed work without duplicate implementations, routine reviewers or new benchmark calls. A visible failure or repeated expensive rework can change the next route; one successful toy test cannot establish production readiness.

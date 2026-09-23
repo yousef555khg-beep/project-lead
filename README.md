@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-A Codex project-control skill: Astra-first but task-selected execution, transparent pre-dispatch tables, optional same-project task communication, and independent review only for material or security risk. Before dispatch, see the task, model, reasoning effort, speed and selection reason—without another approval step. The controller keeps ownership visible, selects useful supporting skills, and verifies usable results without routine review loops.
+A Codex project-control skill: cost-aware GPT-6 Sol/GPT-6 Luna execution, GPT-6 Astra when task depth warrants it, transparent pre-dispatch tables, optional peer communication, and independent review only for material or security risk. See the full model generation, effort, speed and task-specific reason before dispatch—without another approval step. The controller keeps ownership visible and verifies usable results without routine review loops.
 
 ## Project Lead 1.0
 
@@ -18,10 +18,10 @@ Project Lead is a decision and coordination skill, not a replacement for missing
 | --- | --- |
 | Visible ownership | Implementation, review, and long validation run in titled sidebar-visible tasks; Project Lead reuses one executor for the same objective. |
 | Approval boundary | The controller approves normal in-scope work itself and asks only for a real authority or product-policy decision. |
-| Objective-local routing | Astra is preferred, not mandatory for substantive execution; Terra/Spark remain direct choices. Effort is chosen per task, never inherited. |
+| Objective-local routing | Prefer GPT-6 Sol/GPT-6 Luna when adequate; choose GPT-6 Astra directly when justified. Model and effort are task-selected, never compulsory or inherited. |
 | Transparent dispatch | Before each dispatch or substantive follow-up, a table shows the task, task title, model, effort, speed and reason; it informs rather than asks permission. |
 | Scoped peer communication | Same-project tasks may clarify real dependencies when messaging tools are available, without changing each other's scope, model or acceptance. |
-| Capacity recovery | A terminal Spark quota or capacity failure hands the remaining objective once to Terra, with fresh effort selection and no model bounce. |
+| Capacity recovery | After any model quota or capacity failure, make the old attempt terminal and reconcile its work, then choose at most one supported, authorized fallback suited to the remaining work; select effort afresh and never bounce between models. |
 | Risk-proportionate review | Ordinary work has no extra review stage. Material/security consequences trigger one bounded independent review workflow. |
 | Capability discovery | One installed supporting skill may be selected automatically; missing skills are only searched and recommended until the user approves installation. |
 | Completion reliability | `wait_threads` relays terminal events while the client provides it; unavailable event waiting degrades honestly instead of pretending to monitor in the background. |
@@ -66,27 +66,29 @@ For real dependencies, the controller passes verified same-project peer IDs, own
 
 ## Automatic execution-model routing
 
-Astra's exact model ID is **`gpt-6-astra`**. This update preserves the tiered workflow instead of moving every child to the flagship. Existing project routing authorization survives the migration; neither controller effort nor Fast settings flow to child tasks.
+This policy targets **GPT-6 Sol (`gpt-6-sol`), GPT-6 Luna (`gpt-6-luna`), and GPT-6 Astra (`gpt-6-astra`)**. Full generation-specific IDs are required in routing and dispatch notices; bare Sol/Luna names do not establish which generation is running. Existing explicit project constraints survive the migration; controller effort and Fast settings never flow to children.
 
 | Role | Model policy |
 | --- | --- |
-| Controller | User-selected model and effort; Astra is supported. |
-| Necessary independent reviewer | A separate authorized Astra or Sol; prefer suitable Sol for Astra-authored work. Explicit user model constraints win. |
-| Implementation | Astra preferred for substantive work; Terra or eligible text-only Spark when better suited. No compulsory model trial or fixed effort. |
-| Ordinary work | Executor checks and controller acceptance; no Standard/Terra reviewer stage. |
-| Read-only information helper | Luna, with no implementation or acceptance authority. |
+| Controller | Preserve the user's selected model and effort. |
+| Necessary independent reviewer | Separate authorized GPT-6 Sol or GPT-6 Astra; independence is about authorship and evidence, not different model names. |
+| Routine implementation | GPT-6 Luna for clear bounded development; GPT-6 Sol for routine features, debugging and interacting requirements. Both may write code and tests. |
+| Difficult implementation | GPT-6 Astra may be selected directly for justified depth, architecture or consequential reasoning; no forced cheaper-model failure first. |
+| Legacy generations | GPT-5.6 Luna (`gpt-5.6-luna`) stays read-only; GPT-5.6 Sol (`gpt-5.6-sol`) stays controller/review-only. These restrictions do not apply to GPT-6 execution. |
+| Ordinary work | Executor checks and controller acceptance; no routine independent reviewer stage. |
+| Legacy read-only information helper | GPT-5.6 Luna (`gpt-5.6-luna`) only. GPT-6 Luna is an execution candidate, not assigned this helper role. |
 
-Read the current target host's model and effort options before selection; do not manufacture aliases or assume API and desktop mode names are interchangeable. [Model-routing details and official sources](skills/project-lead/references/model-routing.md).
+Read the current target host's model and effort options before selection; do not invent aliases, silently substitute generations, or mistake a selected route for runtime verification. [Full model policy and evidence limits](skills/project-lead/references/model-routing.md).
 
 The user authorizes automatic routing once per project. For every new objective, Project Lead chooses both the model and reasoning effort from the current bounded child objective: its actions, uncertainty, coupling, consequences, checks, and combinations exposed by the dispatch tool. It never inherits the previous objective's route and never inherits effort from the parent project, review lane, or previous task.
 
-- Spark high handles an exact reversible path with deterministic checks. Spark xhigh additionally requires a named hard local reasoning risk; Low-risk classification alone is not enough. Spark is text-only; screenshot interpretation and image-dependent UI work go to a capable executor, normally Terra.
-- Terra high handles one coherent implementation, debugging, or design problem with known contracts and checks. Terra xhigh requires multiple plausible causes or designs, or inseparable interacting constraints. Terra Ultra requires one objective that actually runs large independent workstreams with no shared mutable files.
-- Luna defaults to medium for read-only extraction, may use high for dense multi-source evidence, and uses xhigh only for difficult contradictions. Its authority stays read-only at every effort.
+- Consider low for clear bounded tasks with deterministic checks, and medium when interacting conditions or less obvious edge cases warrant it. These are candidates, not mandatory starting levels.
+- Use supported higher efforts only for task-specific reasoning needs. Inspect missing evidence and diagnose tool/environment failures before escalating. More effort does not guarantee correctness or lower total cost.
+- GPT-6 Luna may implement simple tasks. Only GPT-5.6 Luna retains the model-level read-only restriction. Every model still obeys explicit user task boundaries.
 - Independent review is reserved for concrete major/security consequences or an explicit user request. Changing the execution model does not add a review or reopen an accepted verdict.
-- Astra is preferred, not mandatory. The controller retains judgment and may choose Terra or Spark directly, without first trying Astra. Sol remains reserved for control and independent review.
+- Execution candidates are limited to GPT-6 Sol, GPT-6 Luna and GPT-6 Astra when already authorized and supported by the current tool catalog. GPT-6 Sol/GPT-6 Luna are preferred when adequate, not compulsory; GPT-6 Astra can be chosen directly when the task warrants it. No model or effort is a fixed default.
 
-These effort examples are not mandatory floors. Low and medium are eligible when supported and sufficient. Reviewer effort is chosen separately; an Elevated label never forces xhigh. Max gives a single hard problem more reasoning, while desktop Ultra uses permitted parallel helpers and is not automatically a valid API effort.
+These effort examples are not mandatory floors. Reviewer effort is chosen separately; an Elevated label never forces xhigh. Interpret max/ultra through the actual interface; neither name grants parallel-helper authority. Local three-task tests support trying GPT-6 Sol/GPT-6 Luna for routine work, not universal rankings: an extra tenant-switch boundary was missed by some routes. Public API/credit rates are not subscription quota percentages; fewer tokens or lower effort do not guarantee a cheaper completed task. Do not add duplicate runs or routine reviewers to measure savings.
 
 Before xhigh, Max, or Ultra, Project Lead performs one silent controller judgment: it names a concrete failure risk at the next lower effort. This uses no tool call, extra task, Luna call, or parallel model comparison. File count, long context, architecture/security labels, and prior failure are not enough; when the cause or scope narrows, the next follow-up is downgraded unless the higher-effort risk remains.
 
@@ -94,11 +96,11 @@ Project Lead announces the task, model, effort, and actual speed immediately bef
 
 Formal `create_thread` executor tasks start fresh. Internal helper and reviewer tasks receive no or bounded history; full-history inheritance is never used. If dispatch exposes the resolved route atomically, Project Lead verifies it. Routine accepted dispatches do not create handshake-only tasks when explicit supported model and effort were sent and no mismatch evidence exists; this includes Elevated review. Request acceptance is recorded separately from runtime verification. Concrete mismatches must be resolved before more work; otherwise report `blocked_on_routing`. A model's self-report cannot verify the route.
 
-A follow-up API without route fields cannot switch an existing task in place; after the current turn ends or is interrupted, the logical scope is handed to one correctly routed task without overlapping owners. A Spark-to-Terra fallback waits only for the active Spark turn on the same objective or logical scope; independent scopes may continue in parallel.
+A follow-up API without route fields cannot switch an existing task in place; after the current turn ends or is interrupted, the logical scope is handed to one correctly routed task without overlapping owners. A capacity fallback waits only for the failed attempt on the same objective or logical scope to become terminal; independent scopes may continue in parallel.
 
 When an existing task is idle and `send_message_to_thread` supports `model` and `thinking`, explicitly pass both for the next turn and reuse it. This applies to executor and Luna effort changes. Never change an active turn's route or create a replacement solely because an idle task needs a supported route change.
 
-If a Spark attempt hits a usage, quota, or capacity limit, Project Lead first makes that attempt terminal, reconciles any partial work in the live worktree, and redispatches the remaining objective once to Terra without asking. Terra effort is selected from the remaining work instead of inherited from Spark. This objective-local fallback does not become the project default and will not bounce back to Spark during the same objective. If Terra also hits model capacity, Project Lead reports `blocked_on_capacity` instead of bouncing between models.
+If any model attempt hits a usage, quota, or capacity limit, Project Lead first makes that attempt terminal and reconciles completed and partial work in the live worktree. It then selects one temporary fallback from models currently supported by the tool, already authorized, and suitable for the remaining work and role. Execution fallbacks are also limited to GPT-6 Sol, GPT-6 Luna and GPT-6 Astra, following the same task-based preferences. Select the new model's effort from the remaining work; do not inherit or automatically raise it. This fallback applies only to the current objective and does not become the project default. If no suitable candidate exists or the fallback also hits a quota or capacity limit, report `blocked_on_capacity`; do not bounce between models.
 
 ## Child tasks use Standard speed by default
 
@@ -108,11 +110,11 @@ When the dispatch API has no speed field, Project Lead omits any Fast/priority o
 
 Without service-tier readback, the notice says `平台默认（未回读）` (platform default, not read back); it does not claim the actual service tier has been verified.
 
-## Luna as a read-only information assistant
+## GPT-5.6 Luna as a read-only information assistant
 
-When large or repetitive evidence would materially expand controller context or cost, Project Lead keeps one logical project-scoped `gpt-5.6-luna` assistant scope, normally at medium. An idle helper receives a new effort through supported explicit route fields; replacement is only needed when the interface or context boundary requires it. Luna summarizes long task reports, logs, and test output; extracts progress, blockers, approvals, and terminal state; deduplicates repeated status; and drafts the plain-language update.
+When large or repetitive evidence would materially expand controller context or cost, Project Lead may use one project-scoped `gpt-5.6-luna` read-only helper. If unavailable, omit this optional helper; do not substitute GPT-6 Luna. Effort is task-selected, not fixed medium. The helper summarizes source-bound reports and evidence; it is not invoked for routine updates.
 
-Luna is not used for a few lines or routine updates. Its result remains advisory and source-bound, so the controller verifies primary evidence before acting. Luna never writes code, selects models, reviews, accepts, or marks work complete, and it never replaces required verification.
+In this role it cannot write code, route, review or accept. GPT-6 Luna handles execution, including simple coding tasks, within the user's authorized scope. Final acceptance remains with the controller.
 
 ## Event-driven completion relay
 
@@ -138,7 +140,7 @@ No lane repeats the same incremental review loop after two returns. Necessary re
 5. Run only the checks required by the changed surface and repository policy.
 6. Report progress in plain language.
 
-Delegated Low-risk work may use Spark only when every allowlist condition is proven; substantive project work, non-obvious debugging, and long validation stay in executor tasks.
+Substantive project work, non-obvious debugging, and long validation stay in executor tasks.
 
 Missing information does not automatically create a system-architecture phase or a user question. The controller first inspects or delegates evidence collection; it asks only for a user-exclusive product fact or authority. System architecture is reserved for a real cross-client or cross-service boundary with an unresolved shared contract or material rework risk.
 
@@ -205,6 +207,7 @@ Use project-lead to govern this project.
 
 - [Sanitized use cases](docs/USE-CASES.md)
 - [Behavior validation](docs/VALIDATION.md)
+- [GPT-6 generation-specific routing validation](docs/gpt6-routing-validation-20260923.md)
 - [Changelog](CHANGELOG.md)
 - [Contributing guide](CONTRIBUTING.md)
 - [Code of Conduct](.github/CODE_OF_CONDUCT.md)

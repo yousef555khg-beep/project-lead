@@ -4,23 +4,30 @@ All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
+### GPT-6 task-fit routing (2026-09-23)
+
+- Routine execution now prefers adequate GPT-6 Sol (`gpt-6-sol`) or GPT-6 Luna (`gpt-6-luna`), with GPT-6 Astra (`gpt-6-astra`) chosen directly for justified depth or risk. No fixed model, effort floor or mandatory trial ladder.
+- Full generation IDs are required. GPT-5.6 Luna remains read-only and GPT-5.6 Sol remains controller/review-only; those legacy restrictions no longer block GPT-6 implementation. The optional information-helper role is exclusively GPT-5.6 Luna; GPT-6 Luna is an execution candidate, not assigned that role.
+- Added low/medium task-fit guidance and small-sample/cost caveats; no subscription savings guarantee, duplicate benchmark work or routine review gate. Updated bilingual descriptions and regression checks.
+- Removed Spark and GPT-5.6 Terra from active execution and recovery policy. New execution uses only supported, authorized GPT-6 Sol/Luna/Astra candidates. Model-capacity recovery now reselects once for the remaining objective, preserves unique ownership and partial work, and stops on a shared limit, missing eligible alternate or second capacity failure. Historical release records are unchanged.
+
 ### Added
 
 - Pre-dispatch notices now render as a concise Markdown table with task, task title, model, reasoning effort, speed and a task-specific reason. Batched dispatches may share one table; notices never add approval waits.
 
 - Optional direct peer clarification for same-project tasks, passed explicitly in dispatch briefs with ownership, model-control, privacy, loop and wake-cost limits.
 
-- Astra-aware roles using the verified `gpt-6-astra` ID and current host capabilities. The user's selected controller remains intact; Astra is preferred but not mandatory for substantive execution, while Terra/Spark remain direct choices and Luna remains read-only.
-- A conditional model-routing reference distinguishes desktop Ultra from API efforts, allows justified lower efforts, rejects image-dependent Spark tasks, and permits a separate authorized Sol reviewer for Astra-authored high-risk work.
+- Generation-aware roles using exact IDs and current host capabilities. The user's selected controller remains intact; GPT-6 Sol/GPT-6 Luna are routine execution candidates, GPT-6 Astra is task-selected, and legacy permissions are kept separate.
+- A conditional model-routing reference distinguishes desktop Ultra from API efforts, allows justified lower efforts, checks tool/modality support, and permits a separate authorized Sol reviewer for Astra-authored high-risk work.
 - Controller conversations now follow the same 80,000-token soft and 100,000-token/5 MB hard rollover limits as executor and reviewer tasks, without restarting active executors.
 - Empty/null completion relays now recover the original terminal record once and report `blocked_on_relay` when unavailable; they no longer trigger execution or review reruns by themselves.
-- Conditional Spark-capacity, Luna-assistance, and context-handoff details now live in focused references loaded only when their trigger occurs.
+- Conditional model-capacity, Luna-assistance, and context-handoff details now live in focused references loaded only when their trigger occurs.
 
 ### Changed
 
 - Removed the routine Standard/Terra review lane. Independent review now requires a concrete material/security consequence or an explicit user request; ordinary work retains executor checks and controller acceptance.
 - The 30-minute stale checkpoint cannot override cursor-bound event waiting or cause timeout polling; it runs only at an event/user-resumed checkpoint.
-- Astra-first is a task-fit preference, not a forced model or fixed effort. Another model can be selected directly without an Astra trial or a failed Terra attempt. No automatic running-task changes or additional comparison runs.
+- GPT-6 Sol/GPT-6 Luna preference replaces Astra-first routing without forcing any model or effort. No automatic running-task changes or additional comparison runs.
 
 - Required reviewer effort is selected from the actual task instead of fixed Terra high / Sol xhigh. Model migration does not reopen accepted reviews or grant Fast permission.
 - Idle tasks may receive the next model and effort through explicit supported transport fields; Luna effort changes no longer force a replacement task. Active turns are never rerouted in place.

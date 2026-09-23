@@ -175,14 +175,13 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("Pass supported fields explicitly", routing)
         self.assertIn("A completed objective authorizes nothing for the next", routing)
 
-    def test_spark_effort_is_calibrated_from_the_current_child_task(self) -> None:
+    def test_model_effort_is_calibrated_from_the_current_child_task(self) -> None:
         routing = self.routing
         for phrase in (
-            "Spark `high`: exact reversible scope, one path, deterministic checks",
-            "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
-            "Low-risk alone is insufficient",
+            "Verify required tool/modality support for every model",
+            "Select model and effort together for the next concrete task",
             "For executors: ignore parent complexity, review lane, prior route and effort",
-            "If Spark is unavailable or ineligible, reselect from the same evidence",
+            "If a route is unavailable or ineligible, reselect from the same evidence",
         ):
             self.assertIn(phrase, routing)
 
@@ -194,39 +193,42 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("never overlap owners", routing)
         self.assertIn("never use `all` or omitted full-history inheritance", routing)
 
-    def test_unavailable_spark_capacity_falls_back_explicitly_to_terra(self) -> None:
+    def test_capacity_recovery_preserves_scope_local_single_owner(self) -> None:
         routing = self.routing
-        self.assertIn("If Spark is unavailable or ineligible, reselect from the same evidence", routing)
-        self.assertIn("Never start Terra fallback in the same logical scope while Spark is active", routing)
+        self.assertIn("If a route is unavailable or ineligible, reselect from the same evidence", routing)
+        self.assertIn("Never start fallback in the same logical scope while its previous attempt is active", routing)
         self.assertIn("Independent scopes may continue in parallel", routing)
         self.assertIn("wait for rejection, interruption, or terminal state", routing)
 
-    def test_spark_usage_limit_uses_one_temporary_terra_successor(self) -> None:
+    def test_usage_limit_uses_one_task_fit_authorized_alternate(self) -> None:
         routing = self.routing
         self.assertIn("references/model-capacity-fallback.md", routing)
         fallback = CAPACITY_REFERENCE.read_text(encoding="utf-8")
         for phrase in (
             "terminal capacity failure, not `blocked_on_user`",
-            "If Spark still appears active, interrupt it and wait for terminal state",
+            "If the failed attempt still appears active, interrupt it and wait for terminal state",
             "Reconcile partial work and the exact live worktree before handoff",
-            "Redispatch the same remaining objective once to Terra without asking",
-            "Select Terra effort from the remaining work; never inherit Spark effort or escalate merely because fallback occurred",
+            "current tool-supported, already authorized routes",
+            "If no eligible alternate exists or a shared limit excludes all candidates",
+            "Redispatch the same remaining objective once to the selected alternate without asking for already-held authority",
+            "Select effort from the remaining work; never inherit the failed route's effort or escalate merely because fallback occurred",
             "Keep the fallback objective-local",
-            "Do not switch back to Spark during that objective",
-            "If Terra also hits model capacity, report `blocked_on_capacity`; never bounce between models",
+            "record its use in the existing objective ledger",
+            "Do not switch back to the failed route during that objective",
+            "If that one alternate also hits model capacity, report `blocked_on_capacity`; never bounce between models",
         ):
             self.assertIn(phrase, fallback)
 
     def test_execution_and_review_model_choices_are_independent(self) -> None:
         routing = self.routing
         self.assertIn("Execution-model routing never changes the review lane", routing)
-        self.assertIn("Spark never reviews itself", routing)
+        self.assertIn("authors never independently review themselves", routing)
 
-    def test_astra_is_preferred_not_compulsory_for_execution(self) -> None:
-        for phrase in ("Prefer Astra for substantive implementation",
-                       "Choose Terra or eligible Spark directly when better suited",
-                       "Do not require a failed Terra attempt first",
-                       "Sol remains reserved for controller work and independent review"):
+    def test_gpt6_execution_preferences_are_not_compulsory(self) -> None:
+        for phrase in ("Prefer GPT-6 Sol or Luna for routine execution when adequate",
+                       "choose Astra directly for task-specific depth or risk",
+                       "No compulsory model ladder or trial failure",
+                       "`gpt-6-sol` and `gpt-6-luna` may implement authorized owned scopes"):
             self.assertIn(phrase, self.routing)
 
     def test_controller_selects_a_supported_reasoning_effort_per_dispatch(self) -> None:
@@ -236,12 +238,9 @@ class ProjectLeadModeTests(unittest.TestCase):
             "route only from current child actions, uncertainty, coupling, consequences, and checks",
             "For executors: ignore parent complexity, review lane, prior route and effort",
             "No blanket effort default",
-            "Spark `high`: exact reversible scope, one path, deterministic checks",
-            "Spark `xhigh`: the same bounded scope plus a named hard local reasoning risk",
-            "Terra `high`: one coherent implementation, debugging, or design problem with known contracts and checks",
-            "Terra `xhigh`: multiple plausible causes or designs, or inseparable interacting constraints",
-            "Terra `ultra`: one objective actually runs large independent workstreams with no shared mutable files",
-            "Luna uses `medium` for ordinary evidence extraction, `high` for dense multi-source evidence, and `xhigh` only for hard contradictions",
+            "Verify required tool/modality support for every model",
+            "lower effort does not guarantee lower total usage",
+            "Public API/credit rates are not included subscription quota percentages",
             "uncertainty alone never selects `xhigh`",
             "Only select combinations exposed by the dispatch tool; never invent a model or effort",
         ):
@@ -308,7 +307,7 @@ class ProjectLeadModeTests(unittest.TestCase):
         self.assertIn("references/luna-information-assistance.md", monitoring)
         luna = LUNA_REFERENCE.read_text(encoding="utf-8")
         for phrase in (
-            "`gpt-5.6-luna medium`",
+            "`gpt-5.6-luna`",
             "one project-scoped read-only Luna assistant scope",
             "summarize reports, logs, and tests",
             "extract progress, evidence, blockers, approvals, and terminal state",
@@ -389,17 +388,19 @@ class ProjectLeadModeTests(unittest.TestCase):
     def test_public_docs_explain_the_luna_information_assistant(self) -> None:
         readme_en = README_EN.read_text(encoding="utf-8")
         for phrase in (
-            "## Luna as a read-only information assistant",
+            "## GPT-5.6 Luna as a read-only information assistant",
             "large or repetitive evidence",
-            "never writes code, selects models, reviews, accepts, or marks work complete",
+            "In this role it cannot write code, route, review or accept",
+            "GPT-6 Luna handles execution",
         ):
             self.assertIn(phrase, readme_en)
 
         readme_zh = README_ZH.read_text(encoding="utf-8")
         for phrase in (
-            "## Luna 只读信息助理",
-            "大量或重复的证据",
-            "不会写代码、选择模型、审查、验收或宣布完成",
+            "## GPT-5.6 Luna 只读信息助理",
+            "大量或重复证据",
+            "不能写代码、调度、审查或验收",
+            "GPT-6 Luna 用于执行",
         ):
             self.assertIn(phrase, readme_zh)
 
@@ -433,7 +434,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "fresh titled, user-visible successor",
             "compact handoff",
             "never overlaps mutable ownership",
-            "Astra is preferred, not mandatory",
+            "GPT-6 Sol/GPT-6 Luna are preferred when adequate, not compulsory",
         ):
             self.assertIn(phrase, readme_en)
 
@@ -447,7 +448,7 @@ class ProjectLeadModeTests(unittest.TestCase):
             "新的有标题、侧边栏可见任务",
             "精简交接包",
             "不会产生两个并发修改负责人",
-            "Astra 优先，但不是强制",
+            "够用时优先 GPT-6 Sol/GPT-6 Luna，但不是硬性规定",
         ):
             self.assertIn(phrase, readme_zh)
 
@@ -508,9 +509,9 @@ class ProjectLeadModeTests(unittest.TestCase):
             "`blocked_on_routing`",
             "independent scopes may continue in parallel",
             "hits a usage, quota, or capacity limit",
-            "redispatches the remaining objective once to Terra without asking",
+            "selects one temporary fallback",
             "does not become the project default",
-            "will not bounce back to Spark",
+            "do not bounce between models",
             "`blocked_on_capacity`",
         ):
             self.assertIn(phrase, readme_en)
@@ -533,9 +534,9 @@ class ProjectLeadModeTests(unittest.TestCase):
             "`blocked_on_routing`",
             "无关范围仍可并行推进",
             "用量、额度或容量限制",
-            "不再询问用户",
-            "不会把 Terra 变成项目默认模型",
-            "不会在当前目标中切回 Spark",
+            "选择一次临时回退",
+            "不成为项目默认模型",
+            "不在模型之间来回跳",
             "`blocked_on_capacity`",
         ):
             self.assertIn(phrase, readme_zh)

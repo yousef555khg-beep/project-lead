@@ -37,13 +37,13 @@ Before every new objective, dispatch, or substantive follow-up, route only from 
 
 Read [references/model-routing.md](references/model-routing.md) for model selection. Preserve the user's controller settings; never propagate them to children.
 
-Prefer Astra for substantive implementation and multi-step repair, not every task. Choose Terra or eligible Spark directly when better suited. Do not require a failed Terra attempt first, or an Astra trial before another model. Select effort per task. Sol remains reserved for controller work and independent review.
+Prefer GPT-6 Sol or Luna for routine execution when adequate; choose Astra directly for task-specific depth or risk. No compulsory model ladder or trial failure. `gpt-5.6-luna` remains read-only; `gpt-5.6-sol` remains controller/review-only. `gpt-6-sol` and `gpt-6-luna` may implement authorized owned scopes. Use exact generation IDs, never ambiguous family names.
 
 Inspect minimum missing evidence; uncertainty alone never selects `xhigh`. Before `xhigh`, `max`, or `ultra`, silently name one concrete failure risk at the next lower supported effort. This is one controller judgment: no tool, task, Luna, or parallel model comparison. Without a task-specific risk, reselect from current evidence.
 
-Only select combinations exposed by the dispatch tool; never invent a model or effort. If Spark is unavailable or ineligible, reselect from the same evidence. Never start Terra fallback in the same logical scope while Spark is active; wait for rejection, interruption, or terminal state. Independent scopes may continue in parallel.
+Only select combinations exposed by the dispatch tool; never invent a model or effort. If a route is unavailable or ineligible, reselect from the same evidence. Never start fallback in the same logical scope while its previous attempt is active; wait for rejection, interruption, or terminal state. Independent scopes may continue in parallel.
 
-On Spark usage-limit, quota, or capacity failure, read [references/model-capacity-fallback.md](references/model-capacity-fallback.md) and follow its one-way, objective-local recovery.
+On model quota/capacity failure, read [references/model-capacity-fallback.md](references/model-capacity-fallback.md) for one bounded, objective-local recovery.
 
 Formal `create_thread` tasks start fresh. Internal helper creation uses `fork_turns: none` or a bounded positive turn count; never use `all` or omitted full-history inheritance. Any independent reviewer also uses no or bounded history even when its route matches the controller.
 
@@ -53,7 +53,7 @@ A follow-up without model and effort fields cannot switch them. For an idle task
 
 Immediately before every creation or substantive follow-up, tell the user using the rendered [dispatch table](references/dispatch-notice.md).
 
-Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. On changed routing, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane; Spark never reviews itself.
+Replace `普通` with `Fast` only for an exact objective already authorized below. This notice is informational, never an approval gate; dispatch immediately without waiting for a reply. On changed routing, issue a corrected notice before redispatch. A completed objective authorizes nothing for the next. Execution-model routing never changes the review lane; authors never independently review themselves.
 
 ## Speed tier
 
@@ -112,8 +112,8 @@ At a hard trigger, create one fresh titled user-visible successor with `create_t
 - A timeout is not a state change; reuse the returned cursor. On timeout, do not read tasks, call Luna, or report unchanged status.
 - When a target completes or needs attention, relay it in commentary and keep waiting for the rest. End the turn only when all promised targets are terminal, user input is needed, the user stops waiting, or event waiting is unavailable.
 - If event waiting is unavailable, give one concise notice: automatic completion relay is unavailable in this client; the task remains accepted or running. Do not retry `wait_threads`, poll, call Luna, or repeat it that turn. End after reporting; user may later say `继续` or `跟进` for one fresh read. Never imply that an idle controller, the 30-minute rule, or Luna can wake itself.
-- Use one project-scoped read-only Luna assistant only when large or repetitive evidence materially reduces controller context or cost. Read [references/luna-information-assistance.md](references/luna-information-assistance.md) when invoked.
-- Luna remains advisory and cannot mutate, route, review, accept, or mark work complete.
+- Use one project-scoped read-only Luna assistant (`gpt-5.6-luna` only) when large or repetitive evidence materially reduces controller context or cost. Read [references/luna-information-assistance.md](references/luna-information-assistance.md) when invoked.
+- GPT-5.6 Luna remains advisory and cannot mutate, route, review, accept, or mark work complete.
 - After 30 minutes without substantive progress, at an event/user-resumed checkpoint only (never a wait timeout), take one read-only snapshot; if unclear, send one status-only Luna follow-up; never create heartbeat, cron, or polling.
 - `blocked_on_user` and `blocked_on_capability` may coexist.
 
